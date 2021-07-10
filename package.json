@@ -1,36 +1,26 @@
 {
-  "name": "workspace",
-  "version": "0.1.0",
+  "name": "create-react-app-with-styled-components-typescript",
+  "version": "5.0.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "patch-package": "^6.4.7",
-    "postinstall-postinstall": "^2.1.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "tabler-react": "^2.0.0-alpha.1",
-    "typescript": "^4.1.2",
-    "web-vitals": "^1.0.1"
+    "@material-ui/core": "next",
+    "@material-ui/icons": "^5.0.0-beta.0",
+    "@material-ui/lab": "next",
+    "@material-ui/styled-engine-sc": "next",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-scripts": "latest",
+    "styled-components": "latest"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "format": "prettier --write src/**/*.ts{,x}",
-    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
-    "postinstall": "patch-package"
-  },
-  "eslintConfig": {
-    "extends": []
+    "tsc": "./node_modules/.bin/tsc",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject"
   },
   "browserslist": {
     "production": [
@@ -45,8 +35,13 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/styled-components": "latest",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
+    "customize-cra": "latest",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
@@ -54,8 +49,11 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "prettier": "^2.3.2"
+    "prettier": "^2.3.2",
+    "react-app-rewired": "latest",
+    "typescript": "latest"
   }
 }
