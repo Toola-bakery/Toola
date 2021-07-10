@@ -25,7 +25,7 @@ interface Props {
   window?: () => Window;
 }
 
-export default function App(props: Props) {
+export default function App(props: Props): JSX.Element {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
