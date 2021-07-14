@@ -27,10 +27,19 @@ module.exports = {
   },
   rules: {
     "linebreak-style": "off",
+    "consistent-return": "off",
+    "no-param-reassign": [
+      "error",
+      { props: true, ignorePropertyModificationsFor: ["state"] },
+    ],
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-props-no-spreading": "off",
     "react/require-default-props": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "import/prefer-default-export": "off",
+    "import/no-cycle": "off",
+    "react/prop-types": "off",
     "prettier/prettier": [
       "error",
       {
