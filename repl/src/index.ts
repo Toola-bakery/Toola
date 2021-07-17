@@ -1,3 +1,3 @@
-import { startApi } from './express';
+import { startApi } from './websocketServer';
 
 startApi();
