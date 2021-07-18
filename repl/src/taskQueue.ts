@@ -28,10 +28,7 @@ export class TaskQueue {
 				if (this.queueId === queueId) return fn(this.itemId);
 			},
 			reason => {
-				if (reason instanceof TaskCanceledError) {
-					// Avoid unnecessary deep nesting.
-					throw reason;
-				}
+				if (reason instanceof TaskCanceledError) throw reason;
 				throw new TaskCanceledError(reason);
 			},
 		);

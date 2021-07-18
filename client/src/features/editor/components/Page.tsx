@@ -13,7 +13,7 @@ export function Page({ pageId = 'rand' }): JSX.Element {
 	const elements = useMemo(() => {
 		const page = blocks[pageId];
 		if (page.type !== 'page') return [];
-		return page.blocks.map(blockKey => {
+		return page.blocks.map((blockKey) => {
 			if (blocks[blockKey].type === 'text')
 				return <EditableBlock key={blocks[blockKey].id} block={blocks[blockKey] as TextBlockType} />;
 			if (blocks[blockKey].type === 'code')

@@ -21,7 +21,7 @@ export function EditableBlock({ block: { id, html: _html = '', parentId } }: Edi
 	const deleteBlockRef = useRefLatest(deleteBlock);
 	const textRef = useRefLatest(_html);
 
-	const { previous } = useAppSelector(state => selectBlockNeighbors(state, id));
+	const { previous } = useAppSelector((state) => selectBlockNeighbors(state, id));
 	const previousRef = useRefLatest(previous);
 
 	const contentEditable = useRef<HTMLElement>(null);
@@ -30,15 +30,15 @@ export function EditableBlock({ block: { id, html: _html = '', parentId } }: Edi
 	const { open } = useBlockMenu();
 	const openRef = useRefLatest(open);
 
-	const onChangeHandler = useCallback(e => updateBlock({ id, html: e.target.value }), [id, updateBlock]);
+	const onChangeHandler = useCallback((e) => updateBlock({ id, html: e.target.value }), [id, updateBlock]);
 
-	useEventListener(id, event => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
+	useEventListener(id, (event) => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
 
 	const onKeyDownHandler = useCallback<KeyboardEventHandler>(
-		e => {
+		(e) => {
 			if (e.key === CMD_KEY) {
 				if (!contentEditable.current) return;
-				openRef.current(contentEditable.current).then(v => {
+				openRef.current(contentEditable.current).then((v) => {
 					updateBlock({
 						id,
 						language: 'javascript',

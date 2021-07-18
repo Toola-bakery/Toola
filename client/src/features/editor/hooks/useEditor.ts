@@ -53,12 +53,12 @@ export function useEditor(): UseEditorResponse {
 		[blocks, dispatch, send],
 	);
 	const deleteBlock = useCallback<UseEditorResponse['deleteBlock']>(
-		blockId => {
+		(blockId) => {
 			const { parentId } = blocks[blockId];
 			if (!parentId || !blocks[parentId]) return;
 			const parent = blocks[parentId] as PageBlock;
 
-			const newParentBlocks = parent.blocks.filter(id => id !== blockId);
+			const newParentBlocks = parent.blocks.filter((id) => id !== blockId);
 
 			dispatch(deleteBlockAction({ id: blockId }));
 			dispatch(updateBlockAction({ id: parentId, blocks: newParentBlocks }));

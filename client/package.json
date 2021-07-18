@@ -11,6 +11,7 @@
 		"@testing-library/jest-dom": "latest",
 		"@testing-library/react": "latest",
 		"@testing-library/user-event": "latest",
+		"@types/uuid": "^8.3.1",
 		"re-reselect": "^4.0.0",
 		"react": "latest",
 		"react-contenteditable": "^3.3.5",
@@ -19,7 +20,8 @@
 		"react-scripts": "latest",
 		"redux-persist": "^6.0.0",
 		"reselect": "^4.0.0",
-		"styled-components": "latest"
+		"styled-components": "latest",
+		"uuid": "^8.3.2"
 	},
 	"scripts": {
 		"tsc": "./node_modules/.bin/tsc",

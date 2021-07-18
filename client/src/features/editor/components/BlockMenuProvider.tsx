@@ -22,7 +22,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 	const [anchorEl, setAnchorEl] = useState<NonNullable<BlockMenuContextType['anchorEl']>>();
 
 	const open = useCallback<BlockMenuContextType['open']>(
-		_anchorEl => {
+		(_anchorEl) => {
 			setOpen(true);
 			setAnchorEl(_anchorEl);
 			return cleanPromise();
@@ -33,7 +33,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 	const value = useMemo<BlockMenuContextType>(() => ({ isOpen, anchorEl, open }), [isOpen, anchorEl, open]);
 
 	const close = useCallback(
-		result => {
+		(result) => {
 			resolve(result);
 			setOpen(false);
 			setAnchorEl(undefined);

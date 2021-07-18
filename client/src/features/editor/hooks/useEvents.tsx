@@ -9,22 +9,20 @@ export type EventListeners = {
 
 export type EventChannelStorage = Event[];
 
-export type Event = { eventName: string; waitListener?: boolean } & {
-	[key: string]: string | undefined | boolean | never;
-};
+export type Event = { eventName: string; waitListener?: boolean } & unknown;
 
 const events: EventStorage = {};
 const eventListeners: EventListeners = {};
 
 export type UseEventsResponse = {
-	addEventListener: (channel: string, callback: (event: Event) => void) => void;
+	addEventListener: (channel: string, callback: (event: Event) => void) => () => void;
 	deleteEventListener: (channel: string, callback: (event: Event) => void) => void;
 	send: (channel: string, event: Event) => void;
 };
 
 export function useEvents(): UseEventsResponse {
 	const deleteEventListener = useCallback<UseEventsResponse['deleteEventListener']>((channel, callback) => {
-		eventListeners[channel] = eventListeners[channel].filter(cb => cb !== callback);
+		eventListeners[channel] = eventListeners[channel].filter((cb) => cb !== callback);
 	}, []);
 	const addEventListener = useCallback<UseEventsResponse['addEventListener']>(
 		(channel, callback) => {
@@ -45,20 +43,23 @@ export function useEvents(): UseEventsResponse {
 		if (!eventListeners[channel]?.length && event.waitListener) {
 			if (events[channel]) events[channel].push(event);
 			else events[channel] = [event];
-		} else eventListeners[channel]?.map(listener => listener(event));
+		} else eventListeners[channel]?.map((listener) => listener(event));
 	}, []);
 
-	return useMemo<UseEventsResponse>(() => ({ addEventListener, deleteEventListener, send }), [
-		addEventListener,
-		deleteEventListener,
-		send,
-	]);
+	return useMemo<UseEventsResponse>(
+		() => ({ addEventListener, deleteEventListener, send }),
+		[addEventListener, deleteEventListener, send],
+	);
 }
 
-export function useEventListener(id: string, effect: (event: Event) => void, deps: DependencyList) {
+export function useEventListener<U extends Event = Event>(
+	id: string,
+	effect: (event: U) => void,
+	deps: DependencyList,
+) {
 	const { addEventListener, send } = useEvents();
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const cb = useCallback(effect, deps);
+	const cb = useCallback(effect as (event: Event) => void, deps);
 	useEffect(() => addEventListener(id, cb), [addEventListener, cb, id]);
 
 	return { send };

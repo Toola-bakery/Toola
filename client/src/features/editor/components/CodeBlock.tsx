@@ -1,7 +1,9 @@
-import React, { useRef, MutableRefObject, useCallback } from 'react';
+import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
+import { Button } from '@material-ui/core';
 import { useEditor } from '../hooks/useEditor';
 import { useEventListener } from '../hooks/useEvents';
 import { CodeBlockType } from '../types';
+import { useFunctionExecutor } from '../../executor/hooks/useExecutor';
 
 export type CodeBlockProps = {
 	block: CodeBlockType;
@@ -45,9 +47,19 @@ class Editor extends React.Component<EditorProps> {
 export function CodeBlock({ block }: CodeBlockProps): JSX.Element {
 	const { id, source, language } = block;
 	const { updateBlock } = useEditor();
+	const [logs, setLogs] = useState<string[]>([]);
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
-	useEventListener(id, event => event.eventName === 'focus' && editorRef.current?.focus(), []);
+	useEventListener(id, (event) => event.eventName === 'focus' && editorRef.current?.focus(), []);
+
+	const listener = useCallback<Parameters<typeof useFunctionExecutor>[0]>(
+		(data) => {
+			setLogs([...logs, data.data || JSON.stringify(data.result)]);
+		},
+		[logs],
+	);
+
+	const { runCode, lastEvent } = useFunctionExecutor(listener);
 
 	const onEditorReady = useCallback(() => {
 		if (!editorRef.current) return;
@@ -56,5 +68,20 @@ export function CodeBlock({ block }: CodeBlockProps): JSX.Element {
 		});
 	}, [editorRef, id, updateBlock]);
 
-	return <Editor onEditorReady={onEditorReady} source={source} language={language} editorRef={editorRef} />;
+	return (
+		<div>
+			<Editor onEditorReady={onEditorReady} source={source} language={language} editorRef={editorRef} />
+			<Button
+				variant="contained"
+				color="primary"
+				onClick={() => {
+					setLogs([]);
+					runCode(source);
+				}}
+			>
+				Run CODE
+			</Button>
+			<pre>{logs.join('')}</pre>
+		</div>
+	);
 }

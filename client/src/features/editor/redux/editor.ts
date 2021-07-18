@@ -61,7 +61,7 @@ export const selectBlockParent = (state: RootState, blockId: string) => {
 };
 
 export const selectBlockNeighbors = createCachedSelector(
-	state => state,
+	(state) => state,
 	selectBlock,
 	selectBlockParent,
 	(state, block, parent) => {
