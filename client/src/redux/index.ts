@@ -1,20 +1,21 @@
 import {} from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, PersistConfig } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import { editorReducer } from '../features/editor/redux/editor';
-
-const persistConfig = {
-	key: 'root',
-	storage,
-};
 
 const rootReducer = combineReducers({
 	editor: editorReducer,
 });
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(
+	{
+		key: 'root',
+		storage,
+	},
+	rootReducer,
+);
 
 export const store = configureStore({
 	reducer: persistedReducer,

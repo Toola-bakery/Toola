@@ -1,29 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import createCachedSelector from 're-reselect';
+import update from 'immutability-helper';
 import { RootState } from '../../../redux';
 import { Blocks, PageBlock } from '../types';
 
 interface EditorState {
-	blocks: { [id: string]: Blocks };
+	blocksProperties: { [id: string]: Blocks };
+	blocksState: { [id: string]: Blocks };
 }
 
 const initialState: EditorState = {
-	blocks: {
+	blocksProperties: {
 		rand: { id: 'rand', type: 'page', blocks: ['test3'], parentId: null },
 		test: {
 			id: 'test',
 			type: 'code',
-			source: 'test',
+			value: 'test',
 			parentId: 'rand',
 			language: 'javascript',
 		},
 		test3: {
 			id: 'test3',
 			type: 'text',
-			html: 'test',
+			value: 'test',
 			parentId: 'rand',
 		},
 	},
+	blocksState: {},
 };
 
 export const editorSlice = createSlice({
@@ -31,45 +34,78 @@ export const editorSlice = createSlice({
 	initialState,
 	reducers: {
 		addBlock: (state, action: PayloadAction<Blocks>) => {
-			state.blocks[action.payload.id] = action.payload;
+			state.blocksProperties[action.payload.id] = action.payload;
 		},
-		updateBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id'>>) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			state.blocks[action.payload.id] = {
-				...state.blocks[action.payload.id],
-				...action.payload,
-			};
+		updateBlockProps: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id'>>) => {
+			state.blocksProperties[action.payload.id] = update(state.blocksProperties[action.payload.id], {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				$merge: action.payload,
+			});
+		},
+
+		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id'>>) => {
+			state.blocksState[action.payload.id] = update(state.blocksState[action.payload.id] || {}, {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				$merge: action.payload,
+			});
 		},
 		deleteBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id'>>) => {
-			delete state.blocks[action.payload.id];
-		},
-		setBlocks: (state, action: PayloadAction<{ [id: string]: Blocks }>) => {
-			state.blocks = action.payload;
+			delete state.blocksProperties[action.payload.id];
+			delete state.blocksState[action.payload.id];
 		},
 	},
 });
 
-export const { setBlocks, updateBlock, addBlock, deleteBlock } = editorSlice.actions;
+export const { updateBlockProps, updateBlockState, addBlock, deleteBlock } = editorSlice.actions;
 
-export const selectBlocks = (state: RootState) => state.editor.blocks;
-export const selectBlock = (state: RootState, blockId: string) => state.editor.blocks[blockId];
+export const selectBlocksProps = (state: RootState) => state.editor.blocksProperties;
+export const selectBlocksState = (state: RootState) => state.editor.blocksState;
 
-export const selectBlockParent = (state: RootState, blockId: string) => {
-	const parent = selectBlock(state, blockId)?.parentId;
-	if (parent) return selectBlock(state, parent) as PageBlock;
+export const selectBlockProps = (state: RootState, blockId: string) => selectBlocksProps(state)[blockId];
+export const selectBlockState = (state: RootState, blockId: string) => selectBlocksState(state)[blockId];
+
+export const selectBlockParentProps = (state: RootState, blockId: string) => {
+	const parent = selectBlockProps(state, blockId)?.parentId;
+	if (parent) return selectBlockProps(state, parent) as PageBlock;
 };
 
-export const selectBlockNeighbors = createCachedSelector(
+export const selectBlocksStateWithProps = createCachedSelector(
+	selectBlocksProps,
+	selectBlocksState,
+	(blocksProps, blocksState) => {
+		const response: { [p: string]: Blocks } = {};
+		Object.keys(blocksProps).forEach((key) => {
+			response[key] = { ...blocksProps[key], ...(blocksState[key] ? blocksState[key] : {}) };
+		});
+
+		return response;
+	},
+)(() => 1);
+
+export const selectBlockStateWithProps = createCachedSelector(
 	(state) => state,
-	selectBlock,
-	selectBlockParent,
+	selectBlockProps,
+	selectBlockState,
+	(state, blockProps, blockState) => {
+		return {
+			...blockProps,
+			...blockState,
+		};
+	},
+)((_, blockId) => blockId);
+
+export const selectBlockNeighborsProps = createCachedSelector(
+	(state) => state,
+	selectBlockProps,
+	selectBlockParentProps,
 	(state, block, parent) => {
 		if (!parent) return {};
 		const myIndex = parent.blocks.indexOf(block.id);
 		return {
-			previous: myIndex >= 1 ? selectBlock(state, parent.blocks[myIndex - 1]) : null,
-			next: myIndex + 1 < parent.blocks.length ? selectBlock(state, parent.blocks[myIndex + 1]) : null,
+			previous: myIndex >= 1 ? selectBlockProps(state, parent.blocks[myIndex - 1]) : null,
+			next: myIndex + 1 < parent.blocks.length ? selectBlockProps(state, parent.blocks[myIndex + 1]) : null,
 		};
 	},
 )((_, blockId) => blockId);

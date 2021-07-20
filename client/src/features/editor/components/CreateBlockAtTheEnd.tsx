@@ -12,7 +12,7 @@ export function CreateBlockAtTheEnd({ parentId }: CreateBlockAtTheEndProps): JSX
 			parentId,
 			id: Math.random().toString(),
 			type: 'text',
-			html: '',
+			value: '',
 		});
 	}, [addBlockIn, parentId]);
 	return (

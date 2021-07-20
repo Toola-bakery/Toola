@@ -1,13 +1,14 @@
-import { KeyboardEventHandler, useCallback, useRef } from 'react';
-import ContentEditable from 'react-contenteditable';
+import { KeyboardEventHandler, useCallback, useRef, useState } from 'react';
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { useEditor } from '../hooks/useEditor';
 import { useEventListener } from '../hooks/useEvents';
 import { TextBlockType } from '../types';
 import { useRefLatest } from '../../../hooks/useRefLatest';
 import { getCaretIndex } from '../helpers/getCaretIndex';
 import { useBlockMenu } from '../hooks/useBlockMenu';
-import { selectBlockNeighbors } from '../redux/editor';
+import { selectBlockNeighborsProps } from '../redux/editor';
 import { useAppSelector } from '../../../redux/hooks';
+import { useReferences } from '../hooks/useReferences';
 
 const CMD_KEY = '/';
 
@@ -15,22 +16,25 @@ export type EditableBlockProps = {
 	block: TextBlockType;
 };
 
-export function EditableBlock({ block: { id, html: _html = '', parentId } }: EditableBlockProps): JSX.Element {
-	const { updateBlock, addBlockAfter, deleteBlock } = useEditor();
+export function TextBlock({ block: { id, value: _value = '', parentId } }: EditableBlockProps): JSX.Element {
+	const { updateBlockProps, addBlockAfter, deleteBlock } = useEditor();
+	const [isEditing, setEditing] = useState(false);
 	const addBlockAfterRef = useRefLatest(addBlockAfter);
 	const deleteBlockRef = useRefLatest(deleteBlock);
-	const textRef = useRefLatest(_html);
+	const textRef = useRefLatest(_value);
 
-	const { previous } = useAppSelector((state) => selectBlockNeighbors(state, id));
+	const { previous } = useAppSelector((state) => selectBlockNeighborsProps(state, id));
 	const previousRef = useRefLatest(previous);
 
 	const contentEditable = useRef<HTMLElement>(null);
-	const tag = 'p';
 
 	const { open } = useBlockMenu();
 	const openRef = useRefLatest(open);
 
-	const onChangeHandler = useCallback((e) => updateBlock({ id, html: e.target.value }), [id, updateBlock]);
+	const onChangeHandler = useCallback(
+		(e: ContentEditableEvent) => updateBlockProps({ id, value: e.currentTarget.textContent }),
+		[id, updateBlockProps],
+	);
 
 	useEventListener(id, (event) => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
 
@@ -39,11 +43,11 @@ export function EditableBlock({ block: { id, html: _html = '', parentId } }: Edi
 			if (e.key === CMD_KEY) {
 				if (!contentEditable.current) return;
 				openRef.current(contentEditable.current).then((v) => {
-					updateBlock({
+					updateBlockProps({
 						id,
 						language: 'javascript',
 						type: v as 'text' | 'code',
-						source: '',
+						value: '',
 					});
 				});
 			}
@@ -54,9 +58,9 @@ export function EditableBlock({ block: { id, html: _html = '', parentId } }: Edi
 					id: Math.random().toString(),
 					type: 'text',
 					parentId,
-					html: textRef.current.slice(index),
+					value: textRef.current.slice(index),
 				});
-				updateBlock({ id, html: textRef.current.slice(0, index) });
+				updateBlockProps({ id, value: textRef.current.slice(0, index) });
 				e.preventDefault();
 			}
 			if (e.key === 'Backspace') {
@@ -66,25 +70,30 @@ export function EditableBlock({ block: { id, html: _html = '', parentId } }: Edi
 					e.preventDefault();
 					deleteBlockRef.current(id);
 					if (previousRef.current?.type === 'text')
-						updateBlock(
+						updateBlockProps(
 							{
 								id: previousRef.current.id,
-								html: previousRef.current.html + textRef.current,
+								value: previousRef.current.value + textRef.current,
 							},
 							true,
 						);
 				}
 			}
 		},
-		[addBlockAfterRef, deleteBlockRef, id, openRef, parentId, previousRef, textRef, updateBlock],
+		[addBlockAfterRef, deleteBlockRef, id, openRef, parentId, previousRef, textRef, updateBlockProps],
 	);
+
+	const html = useReferences(_value);
+	const htmlString = typeof html === 'string' ? html : JSON.stringify(html);
 
 	return (
 		<ContentEditable
 			className="Block"
+			onFocus={() => setEditing(true)}
+			onBlur={() => setEditing(false)}
 			innerRef={contentEditable}
-			html={_html}
-			tagName={tag}
+			html={isEditing ? _value : htmlString}
+			tagName="p"
 			onChange={onChangeHandler}
 			onKeyDown={onKeyDownHandler}
 		/>

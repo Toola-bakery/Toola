@@ -3,9 +3,10 @@ import { useEvents } from './useEvents';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import {
 	addBlock as addBlockAction,
-	updateBlock as updateBlockAction,
+	updateBlockProps as updateBlockPropsAction,
+	updateBlockState as updateBlockStateAction,
 	deleteBlock as deleteBlockAction,
-	selectBlocks,
+	selectBlocksProps,
 } from '../redux/editor';
 import { Blocks, PageBlock } from '../types';
 
@@ -13,14 +14,15 @@ type UseEditorResponse = {
 	addBlockAfter: (putAfterId: string, block: Blocks) => void;
 	addBlockIn: (parentId: string, block: Blocks) => void;
 	deleteBlock: (blockId: string) => void;
-	updateBlock: (block: Parameters<typeof updateBlockAction>[0], focus?: boolean) => void;
+	updateBlockProps: (block: Parameters<typeof updateBlockPropsAction>[0], focus?: boolean) => void;
+	updateBlockState: (block: Parameters<typeof updateBlockStateAction>[0], focus?: boolean) => void;
 };
 
 export function useEditor(): UseEditorResponse {
 	const { send } = useEvents();
 	const dispatch = useAppDispatch();
 
-	const blocks = useAppSelector(selectBlocks);
+	const blocks = useAppSelector(selectBlocksProps);
 
 	const addBlockAfter = useCallback<UseEditorResponse['addBlockAfter']>(
 		(putAfterId, block) => {
@@ -32,7 +34,7 @@ export function useEditor(): UseEditorResponse {
 			newParentBlocks.splice(parent.blocks.indexOf(putAfterId) + 1, 0, block.id);
 
 			dispatch(addBlockAction(block));
-			dispatch(updateBlockAction({ id: parentId, blocks: newParentBlocks }));
+			dispatch(updateBlockPropsAction({ id: parentId, blocks: newParentBlocks }));
 			send(block.id, { eventName: 'focus', waitListener: true });
 		},
 		[blocks, dispatch, send],
@@ -47,7 +49,7 @@ export function useEditor(): UseEditorResponse {
 			newParentBlocks.push(block.id);
 
 			dispatch(addBlockAction(block));
-			dispatch(updateBlockAction({ id: parentId, blocks: newParentBlocks }));
+			dispatch(updateBlockPropsAction({ id: parentId, blocks: newParentBlocks }));
 			send(block.id, { eventName: 'focus', waitListener: true });
 		},
 		[blocks, dispatch, send],
@@ -61,17 +63,24 @@ export function useEditor(): UseEditorResponse {
 			const newParentBlocks = parent.blocks.filter((id) => id !== blockId);
 
 			dispatch(deleteBlockAction({ id: blockId }));
-			dispatch(updateBlockAction({ id: parentId, blocks: newParentBlocks }));
+			dispatch(updateBlockPropsAction({ id: parentId, blocks: newParentBlocks }));
 		},
 		[blocks, dispatch],
 	);
-	const updateBlock = useCallback<UseEditorResponse['updateBlock']>(
+	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
-			dispatch(updateBlockAction(block));
+			dispatch(updateBlockPropsAction(block));
+			if (focus) send(block.id, { eventName: 'focus', waitListener: true });
+		},
+		[dispatch, send],
+	);
+	const updateBlockState = useCallback<UseEditorResponse['updateBlockProps']>(
+		(block, focus = false) => {
+			dispatch(updateBlockStateAction(block));
 			if (focus) send(block.id, { eventName: 'focus', waitListener: true });
 		},
 		[dispatch, send],
 	);
 
-	return { addBlockAfter, deleteBlock, addBlockIn, updateBlock };
+	return { addBlockAfter, deleteBlock, addBlockIn, updateBlockProps, updateBlockState };
 }

@@ -4,8 +4,7 @@ import { ExecutorProviderContext } from '../components/ExecutorProvider';
 import { useEventListener } from '../../editor/hooks/useEvents';
 
 export function useExecutor() {
-	const { ws, sendWS } = useContext(ExecutorProviderContext);
-	return { ws, sendWS };
+	return useContext(ExecutorProviderContext);
 }
 
 export type FunctionExecutorAction = {
