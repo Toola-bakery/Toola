@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { usePromise } from '../../../hooks/usePromise';
+import { Blocks } from '../types';
 
 export type BlockMenuContextType = {
 	isOpen: boolean;
@@ -33,7 +34,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 	const value = useMemo<BlockMenuContextType>(() => ({ isOpen, anchorEl, open }), [isOpen, anchorEl, open]);
 
 	const close = useCallback(
-		(result) => {
+		(result: Blocks['type']) => {
 			resolve(result);
 			setOpen(false);
 			setAnchorEl(undefined);
@@ -49,6 +50,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 				<Menu anchorEl={anchorEl} keepMounted open={isOpen}>
 					<MenuItem onClick={() => close('text')}>Text</MenuItem>
 					<MenuItem onClick={() => close('code')}>Code</MenuItem>
+					<MenuItem onClick={() => close('JSONView')}>JSON viewer</MenuItem>
 				</Menu>
 			</>
 		</BlockMenuContext.Provider>

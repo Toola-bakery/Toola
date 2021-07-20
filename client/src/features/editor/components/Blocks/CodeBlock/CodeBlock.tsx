@@ -1,9 +1,9 @@
 import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
 import { Button } from '@material-ui/core';
-import { useEditor } from '../../hooks/useEditor';
-import { useEventListener } from '../../hooks/useEvents';
-import { CodeBlockType } from '../../types';
-import { useFunctionExecutor } from '../../../executor/hooks/useExecutor';
+import { useEditor } from '../../../hooks/useEditor';
+import { useEventListener } from '../../../hooks/useEvents';
+import { CodeBlockType } from '../../../types';
+import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { Editor } from './Editor';
 
 export type CodeBlockComponentProps = {

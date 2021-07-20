@@ -7,12 +7,12 @@ export type ExecutorProviderContextType = {
 };
 
 export const ExecutorProviderContext = React.createContext<ExecutorProviderContextType>({
-	sendWS: (data) => {},
+	sendWS: () => {},
 });
 
 export function ExecutorProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
 	const [ws] = useState(() => new WebSocket('ws://localhost:8080'));
-	const { send, addEventListener, deleteEventListener } = useEvents();
+	const { send } = useEvents();
 
 	useEffect(() => {
 		ws.onmessage = (event) => {

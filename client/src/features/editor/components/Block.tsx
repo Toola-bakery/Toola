@@ -1,7 +1,7 @@
-import { TextBlock } from './TextBlock';
+import { TextBlock } from './Blocks/TextBlock';
 import { Blocks, CodeBlockType, JSONViewBlockType, TextBlockType } from '../types';
-import { CodeBlock } from './CodeBlock/CodeBlock';
-import { JSONViewBlock } from './JSONViewBlock';
+import { CodeBlock } from './Blocks/CodeBlock/CodeBlock';
+import { JSONViewBlock } from './Blocks/JSONViewBlock';
 
 export function Block({ block }: { block: Blocks }): JSX.Element {
 	if (block.type === 'text') return <TextBlock block={block as TextBlockType} />;

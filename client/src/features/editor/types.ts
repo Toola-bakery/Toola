@@ -21,11 +21,9 @@ export type CodeBlockState = {
 	logs?: string[];
 };
 
-export type JSONViewBlockType = JSONViewBlockProps & JSONViewBlockState;
+export type JSONViewBlockType = JSONViewBlockProps;
 export type JSONViewBlockProps = BasicBlock & {
 	type: 'JSONView';
 	getValueFunction: string;
-};
-export type JSONViewBlockState = {
-	value?: unknown;
+	value: string;
 };
