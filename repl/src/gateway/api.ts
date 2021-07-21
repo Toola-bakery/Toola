@@ -5,8 +5,6 @@ import fastifyCors from 'fastify-cors';
 import { startWS } from './websocketServer';
 import { getMongo } from '../utils/mongo';
 
-const db = new JSONdb('./database.json');
-
 type PageSchema = {
 	value: any;
 	pageId: string;
@@ -51,7 +49,18 @@ fastify.post<{ Body: { pageId: string; value: unknown } }>('/page', async (reque
 
 fastify.get('/pages', async (request, reply) => {
 	reply.type('application/json').code(200);
-	return Object.keys(db.JSON());
+	const mongo = await getMongo();
+
+	const response = await mongo
+		.collection<PageSchema>('pages')
+		.aggregate<{ names: string[] }>([
+			{
+				$group: { _id: null, names: { $addToSet: '$pageId' } },
+			},
+		])
+		.toArray();
+
+	return response[0].names;
 });
 
 fastify.listen(process.env.PORT || 8080, '0.0.0.0', (err, address) => {
