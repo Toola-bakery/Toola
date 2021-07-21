@@ -9,6 +9,7 @@ lib-cov
 *.swp
 
 database.json
+.env
 
 pids
 logs

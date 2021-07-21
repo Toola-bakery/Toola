@@ -1,9 +1,16 @@
 import createFastify from 'fastify';
 import JSONdb from 'simple-json-db';
 import fastifyCors from 'fastify-cors';
+
 import { startWS } from './websocketServer';
+import { getMongo } from '../utils/mongo';
 
 const db = new JSONdb('./database.json');
+
+type PageSchema = {
+	value: any;
+	pageId: string;
+};
 
 const fastify = createFastify({
 	logger: false,
@@ -21,7 +28,8 @@ fastify.get('/', async (request, reply) => {
 fastify.get<{ Querystring: { pageId: string } }>('/page', async (request, reply) => {
 	reply.type('application/json').code(200);
 	const { pageId } = request.query;
-	const resp = db.get(pageId) as any;
+	const mongo = await getMongo();
+	const resp = await mongo.collection<PageSchema>('pages').findOne({ pageId });
 	if (!resp || !resp.value || !resp.value[request.query.pageId])
 		return {
 			value: {
@@ -31,15 +39,19 @@ fastify.get<{ Querystring: { pageId: string } }>('/page', async (request, reply)
 	return resp;
 });
 
+fastify.post<{ Body: { pageId: string; value: unknown } }>('/page', async (request, reply) => {
+	reply.type('application/json').code(200);
+	const { pageId, value } = request.body;
+
+	const mongo = await getMongo();
+	await mongo.collection<PageSchema>('pages').updateOne({ pageId }, { $set: { value } }, { upsert: true });
+
+	return { ok: true };
+});
+
 fastify.get('/pages', async (request, reply) => {
 	reply.type('application/json').code(200);
 	return Object.keys(db.JSON());
-});
-
-fastify.post<{ Body: { pageId: string; value: unknown } }>('/page', async (request, reply) => {
-	reply.type('application/json').code(200);
-	db.set(request.body.pageId, { value: request.body.value });
-	return { ok: true };
 });
 
 fastify.listen(process.env.PORT || 8080, '0.0.0.0', (err, address) => {
