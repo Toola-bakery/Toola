@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useEvents } from '../../editor/hooks/useEvents';
+import { Config } from '../../../config';
 
 export type ExecutorProviderContextType = {
 	ws?: WebSocket;
@@ -11,7 +12,7 @@ export const ExecutorProviderContext = React.createContext<ExecutorProviderConte
 });
 
 export function ExecutorProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
-	const [ws] = useState(() => new WebSocket('ws://localhost:8080'));
+	const [ws] = useState(() => new WebSocket(Config.websocket));
 	const { send } = useEvents();
 
 	useEffect(() => {
