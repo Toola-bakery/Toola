@@ -1,46 +1,60 @@
 import * as React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
 import DescriptionIcon from '@material-ui/icons/Description';
 import Drawer from '@material-ui/core/Drawer';
-import { ListSubheader } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+
+import { useEffect, useState } from 'react';
+import ky from 'ky';
+
+function DrawerItem({ text }: { text: string }) {
+	return (
+		<Link to={`/${text}`}>
+			<ListItem
+				sx={{
+					pt: { sm: 0.5 },
+					pb: { sm: 0.5 },
+
+					'& .MuiListItemText-primary': {
+						fontSize: 14,
+					},
+				}}
+				button
+				key={text}
+			>
+				<ListItemIcon sx={{ minWidth: 20 }}>
+					<DescriptionIcon style={{ fontSize: 16 }} />
+				</ListItemIcon>
+
+				<ListItemText primary={text} />
+			</ListItem>
+		</Link>
+	);
+}
 
 export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Element {
+	const [pages, setPages] = useState<string[]>([]);
+
+	useEffect(() => {
+		ky.get('http://localhost:3001/pages')
+			.json<string[]>()
+			.then((v) => setPages(v));
+	}, []);
 	const menu = (
 		<div>
 			<List subheader={<ListSubheader>Pages</ListSubheader>}>
-				{['App Dashboard', 'Notes', 'App Admin', 'Drafts'].map((text, index) => (
-					<ListItem
-						sx={{
-							pt: { sm: 0.5 },
-							pb: { sm: 0.5 },
-
-							'& .MuiListItemText-primary': {
-								fontSize: 14,
-							},
-						}}
-						button
-						key={text}
-					>
-						<ListItemIcon sx={{ minWidth: 20 }}>
-							<DescriptionIcon style={{ fontSize: 16 }} />
-						</ListItemIcon>
-						<ListItemText primary={text} />
-					</ListItem>
+				{pages.map((text) => (
+					<DrawerItem text={text} />
 				))}
 			</List>
 
-			<List subheader={<ListSubheader>Databases</ListSubheader>}>
-				{['All mail', 'Trash', 'Spam'].map((text, index) => (
-					<ListItem button key={text}>
-						<ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-						<ListItemText primary={text} />
-					</ListItem>
+			<List subheader={<ListSubheader>Infra</ListSubheader>}>
+				{['Gateway', 'Domains', 'Functions'].map((text) => (
+					<DrawerItem text={text} />
 				))}
 			</List>
 		</div>
@@ -52,12 +66,10 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 		setMobileOpen(!mobileOpen);
 	};
 
-	const container = window.document.body;
-
 	return (
 		<>
 			<Drawer
-				container={container}
+				container={window.document.body}
 				variant="temporary"
 				open={mobileOpen}
 				onClose={handleDrawerToggle}
@@ -85,6 +97,8 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 				}}
 				open
 			>
+				{/*<Toolbar />*/}
+
 				{menu}
 			</Drawer>
 		</>

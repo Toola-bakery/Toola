@@ -22,7 +22,7 @@ export function JSONViewBlock({ block }: JSONViewBlockProps): JSX.Element {
 			{
 				key: 'Data Source',
 				next: ({ block: _block, id: _id }) => (
-					<UpdateProperties block={_block} id={_id} properties={[{ propertyName: 'value', type: 'code' }]} />
+					<UpdateProperties block={_block} properties={[{ propertyName: 'value', type: 'code' }]} />
 				),
 			},
 			{

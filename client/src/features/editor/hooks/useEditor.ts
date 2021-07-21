@@ -9,6 +9,7 @@ import {
 	selectBlocksProps,
 } from '../redux/editor';
 import { Blocks, PageBlock } from '../types';
+import { usePageContext } from './useReferences';
 
 type UseEditorResponse = {
 	addBlockAfter: (putAfterId: string, block: Blocks) => void;
@@ -20,9 +21,12 @@ type UseEditorResponse = {
 
 export function useEditor(): UseEditorResponse {
 	const { send } = useEvents();
+	const {
+		globals: { pageId },
+	} = usePageContext();
 	const dispatch = useAppDispatch();
 
-	const blocks = useAppSelector(selectBlocksProps);
+	const blocks = useAppSelector((state) => selectBlocksProps(state, pageId));
 
 	const addBlockAfter = useCallback<UseEditorResponse['addBlockAfter']>(
 		(putAfterId, block) => {
@@ -34,10 +38,10 @@ export function useEditor(): UseEditorResponse {
 			newParentBlocks.splice(parent.blocks.indexOf(putAfterId) + 1, 0, block.id);
 
 			dispatch(addBlockAction(block));
-			dispatch(updateBlockPropsAction({ id: parentId, blocks: newParentBlocks }));
+			dispatch(updateBlockPropsAction({ id: parentId, pageId, blocks: newParentBlocks }));
 			send(block.id, { eventName: 'focus', waitListener: true });
 		},
-		[blocks, dispatch, send],
+		[blocks, dispatch, pageId, send],
 	);
 
 	const addBlockIn = useCallback<UseEditorResponse['addBlockIn']>(
@@ -49,10 +53,10 @@ export function useEditor(): UseEditorResponse {
 			newParentBlocks.push(block.id);
 
 			dispatch(addBlockAction(block));
-			dispatch(updateBlockPropsAction({ id: parentId, blocks: newParentBlocks }));
+			dispatch(updateBlockPropsAction({ id: parentId, pageId, blocks: newParentBlocks }));
 			send(block.id, { eventName: 'focus', waitListener: true });
 		},
-		[blocks, dispatch, send],
+		[blocks, dispatch, pageId, send],
 	);
 	const deleteBlock = useCallback<UseEditorResponse['deleteBlock']>(
 		(blockId) => {
@@ -62,10 +66,10 @@ export function useEditor(): UseEditorResponse {
 
 			const newParentBlocks = parent.blocks.filter((id) => id !== blockId);
 
-			dispatch(deleteBlockAction({ id: blockId }));
-			dispatch(updateBlockPropsAction({ id: parentId, blocks: newParentBlocks }));
+			dispatch(deleteBlockAction({ id: blockId, pageId }));
+			dispatch(updateBlockPropsAction({ id: parentId, pageId, blocks: newParentBlocks }));
 		},
-		[blocks, dispatch],
+		[blocks, dispatch, pageId],
 	);
 	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {

@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
-import { useAppSelector } from '../../../redux/hooks';
-import { selectBlocksStateWithProps } from '../redux/editor';
+import React, { useEffect, useMemo } from 'react';
+import ky from 'ky';
+import { useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { selectBlocksProps, selectBlocksStateWithProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { Block } from './Block';
 import { Blocks } from '../types';
@@ -15,12 +17,27 @@ export const PageContext = React.createContext<PageContextType>({
 	globals: { pageId: '' },
 });
 
-export function Page({ pageId = 'rand' }): JSX.Element {
-	const blocks = useAppSelector(selectBlocksStateWithProps);
+export function Page(): JSX.Element {
+	const { pageId } = useParams<{ pageId: string }>();
+	const dispatch = useAppDispatch();
+
+	const blocks = useAppSelector((state) => selectBlocksStateWithProps(state, pageId));
+	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
+	useEffect(() => {
+		ky.get('http://localhost:3001/page', { searchParams: { pageId } })
+			.json<{ value: { [key: string]: Blocks } }>()
+			.then((v) => {
+				dispatch(setPage({ blocks: v.value, pageId }));
+			});
+	}, [dispatch, pageId]);
+
+	useEffect(() => {
+		ky.post('http://localhost:3001/page', { json: { pageId, value: blocksProps } });
+	}, [blocksProps, pageId]);
 
 	const elements = useMemo(() => {
-		const page = blocks[pageId];
-		if (page.type !== 'page') return [];
+		const page = blocks?.[pageId];
+		if (page?.type !== 'page') return [];
 
 		return page.blocks.map((blockKey) => <Block key={blocks[blockKey].id} block={blocks[blockKey]} />);
 	}, [blocks, pageId]);
@@ -30,7 +47,7 @@ export function Page({ pageId = 'rand' }): JSX.Element {
 	return (
 		<PageContext.Provider value={value}>
 			{elements}
-			<CreateBlockAtTheEnd parentId={pageId} />
+			<CreateBlockAtTheEnd pageId={pageId} parentId={pageId} />
 		</PageContext.Provider>
 	);
 }

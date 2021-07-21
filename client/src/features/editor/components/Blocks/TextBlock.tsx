@@ -20,7 +20,7 @@ export type EditableBlockProps = {
 };
 
 export function TextBlock({ block }: EditableBlockProps): JSX.Element {
-	const { id, value: realValue = '', parentId } = block;
+	const { id, pageId, value: realValue = '', parentId } = block;
 	const [value, setValue] = useState(realValue);
 
 	const { updateBlockProps, addBlockAfter, deleteBlock } = useEditor();
@@ -41,9 +41,9 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
 			setValue(e.target.value);
-			updateBlockProps({ id, value: decode(e.currentTarget.textContent) });
+			updateBlockProps({ id, pageId, value: decode(e.currentTarget.textContent) });
 		},
-		[id, updateBlockProps],
+		[id, pageId, updateBlockProps],
 	);
 
 	useEventListener(id, (event) => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
@@ -55,6 +55,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 				openRef.current(contentEditable.current).then((v) => {
 					updateBlockProps({
 						id,
+						pageId,
 						language: 'javascript',
 						type: v as 'text' | 'code',
 						value: '',
@@ -68,9 +69,10 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 					id: Math.random().toString(),
 					type: 'text',
 					parentId,
+					pageId,
 					value: valueRef.current.slice(index),
 				});
-				updateBlockProps({ id, value: valueRef.current.slice(0, index) });
+				updateBlockProps({ id, pageId, value: valueRef.current.slice(0, index) });
 				e.preventDefault();
 			}
 			if (e.key === 'Backspace') {
@@ -82,6 +84,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 					if (previousRef.current?.type === 'text')
 						updateBlockProps(
 							{
+								pageId,
 								id: previousRef.current.id,
 								value: previousRef.current.value + valueRef.current,
 							},
@@ -90,7 +93,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 				}
 			}
 		},
-		[addBlockAfterRef, deleteBlockRef, id, openRef, parentId, previousRef, valueRef, updateBlockProps],
+		[openRef, updateBlockProps, id, pageId, addBlockAfterRef, parentId, valueRef, deleteBlockRef, previousRef],
 	);
 
 	const html = useReferences(isEditing ? '' : realValue);

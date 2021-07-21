@@ -1,0 +1,102 @@
+{
+    "rand": {
+        "value": {
+            "rand": {
+                "id": "rand",
+                "type": "page",
+                "blocks": [
+                    "0.7697758097854404",
+                    "0.4878407296890963",
+                    "0.7405535879964686",
+                    "0.6867267327257589"
+                ],
+                "parentId": null,
+                "pageId": "rand"
+            },
+            "0.7697758097854404": {
+                "parentId": "rand",
+                "pageId": "rand",
+                "id": "0.7697758097854404",
+                "type": "text",
+                "value": "Привет!"
+            },
+            "0.4878407296890963": {
+                "parentId": "rand",
+                "pageId": "rand",
+                "id": "0.4878407296890963",
+                "type": "text",
+                "value": "Разве это плохо, что ты не плохо"
+            },
+            "0.6867267327257589": {
+                "id": "0.6867267327257589",
+                "type": "text",
+                "parentId": "rand",
+                "pageId": "rand",
+                "value": ""
+            },
+            "0.7405535879964686": {
+                "id": "0.7405535879964686",
+                "type": "code",
+                "parentId": "rand",
+                "pageId": "rand",
+                "value": "",
+                "language": "javascript"
+            }
+        }
+    },
+    "rand2": {
+        "value": {
+            "rand2": {
+                "id": "rand2",
+                "type": "page",
+                "blocks": [
+                    "0.8291063016085833",
+                    "0.017511374432364724",
+                    "0.43861198674683033",
+                    "0.8980097257600419"
+                ],
+                "parentId": null,
+                "pageId": "rand2"
+            },
+            "0.8291063016085833": {
+                "parentId": "rand2",
+                "pageId": "rand2",
+                "id": "0.8291063016085833",
+                "type": "text",
+                "value": "фывфы"
+            },
+            "0.017511374432364724": {
+                "id": "0.017511374432364724",
+                "type": "text",
+                "parentId": "rand2",
+                "pageId": "rand2",
+                "value": "вфыв"
+            },
+            "0.43861198674683033": {
+                "parentId": "rand2",
+                "pageId": "rand2",
+                "id": "0.43861198674683033",
+                "type": "text",
+                "value": "ыфвфы"
+            },
+            "0.8980097257600419": {
+                "id": "0.8980097257600419",
+                "type": "text",
+                "parentId": "rand2",
+                "pageId": "rand2",
+                "value": "ыв"
+            }
+        }
+    },
+    "Gateway": {
+        "value": {
+            "Gateway": {
+                "id": "Gateway",
+                "type": "page",
+                "blocks": [],
+                "parentId": null,
+                "pageId": "Gateway"
+            }
+        }
+    }
+}

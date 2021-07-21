@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
-import { execute } from './notebook/notebook';
-import { TaskQueue } from './taskQueue';
-import { executeFunction } from './serverless/executeFunction';
+import { execute } from '../notebook/notebook';
+import { TaskQueue } from '../utils/taskQueue';
+import { executeFunction } from '../serverless/executeFunction';
 
 const serverRef: { current?: WebSocket.Server } = {};
 

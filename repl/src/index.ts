@@ -1,3 +1,4 @@
-import { startApi } from './websocketServer';
+import { startApi } from './gateway/websocketServer';
 
+import('./gateway/api');
 startApi();

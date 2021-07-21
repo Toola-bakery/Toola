@@ -3,18 +3,20 @@ import { useEditor } from '../hooks/useEditor';
 
 export type CreateBlockAtTheEndProps = {
 	parentId: string;
+	pageId: string;
 };
 
-export function CreateBlockAtTheEnd({ parentId }: CreateBlockAtTheEndProps): JSX.Element {
+export function CreateBlockAtTheEnd({ parentId, pageId }: CreateBlockAtTheEndProps): JSX.Element {
 	const { addBlockIn } = useEditor();
 	const handler = useCallback(() => {
 		addBlockIn(parentId, {
 			parentId,
+			pageId,
 			id: Math.random().toString(),
 			type: 'text',
 			value: '',
 		});
-	}, [addBlockIn, parentId]);
+	}, [addBlockIn, pageId, parentId]);
 	return (
 		<div
 			style={{

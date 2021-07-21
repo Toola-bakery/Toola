@@ -1,6 +1,7 @@
 export interface BasicBlock {
 	id: string;
 	parentId: string | null;
+	pageId: string;
 }
 
 export type Blocks = TextBlockType | PageBlock | RawBlock | ColumnBlock | CodeBlockType | JSONViewBlockType;

@@ -11,7 +11,7 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, value, language, logs = [], result } = block;
+	const { id, pageId, value, language, logs = [], result } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
@@ -21,20 +21,20 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const listener = useCallback<Parameters<typeof useFunctionExecutor>[0]>(
 		(data) => {
-			if (data.result) updateBlockState({ id, result: data.result });
-			else updateBlockState({ id, logs: [...logs, data.data] });
+			if (data.result) updateBlockState({ id, pageId, result: data.result });
+			else updateBlockState({ id, pageId, logs: [...logs, data.data] });
 		},
-		[id, logs, updateBlockState],
+		[id, logs, pageId, updateBlockState],
 	);
 
-	const { runCode, lastEvent } = useFunctionExecutor(listener);
+	const { runCode } = useFunctionExecutor(listener);
 
 	const onEditorReady = useCallback(() => {
 		if (!editorRef.current) return;
 		editorRef.current.on('change', (_, v) => {
-			updateBlockProps({ id, value: v });
+			updateBlockProps({ id, pageId, value: v });
 		});
-	}, [editorRef, id, updateBlockProps]);
+	}, [editorRef, id, pageId, updateBlockProps]);
 
 	return (
 		<div>
@@ -46,7 +46,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 				variant="contained"
 				color="primary"
 				onClick={() => {
-					updateBlockState({ id, logs: [], result: [] });
+					updateBlockState({ id, pageId, logs: [], result: [] });
 					runCode(value);
 				}}
 			>
