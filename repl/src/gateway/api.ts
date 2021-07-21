@@ -1,6 +1,7 @@
 import createFastify from 'fastify';
 import JSONdb from 'simple-json-db';
 import fastifyCors from 'fastify-cors';
+import { startWS } from './websocketServer';
 
 const db = new JSONdb('./database.json');
 
@@ -41,7 +42,9 @@ fastify.post<{ Body: { pageId: string; value: unknown } }>('/page', async (reque
 	return { ok: true };
 });
 
-fastify.listen(3001, (err, address) => {
+fastify.listen(8080, (err, address) => {
 	if (err) throw err;
 	console.log(`Server is now listening on ${address}`);
 });
+
+startWS(fastify.server);

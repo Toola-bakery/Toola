@@ -1,13 +1,14 @@
 import WebSocket from 'ws';
+import http from 'http';
 import { execute } from '../notebook/notebook';
 import { TaskQueue } from '../utils/taskQueue';
 import { executeFunction } from '../serverless/executeFunction';
 
 const serverRef: { current?: WebSocket.Server } = {};
 
-function startApi() {
+function startWS(httpServer: http.Server) {
 	const taskQueue = new TaskQueue();
-	const server = new WebSocket.Server({ port: 8080 });
+	const server = new WebSocket.Server({ server: httpServer });
 	serverRef.current = server;
 
 	server.on('connection', ws => {
@@ -52,4 +53,4 @@ function startApi() {
 	});
 }
 
-export { serverRef, startApi };
+export { serverRef, startWS };
