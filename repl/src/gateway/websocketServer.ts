@@ -43,13 +43,6 @@ function startWS(httpServer: http.Server) {
 				.then(console.log)
 				.catch(console.log);
 		});
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// process.stdout.write = (data: string) => {
-		// 	// eslint-disable-next-line no-control-regex
-		// 	ws.send(data.replace(/\u001B\[[0-9]+m/g, ''));
-		// };
 	});
 }
 
