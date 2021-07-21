@@ -6,6 +6,7 @@ import { selectBlocksProps, selectBlocksStateWithProps, setPage } from '../redux
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { Block } from './Block';
 import { Blocks } from '../types';
+import { Config } from '../../../config';
 
 export type PageContextType = {
 	blocks: { [key: string]: Blocks };
@@ -24,7 +25,7 @@ export function Page(): JSX.Element {
 	const blocks = useAppSelector((state) => selectBlocksStateWithProps(state, pageId));
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 	useEffect(() => {
-		ky.get('http://localhost:3001/page', { searchParams: { pageId } })
+		ky.get(`${Config.domain}/page`, { searchParams: { pageId } })
 			.json<{ value: { [key: string]: Blocks } }>()
 			.then((v) => {
 				dispatch(setPage({ blocks: v.value, pageId }));
@@ -32,7 +33,7 @@ export function Page(): JSX.Element {
 	}, [dispatch, pageId]);
 
 	useEffect(() => {
-		ky.post('http://localhost:3001/page', { json: { pageId, value: blocksProps } });
+		ky.post(`${Config.domain}/page`, { json: { pageId, value: blocksProps } });
 	}, [blocksProps, pageId]);
 
 	const elements = useMemo(() => {

@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 import ky from 'ky';
+import { Config } from '../../config';
 
 function DrawerItem({ text }: { text: string }) {
 	return (
@@ -40,7 +41,7 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 	const [pages, setPages] = useState<string[]>([]);
 
 	useEffect(() => {
-		ky.get('http://localhost:3001/pages')
+		ky.get(`${Config.domain}/pages`)
 			.json<string[]>()
 			.then((v) => setPages(v));
 	}, []);
@@ -48,7 +49,7 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 		<div>
 			<List subheader={<ListSubheader>Pages</ListSubheader>}>
 				{pages.map((text) => (
-					<DrawerItem text={text} />
+					<DrawerItem key={text} text={text} />
 				))}
 			</List>
 
