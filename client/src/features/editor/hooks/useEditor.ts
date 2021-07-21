@@ -42,13 +42,17 @@ export function useEditor(): UseEditorResponse {
 
 	const getNextId = useCallback<UseEditorResponse['getNextId']>(
 		(name) => {
+			let nextIndex = (page.itemIterator?.[name] || 0) + 1;
+			while (blocks[`${name}${nextIndex}`]) {
+				nextIndex += 1;
+			}
 			const itemIterator = update(page.itemIterator || {}, {
-				$merge: { [name]: (page.itemIterator?.[name] || 0) + 1 },
+				$merge: { [name]: nextIndex },
 			});
 			updateBlockState({ id: page.id, pageId: page.id, itemIterator });
 			return `${name}${itemIterator[name]}`;
 		},
-		[page, updateBlockState],
+		[blocks, page, updateBlockState],
 	);
 
 	const addBlockAfter = useCallback<UseEditorResponse['addBlockAfter']>(

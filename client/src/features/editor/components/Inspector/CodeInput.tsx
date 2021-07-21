@@ -21,7 +21,7 @@ export function getSuggestionKeys(currentState: any) {
 		const value1 = currentState[key];
 		Object.keys(value1).forEach((key2) => {
 			const value2 = value1[key2];
-			if (!GO_DEEPER_TYPES.includes(typeof value2))
+			if (value2 == null || !GO_DEEPER_TYPES.includes(typeof value2))
 				suggestions.push({ value: `${key}${wrapKey(key2)}`, type: typeof value2 });
 			else
 				Object.keys(value2).forEach((key3) => {

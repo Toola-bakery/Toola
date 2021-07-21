@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ky from 'ky';
 import { useParams } from 'react-router-dom';
 import update from 'immutability-helper';
@@ -22,9 +22,10 @@ export const PageContext = React.createContext<PageContextType>({
 });
 
 export function Page(): JSX.Element {
+	const dispatch = useAppDispatch();
 	const { pageId } = useParams<{ pageId: string }>();
 
-	const dispatch = useAppDispatch();
+	const [fetching, setFetching] = useState(true);
 
 	const blocks = useAppSelector((state) => selectBlocksStateWithProps(state, pageId));
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
@@ -35,12 +36,14 @@ export function Page(): JSX.Element {
 			.json<{ value: { [key: string]: BasicBlock & Blocks } }>()
 			.then((v) => {
 				dispatch(setPage({ blocks: v.value, pageId }));
+				setFetching(false);
 			});
 	}, [dispatch, pageId]);
 
 	useEffect(() => {
+		if (fetching) return;
 		ky.post(`${Config.domain}/page`, { json: { pageId, value: blocksProps } });
-	}, [blocksProps, pageId]);
+	}, [fetching, blocksProps, pageId]);
 
 	const elements = useMemo(() => {
 		if (page?.type !== 'page') return [];
