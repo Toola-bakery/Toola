@@ -42,7 +42,7 @@ fastify.post<{ Body: { pageId: string; value: unknown } }>('/page', async (reque
 	return { ok: true };
 });
 
-fastify.listen(8080, (err, address) => {
+fastify.listen(process.env.PORT || 8080, '0.0.0.0', (err, address) => {
 	if (err) throw err;
 	console.log(`Server is now listening on ${address}`);
 });
