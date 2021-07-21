@@ -7,7 +7,7 @@ import { Blocks } from '../types';
 export type BlockMenuContextType = {
 	isOpen: boolean;
 	anchorEl?: HTMLElement;
-	open: (anchorEl: NonNullable<BlockMenuContextType['anchorEl']>) => Promise<string | void | unknown>;
+	open: (anchorEl: NonNullable<BlockMenuContextType['anchorEl']>) => Promise<Blocks['type'] | null>;
 };
 
 export const BlockMenuContext = React.createContext<BlockMenuContextType>({
@@ -26,7 +26,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 		(_anchorEl) => {
 			setOpen(true);
 			setAnchorEl(_anchorEl);
-			return cleanPromise();
+			return cleanPromise() as Promise<Blocks['type'] | null>;
 		},
 		[cleanPromise],
 	);

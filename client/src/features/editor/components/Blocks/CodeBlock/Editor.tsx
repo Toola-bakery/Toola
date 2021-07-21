@@ -1,7 +1,8 @@
-import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
+import React, { MutableRefObject, MouseEventHandler } from 'react';
 import { CodeBlockType } from '../../../types';
 
 type EditorProps = {
+	onContextMenu?: MouseEventHandler<HTMLDivElement>;
 	onEditorReady: () => void;
 	editorRef: MutableRefObject<Copenhagen.Editor>;
 	language: CodeBlockType['language'];
@@ -18,11 +19,15 @@ export class Editor extends React.Component<EditorProps> {
 	}
 
 	componentDidMount() {
-		const { editorRef, onEditorReady, language, value } = this.props;
+		const { editorRef, onEditorReady, language, value, onContextMenu } = this.props;
 		const editor = new Copenhagen.Editor({ language });
 		// eslint-disable-next-line no-param-reassign,prefer-destructuring
 		editorRef.current = editor;
 		if (this.editorRef.current) editor.open(this.editorRef.current);
+		editor.on('contextmenu', (_, event) => {
+			event.preventDefault();
+			onContextMenu?.(event);
+		});
 		if (typeof value !== 'undefined') editor.setValue(value);
 		onEditorReady();
 	}

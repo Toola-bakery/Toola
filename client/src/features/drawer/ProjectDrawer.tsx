@@ -43,7 +43,15 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 	useEffect(() => {
 		ky.get(`${Config.domain}/pages`)
 			.json<string[]>()
-			.then((v) => setPages(v));
+			.then((v) =>
+				setPages(
+					v.sort((a, b) => {
+						if (a.toLowerCase() < b.toLowerCase()) return -1;
+						if (a.toLowerCase() > b.toLowerCase()) return 1;
+						return 0;
+					}),
+				),
+			);
 	}, []);
 	const menu = (
 		<div>
@@ -55,7 +63,7 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 
 			<List subheader={<ListSubheader>Infra</ListSubheader>}>
 				{['Gateway', 'Domains', 'Functions'].map((text) => (
-					<DrawerItem text={text} />
+					<DrawerItem key={text} text={text} />
 				))}
 			</List>
 		</div>

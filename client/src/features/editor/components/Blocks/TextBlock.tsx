@@ -3,7 +3,7 @@ import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { decode } from 'html-entities';
 import { useEditor } from '../../hooks/useEditor';
 import { useEventListener } from '../../hooks/useEvents';
-import { TextBlockType } from '../../types';
+import { BasicBlock, TextBlockType } from '../../types';
 import { useRefLatest } from '../../../../hooks/useRefLatest';
 import { getCaretIndex } from '../../helpers/getCaretIndex';
 import { useBlockMenu } from '../../hooks/useBlockMenu';
@@ -16,16 +16,17 @@ import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 const CMD_KEY = '/';
 
 export type EditableBlockProps = {
-	block: TextBlockType;
+	block: BasicBlock & TextBlockType;
 };
 
 export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 	const { id, pageId, value: realValue = '', parentId } = block;
 	const [value, setValue] = useState(realValue);
 
-	const { updateBlockProps, addBlockAfter, deleteBlock } = useEditor();
+	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
 	const [isEditing, setEditing] = useState(false);
 	const addBlockAfterRef = useRefLatest(addBlockAfter);
+	const updateBlockTypeRef = useRefLatest(updateBlockType);
 	const deleteBlockRef = useRefLatest(deleteBlock);
 	const valueRef = useRefLatest(value);
 	const isEditingRef = useRefLatest(isEditing);
@@ -53,23 +54,15 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 			if (e.key === CMD_KEY) {
 				if (!contentEditable.current) return;
 				openRef.current(contentEditable.current).then((v) => {
-					updateBlockProps({
-						id,
-						pageId,
-						language: 'javascript',
-						type: v as 'text' | 'code',
-						value: '',
-					});
+					if (!v) return;
+					updateBlockTypeRef.current(id, v);
 				});
 			}
 			if (e.key === 'Enter' && !e.shiftKey) {
 				if (!contentEditable.current) return;
 				const index = getCaretIndex(contentEditable.current);
 				addBlockAfterRef.current(id, {
-					id: Math.random().toString(),
 					type: 'text',
-					parentId,
-					pageId,
 					value: valueRef.current.slice(index),
 				});
 				updateBlockProps({ id, pageId, value: valueRef.current.slice(0, index) });
@@ -93,17 +86,24 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 				}
 			}
 		},
-		[openRef, updateBlockProps, id, pageId, addBlockAfterRef, parentId, valueRef, deleteBlockRef, previousRef],
+		[
+			openRef,
+			updateBlockTypeRef,
+			id,
+			addBlockAfterRef,
+			valueRef,
+			updateBlockProps,
+			pageId,
+			deleteBlockRef,
+			previousRef,
+		],
 	);
 
 	const html = useReferences(isEditing ? '' : realValue);
 
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
-	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState(
-		[{ key: 'open', call: () => console.log('open') }],
-		[],
-	);
+	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState(id, [], []);
 
 	return (
 		<>

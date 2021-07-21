@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { ClickAwayListener } from '@material-ui/core';
-import { Blocks } from '../../types';
+import { BasicBlock, Blocks } from '../../types';
 
 export type MenuItemProps = {
 	key: string;
@@ -13,7 +13,7 @@ export type MenuItemProps = {
 
 export type BlockInspectorProps = {
 	menu: MenuItemProps[];
-	context: { id: string; block: Blocks };
+	context: { id: string; block: BasicBlock & Blocks };
 	isOpen: [number, number] | false;
 	close: (value: unknown) => void;
 };

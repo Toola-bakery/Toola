@@ -2,13 +2,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
-import { Blocks, PageBlock } from '../types';
+import { BasicBlock, Blocks, PageBlockType } from '../types';
 
 interface EditorState {
 	pages: {
 		[pageId: string]: {
-			blocksProperties: { [id: string]: Blocks };
-			blocksState: { [id: string]: Blocks };
+			blocksProperties: { [id: string]: BasicBlock & Blocks };
+			blocksState: { [id: string]: BasicBlock & Blocks };
 		};
 	};
 }
@@ -17,7 +17,7 @@ const initialState: EditorState = {
 	pages: {
 		rand: {
 			blocksProperties: {
-				rand: { id: 'rand', type: 'page', blocks: ['test3'], parentId: null, pageId: 'rand' },
+				rand: { id: 'rand', type: 'page', blocks: ['test3'], parentId: null, pageId: 'rand', itemIterator: {} },
 				test: {
 					id: 'test',
 					type: 'code',
@@ -43,10 +43,10 @@ export const editorSlice = createSlice({
 	name: 'editor',
 	initialState,
 	reducers: {
-		addBlock: (state, action: PayloadAction<Blocks>) => {
+		addBlock: (state, action: PayloadAction<BasicBlock & Blocks>) => {
 			state.pages[action.payload.pageId].blocksProperties[action.payload.id] = action.payload;
 		},
-		updateBlockProps: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id' | 'pageId'>>) => {
+		updateBlockProps: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { blocksProperties } = state.pages[action.payload.pageId];
 			blocksProperties[action.payload.id] = update(blocksProperties[action.payload.id], {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -55,7 +55,7 @@ export const editorSlice = createSlice({
 			});
 		},
 
-		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id' | 'pageId'>>) => {
+		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { blocksState } = state.pages[action.payload.pageId];
 
 			blocksState[action.payload.id] = update(blocksState[action.payload.id] || {}, {
@@ -64,13 +64,11 @@ export const editorSlice = createSlice({
 				$merge: action.payload,
 			});
 		},
-		deleteBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<Blocks, 'id' | 'pageId'>>) => {
-			const { blocksState, blocksProperties } = state.pages[action.payload.pageId];
-
-			delete blocksProperties[action.payload.id];
-			delete blocksState[action.payload.id];
+		deleteBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
+			delete state.pages[action.payload.pageId].blocksProperties[action.payload.id];
+			delete state.pages[action.payload.pageId].blocksState[action.payload.id];
 		},
-		setPage: (state, action: PayloadAction<{ blocks: { [id: string]: Blocks }; pageId: string }>) => {
+		setPage: (state, action: PayloadAction<{ blocks: { [id: string]: BasicBlock & Blocks }; pageId: string }>) => {
 			if (!state.pages[action.payload.pageId])
 				state.pages[action.payload.pageId] = { blocksState: {}, blocksProperties: {} };
 			state.pages[action.payload.pageId].blocksProperties = action.payload.blocks;
@@ -91,14 +89,14 @@ export const selectBlockState = (state: RootState, pageId: string, blockId: stri
 
 export const selectBlockParentProps = (state: RootState, pageId: string, blockId: string) => {
 	const parent = selectBlockProps(state, pageId, blockId)?.parentId;
-	if (parent) return selectBlockProps(state, pageId, parent) as PageBlock;
+	if (parent) return selectBlockProps(state, pageId, parent) as PageBlockType;
 };
 
 export const selectBlocksStateWithProps = createCachedSelector(
 	selectBlocksProps,
 	selectBlocksState,
 	(blocksProps, blocksState) => {
-		const response: { [p: string]: Blocks } = {};
+		const response: { [p: string]: BasicBlock & Blocks } = {};
 		Object.keys(blocksProps).forEach((key) => {
 			response[key] = { ...blocksProps[key], ...(blocksState[key] ? blocksState[key] : {}) };
 		});

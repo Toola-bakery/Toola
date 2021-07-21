@@ -1,25 +1,25 @@
 import { useCallback, useState } from 'react';
 import { useRefLatest } from './useRefLatest';
 
-export function usePromise(whenNew?: 'resolve' | 'reject') {
-	function getPromise<P>(): {
-		promise: Promise<P>;
-		resolve: (value?: P) => void;
-		reject: (reason: unknown) => void;
-	} {
-		let resolve;
-		let reject;
-		const promise = new Promise<P>((_resolve, _reject) => {
-			resolve = _resolve;
-			reject = _reject;
-		});
-		promise.then(() => {});
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		return { resolve, reject, promise };
-	}
+function getPromise<P>(): {
+	promise: Promise<P>;
+	resolve: (value?: P) => void;
+	reject: (reason: unknown) => void;
+} {
+	let resolve;
+	let reject;
+	const promise = new Promise<P>((_resolve, _reject) => {
+		resolve = _resolve;
+		reject = _reject;
+	});
+	promise.then(() => {});
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	return { resolve, reject, promise };
+}
 
-	const [{ promise, reject, resolve }, setPromise] = useState(getPromise);
+export function usePromise(whenNew?: 'resolve' | 'reject') {
+	const [{ promise, reject, resolve }, setPromise] = useState(() => getPromise());
 	const rejectRef = useRefLatest(reject);
 	const resolveRef = useRefLatest(resolve);
 
