@@ -8,6 +8,8 @@ lib-cov
 *.gz
 *.swp
 
+database.json
+
 pids
 logs
 results
