@@ -98,7 +98,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 
 	const html = useReferences(isEditing ? '' : realValue);
 
-	const htmlString = typeof html === 'string' ? html : JSON.stringify(html, Object.getOwnPropertyNames(html));
+	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
 	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState(
 		[{ key: 'open', call: () => console.log('open') }],
