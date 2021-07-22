@@ -76,6 +76,7 @@ export function CodeInput({ onChange, value, label }: { label: string; value: st
 				inputRef={inputRef}
 				variant="outlined"
 				value={value}
+				autoComplete="off"
 				onChange={(e) => {
 					onChange(e.target.value);
 					updateCaret();

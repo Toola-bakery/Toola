@@ -33,10 +33,13 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const onEditorReady = useCallback(() => {
 		if (!editorRef.current) return;
+
 		editorRef.current.on('change', (_, v) => {
 			updateBlockProps({ id, pageId, value: v });
 		});
-	}, [editorRef, id, pageId, updateBlockProps]);
+
+		runCode(value);
+	}, [editorRef, id, pageId, runCode, updateBlockProps, value]);
 
 	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState(id, [], []);
 

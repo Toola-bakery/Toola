@@ -4,7 +4,8 @@ export interface BasicBlock {
 	pageId: string;
 }
 
-export type Blocks = TextBlockType | PageBlockType | RawBlock | ColumnBlock | CodeBlockType | JSONViewBlockType;
+export type Blocks = TextBlockType | TableBlockType | CodeBlockType | JSONViewBlockType | LayoutBlocks;
+export type LayoutBlocks = PageBlockType | ColumnBlockType | RowBlockType;
 
 export type PageBlockType = PageBlockProps & PageBlockState;
 export type PageBlockProps = {
@@ -16,8 +17,8 @@ export type PageBlockState = {
 };
 
 export type TextBlockType = { type: 'text'; value: string };
-export type RawBlock = { type: 'raw'; blocks: string[] };
-export type ColumnBlock = { type: 'column'; blocks: string[] };
+export type ColumnBlockType = { type: 'column'; blocks: string[] };
+export type RowBlockType = { type: 'raw'; blocks: string[]; widths?: number[] };
 
 export type CodeBlockType = CodeBlockProps & CodeBlockState;
 export type CodeBlockProps = {
@@ -28,6 +29,15 @@ export type CodeBlockProps = {
 export type CodeBlockState = {
 	result?: unknown;
 	logs?: string[];
+};
+
+export type TableBlockType = TableBlockProps & TableBlockState;
+export type TableBlockProps = {
+	type: 'table';
+	value: string;
+};
+export type TableBlockState = {
+	page?: number;
 };
 
 export type JSONViewBlockType = JSONViewBlockProps;

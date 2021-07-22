@@ -7,15 +7,22 @@ import {
 	updateBlockProps as updateBlockPropsAction,
 	updateBlockState as updateBlockStateAction,
 	deleteBlock as deleteBlockAction,
+	deleteChildFromParent as deleteChildFromParentAction,
+	addChildAtIndex as addChildAtIndexAction,
+	addChildAfterId as addChildAfterIdAction,
 	selectBlocksProps,
 } from '../redux/editor';
 import { Blocks, PageBlockType } from '../types';
 import { usePageContext } from './useReferences';
 
 type UseEditorResponse = {
+	addChild: (parentId: string, blockId: string, index?: number) => void;
+	addChildAfterId: (putAfterId: string, blockId: string) => void;
 	addBlockAfter: (putAfterId: string, block: Blocks) => void;
+	replaceBlockAfterId: (blockId: string, putAfterId: string) => void;
 	addBlockIn: (parentId: string, block: Blocks) => void;
 	deleteBlock: (blockId: string) => void;
+	deleteFromParent: (blockId: string) => void;
 	updateBlockProps: (block: Parameters<typeof updateBlockPropsAction>[0], focus?: boolean) => void;
 	updateBlockType: (blockId: string, type: Blocks['type']) => void;
 	updateBlockState: (block: Parameters<typeof updateBlockStateAction>[0], focus?: boolean) => void;
@@ -31,6 +38,35 @@ export function useEditor(): UseEditorResponse {
 	const dispatch = useAppDispatch();
 
 	const blocks = useAppSelector((state) => selectBlocksProps(state, pageId));
+
+	const addChild = useCallback<UseEditorResponse['addChild']>(
+		(parentId, blockId, index) => {
+			dispatch(addChildAtIndexAction({ pageId, parentId, blockId, index }));
+		},
+		[dispatch, pageId],
+	);
+
+	const addChildAfterId = useCallback<UseEditorResponse['addChildAfterId']>(
+		(putAfterId, blockId) => {
+			dispatch(addChildAfterIdAction({ pageId, blockId, putAfterId }));
+		},
+		[dispatch, pageId],
+	);
+
+	const deleteFromParent = useCallback<UseEditorResponse['deleteBlock']>(
+		(blockId) => {
+			dispatch(deleteChildFromParentAction({ pageId, blockId }));
+		},
+		[dispatch, pageId],
+	);
+
+	const replaceBlockAfterId = useCallback<UseEditorResponse['replaceBlockAfterId']>(
+		(blockId, putAfterId) => {
+			deleteFromParent(blockId);
+			addChildAfterId(putAfterId, blockId);
+		},
+		[addChildAfterId, deleteFromParent],
+	);
 
 	const updateBlockState = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
@@ -58,53 +94,39 @@ export function useEditor(): UseEditorResponse {
 	const addBlockAfter = useCallback<UseEditorResponse['addBlockAfter']>(
 		(putAfterId, block) => {
 			const { parentId } = blocks[putAfterId];
-			if (!parentId || !blocks[parentId]) return;
-			const parent = blocks[parentId] as PageBlockType;
 
-			const newParentBlocks = [...parent.blocks];
 			const id = getNextId(block.type);
 
-			newParentBlocks.splice(parent.blocks.indexOf(putAfterId) + 1, 0, id);
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			dispatch(addBlockAction({ ...block, id, pageId, parentId }));
-			dispatch(updateBlockPropsAction({ id: parentId, pageId, blocks: newParentBlocks }));
+
+			addChildAfterId(putAfterId, id);
+
 			send(id, { eventName: 'focus', waitListener: true });
 		},
-		[blocks, dispatch, getNextId, pageId, send],
+		[addChildAfterId, blocks, dispatch, getNextId, pageId, send],
 	);
 
 	const addBlockIn = useCallback<UseEditorResponse['addBlockIn']>(
 		(parentId, block) => {
-			if (!parentId || !blocks[parentId]) return;
-			const parent = blocks[parentId] as PageBlockType;
-
-			const newParentBlocks = [...parent.blocks];
-
 			const id = getNextId(block.type);
-			newParentBlocks.push(id);
-
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			dispatch(addBlockAction({ ...block, id, pageId, parentId }));
-			dispatch(updateBlockPropsAction({ id: parentId, pageId, blocks: newParentBlocks }));
+
+			addChild(parentId, id);
 			send(id, { eventName: 'focus', waitListener: true });
 		},
-		[blocks, dispatch, getNextId, pageId, send],
+		[addChild, dispatch, getNextId, pageId, send],
 	);
 
 	const deleteBlock = useCallback<UseEditorResponse['deleteBlock']>(
 		(blockId) => {
-			const { parentId } = blocks[blockId];
-			if (!parentId || !blocks[parentId]) return;
-			const parent = blocks[parentId] as PageBlockType;
-
-			const newParentBlocks = parent.blocks.filter((id) => id !== blockId);
-
+			deleteFromParent(blockId);
 			dispatch(deleteBlockAction({ id: blockId, pageId }));
-			dispatch(updateBlockPropsAction({ id: parentId, pageId, blocks: newParentBlocks }));
 		},
-		[blocks, dispatch, pageId],
+		[deleteFromParent, dispatch, pageId],
 	);
 
 	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
@@ -133,5 +155,17 @@ export function useEditor(): UseEditorResponse {
 		[blocks, dispatch, getNextId, pageId],
 	);
 
-	return { addBlockAfter, updateBlockType, getNextId, deleteBlock, addBlockIn, updateBlockProps, updateBlockState };
+	return {
+		addChild,
+		addChildAfterId,
+		deleteFromParent,
+		addBlockAfter,
+		updateBlockType,
+		getNextId,
+		deleteBlock,
+		addBlockIn,
+		updateBlockProps,
+		updateBlockState,
+		replaceBlockAfterId,
+	};
 }

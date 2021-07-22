@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
-import { BasicBlock, Blocks, PageBlockType } from '../types';
+import { BasicBlock, Blocks, LayoutBlocks, PageBlockType } from '../types';
 
 interface EditorState {
 	pages: {
@@ -55,6 +55,33 @@ export const editorSlice = createSlice({
 			});
 		},
 
+		deleteChildFromParent: (state, action: PayloadAction<{ pageId: string; blockId: string }>) => {
+			const { pageId, blockId } = action.payload;
+			const { blocksProperties } = state.pages[pageId];
+			const block = blocksProperties[blockId] as BasicBlock;
+			if (!block.parentId) return;
+			const parent = blocksProperties[block.parentId] as LayoutBlocks;
+			parent.blocks = parent.blocks.filter((id) => id !== blockId);
+		},
+		addChildAtIndex: (
+			state,
+			action: PayloadAction<{ pageId: string; parentId: string; blockId: string; index?: number }>,
+		) => {
+			const { pageId, blockId, index, parentId } = action.payload;
+			const { blocksProperties } = state.pages[pageId];
+			const parent = blocksProperties[parentId] as LayoutBlocks;
+			if (typeof index !== 'undefined') parent.blocks.splice(index, 0, blockId);
+			else parent.blocks.push(blockId);
+		},
+		addChildAfterId: (state, action: PayloadAction<{ pageId: string; putAfterId: string; blockId: string }>) => {
+			const { pageId, blockId, putAfterId } = action.payload;
+			const { blocksProperties } = state.pages[pageId];
+			const { parentId, id: neighborId } = blocksProperties[putAfterId] as BasicBlock;
+			if (!parentId) return;
+			const parent = blocksProperties[parentId] as LayoutBlocks;
+			parent.blocks.splice(parent.blocks.indexOf(neighborId) + 1, 0, blockId);
+		},
+
 		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { blocksState } = state.pages[action.payload.pageId];
 
@@ -76,7 +103,16 @@ export const editorSlice = createSlice({
 	},
 });
 
-export const { updateBlockProps, setPage, updateBlockState, addBlock, deleteBlock } = editorSlice.actions;
+export const {
+	addChildAtIndex,
+	addChildAfterId,
+	deleteChildFromParent,
+	updateBlockProps,
+	setPage,
+	updateBlockState,
+	addBlock,
+	deleteBlock,
+} = editorSlice.actions;
 
 export const selectBlocksProps = (state: RootState, pageId: string) =>
 	state.editor.pages?.[pageId]?.blocksProperties || {};

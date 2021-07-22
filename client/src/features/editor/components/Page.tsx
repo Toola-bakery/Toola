@@ -1,16 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ky from 'ky';
+import debounce from 'just-debounce';
 import { useParams } from 'react-router-dom';
-import update from 'immutability-helper';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { selectBlocksProps, selectBlocksStateWithProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { Block } from './Block';
-import { BasicBlock, Blocks, PageBlockType } from '../types';
+import { BasicBlock, Blocks, ColumnBlockType, PageBlockType } from '../types';
 import { Config } from '../../../config';
+import { ColumnBlock } from './Blocks/Layout/ColumnBlock';
 
 export type PageContextType = {
-	blocks: { [key: string]: Blocks };
+	blocks: { [key: string]: BasicBlock & Blocks };
 	globals: { pageId: string };
 	page: BasicBlock & PageBlockType;
 };
@@ -20,6 +23,10 @@ export const PageContext = React.createContext<PageContextType>({
 	globals: { pageId: '' },
 	page: { id: '', pageId: '', parentId: '', type: 'page', itemIterator: {}, blocks: [] },
 });
+
+const putPage = debounce((pageId, blocksProps) => {
+	return ky.post(`${Config.domain}/page`, { json: { pageId, value: blocksProps } });
+}, 300);
 
 export function Page(): JSX.Element {
 	const dispatch = useAppDispatch();
@@ -42,20 +49,19 @@ export function Page(): JSX.Element {
 
 	useEffect(() => {
 		if (fetching) return;
-		ky.post(`${Config.domain}/page`, { json: { pageId, value: blocksProps } });
+		putPage(pageId, blocksProps);
 	}, [fetching, blocksProps, pageId]);
-
-	const elements = useMemo(() => {
-		if (page?.type !== 'page') return [];
-		return page.blocks.map((blockKey) => <Block key={blocks[blockKey].id} block={blocks[blockKey]} />);
-	}, [blocks, page]);
 
 	const value = useMemo<PageContextType>(() => ({ blocks, globals: { pageId }, page }), [blocks, pageId, page]);
 
 	return (
-		<PageContext.Provider value={value}>
-			{elements}
-			<CreateBlockAtTheEnd parentId={pageId} />
-		</PageContext.Provider>
+		<DndProvider backend={HTML5Backend}>
+			<PageContext.Provider value={value}>
+				<div style={{ width: '100%', overflowX: 'clip' }}>
+					{page ? <ColumnBlock block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
+					<CreateBlockAtTheEnd parentId={pageId} />
+				</div>
+			</PageContext.Provider>
+		</DndProvider>
 	);
 }

@@ -25,7 +25,7 @@ export function useBlockInspectorState(id: string, menuConfig: BlockInspectorPro
 
 	const onContextMenu = useCallback<MouseEventHandler<HTMLDivElement>>(
 		(e) => {
-			open(e.pageX, e.pageY - window.scrollY);
+			open(e.pageX - window.scrollX, e.pageY - window.scrollY);
 			e.preventDefault();
 		},
 		[open],

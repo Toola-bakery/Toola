@@ -118,6 +118,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 				innerRef={contentEditable}
 				html={isEditing ? value : htmlString}
 				tagName="p"
+				style={{ margin: 0, marginBottom: 10 }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
 			/>

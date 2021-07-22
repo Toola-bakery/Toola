@@ -1,7 +1,6 @@
-import { useMemo, useRef } from 'react';
 import JSONTree from 'react-json-tree';
 import { BasicBlock, JSONViewBlockType } from '../../types';
-import { BlockInspector, BlockInspectorProps } from '../Inspector/BlockInspector';
+import { BlockInspector } from '../Inspector/BlockInspector';
 import { useReferences } from '../../hooks/useReferences';
 import { UpdateProperties } from '../Inspector/UpdateProperties';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
