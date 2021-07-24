@@ -1,16 +1,21 @@
 import { Column, useTable } from 'react-table';
 import { useMemo } from 'react';
-import { BasicBlock, TableBlockType } from '../../../types';
+import { BasicBlock } from '../../../types/basicBlock';
 import { useReferences } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
 import { UpdateProperties } from '../../Inspector/UpdateProperties';
 import { BlockInspector } from '../../Inspector/BlockInspector';
 
+export type TableBlockType = TableBlockProps & TableBlockState;
 export type TableBlockProps = {
-	block: BasicBlock & TableBlockType;
+	type: 'table';
+	value: string;
+};
+export type TableBlockState = {
+	page?: number;
 };
 
-export function TableBlock({ block }: TableBlockProps) {
+export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { value, id } = block;
 
 	const state = useReferences(value);

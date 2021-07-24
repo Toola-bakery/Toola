@@ -2,7 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
-import { BasicBlock, Blocks, LayoutBlocks, PageBlockType } from '../types';
+import { BasicBlock } from '../types/basicBlock';
+import { Blocks, LayoutBlocks } from '../types/blocks';
+import { PageBlockType } from '../components/Page';
 
 interface EditorState {
 	pages: {

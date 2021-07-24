@@ -10,6 +10,7 @@
 		"serve": "nodemon --exec 'NODE_ENV=development node -r ts-node/register src/index.ts' -e ts"
 	},
 	"dependencies": {
+		"@types/uuid": "^8.3.1",
 		"@types/ws": "^7.4.6",
 		"axios": "^0.21.1",
 		"bluebird": "^3.5.5",
@@ -20,6 +21,7 @@
 		"express-async-errors": "^3.1.1",
 		"fastify": "^3.19.1",
 		"fastify-cors": "^6.0.2",
+		"fastify-mongodb": "^4.0.0",
 		"lodash": "^4.17.13",
 		"mongodb": "^4.0.1",
 		"mongoose": "^5.6.0",
@@ -28,6 +30,7 @@
 		"simple-json-db": "^1.2.3",
 		"tslint-config-airbnb-base": "^0.3.0",
 		"tslint-config-prettier": "^1.18.0",
+		"uuid": "^8.3.2",
 		"ws": "^7.5.3"
 	},
 	"devDependencies": {

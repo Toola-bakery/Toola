@@ -13,9 +13,10 @@ import {
 	updateParentId as updateParentIdAction,
 	selectBlocksProps,
 } from '../redux/editor';
-import { BasicBlock, Blocks } from '../types';
+import { BasicBlock } from '../types/basicBlock';
 import { usePageContext } from './useReferences';
 import { BlockCreators } from '../helpers/BlockCreators';
+import { Blocks } from '../types/blocks';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 

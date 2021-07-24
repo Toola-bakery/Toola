@@ -32,15 +32,15 @@ export function executeFunction({
 			const stringData = data.toString('utf-8');
 			if (stringData.includes(id)) {
 				const batch = stringData.split(id);
-				console.log({ stringData });
+				console.log({ stringData, l: batch.length });
 
 				if (!mentionedOnce) {
 					if (batch[0]) output(Buffer.from(batch[0]));
 					response += batch[1];
-					if (batch.length === 3 && batch[2]) {
+					if (batch.length === 3) {
 						resolve(JSON.parse(response).result);
 						console.log({ response });
-						output(Buffer.from(batch[2]));
+						if (batch[2]) output(Buffer.from(batch[2]));
 					}
 					mentionedOnce = true;
 				} else {

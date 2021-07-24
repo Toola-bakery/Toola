@@ -1,5 +1,5 @@
 import React, { MutableRefObject, MouseEventHandler } from 'react';
-import { CodeBlockType } from '../../../types';
+import { CodeBlockType } from './CodeBlock';
 
 type EditorProps = {
 	onContextMenu?: MouseEventHandler<HTMLDivElement>;

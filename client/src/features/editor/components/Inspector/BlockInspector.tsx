@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { ClickAwayListener } from '@material-ui/core';
-import { BasicBlock, Blocks } from '../../types';
+import { BasicBlock } from '../../types/basicBlock';
+import { Blocks } from '../../types/blocks';
 
 export type MenuItemProps = {
 	key: string;

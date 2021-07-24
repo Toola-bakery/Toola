@@ -1,14 +1,16 @@
-import { BasicBlock, ImageBlockType } from '../../types';
+import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
 import { useReferences } from '../../hooks/useReferences';
 import { UpdateProperties } from '../Inspector/UpdateProperties';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 
+export type ImageBlockType = ImageBlockProps;
 export type ImageBlockProps = {
-	block: BasicBlock & ImageBlockType;
+	type: 'image';
+	value: string;
 };
 
-export function ImageBlock({ block }: ImageBlockProps): JSX.Element {
+export function ImageBlock({ block }: { block: BasicBlock & ImageBlockType }): JSX.Element {
 	const { id, value } = block;
 
 	const state = useReferences(value);

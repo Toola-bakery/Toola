@@ -1,4 +1,4 @@
-import { Blocks } from '../types';
+import { Blocks } from '../types/blocks';
 
 function copyProps<P extends Blocks['type']>(joinWith: { type: P } & Blocks, anyBlock?: Blocks) {
 	if (!anyBlock) return joinWith;
@@ -21,4 +21,5 @@ export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: Blocks) => { ty
 	table: (anyBlock?: Blocks) => copyProps({ type: 'table', value: '' }, anyBlock),
 	text: (anyBlock?: Blocks) => copyProps({ type: 'text', value: '' }, anyBlock),
 	image: (anyBlock?: Blocks) => copyProps({ type: 'image', value: '' }, anyBlock),
+	input: (anyBlock?: Blocks) => copyProps({ type: 'input', initialValue: '', label: '' }, anyBlock),
 };

@@ -1,15 +1,17 @@
 import JSONTree from 'react-json-tree';
-import { BasicBlock, JSONViewBlockType } from '../../types';
+import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
 import { useReferences } from '../../hooks/useReferences';
 import { UpdateProperties } from '../Inspector/UpdateProperties';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 
+export type JSONViewBlockType = JSONViewBlockProps;
 export type JSONViewBlockProps = {
-	block: BasicBlock & JSONViewBlockType;
+	type: 'JSONView';
+	value: string;
 };
 
-export function JSONViewBlock({ block }: JSONViewBlockProps): JSX.Element {
+export function JSONViewBlock({ block }: { block: BasicBlock & JSONViewBlockType }): JSX.Element {
 	const { id, value } = block;
 
 	const state = useReferences(value);

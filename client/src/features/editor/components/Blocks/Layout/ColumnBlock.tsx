@@ -1,19 +1,17 @@
 import React, { useMemo } from 'react';
 import { Block } from '../../Block';
-import { BasicBlock, Blocks, ColumnBlockType, RowBlockType } from '../../../types';
+import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext } from '../../../hooks/useReferences';
 import { useEditor } from '../../../hooks/useEditor';
-import { RowBlock } from './RowBlock';
+import { RowBlock, RowBlockType } from './RowBlock';
 import { DropTarget } from './DropTarget';
+import { Blocks } from '../../../types/blocks';
 
-export type ColumnBlockProps = {
-	block: BasicBlock & ColumnBlockType;
-	fake?: boolean;
-};
+export type ColumnBlockType = { type: 'column'; blocks: string[] };
 
-export function ColumnBlock({ block, fake }: ColumnBlockProps) {
+export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockType; fake?: boolean }) {
 	const { blocks, pageId } = usePageContext();
-	const { moveBlockAfterId } = useEditor();
+	const { moveBlockAfterId, addChild } = useEditor();
 
 	const elements = useMemo(() => {
 		return block.blocks.map((blockKey) => {
@@ -37,5 +35,10 @@ export function ColumnBlock({ block, fake }: ColumnBlockProps) {
 		});
 	}, [block.blocks, block.id, blocks, fake, moveBlockAfterId, pageId]);
 
-	return <>{elements}</>;
+	return (
+		<>
+			<DropTarget onDrop={(item: BasicBlock & Blocks) => addChild(block.id, item.id, 0)} />
+			{elements}
+		</>
+	);
 }

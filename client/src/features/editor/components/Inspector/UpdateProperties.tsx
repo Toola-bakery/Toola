@@ -1,6 +1,7 @@
 import { useEditor } from '../../hooks/useEditor';
-import { BasicBlock, Blocks } from '../../types';
+import { BasicBlock } from '../../types/basicBlock';
 import { CodeInput } from './CodeInput';
+import { Blocks } from '../../types/blocks';
 
 export type UpdatePropertiesProps = {
 	block: BasicBlock & Blocks;

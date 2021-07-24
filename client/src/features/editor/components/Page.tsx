@@ -7,9 +7,16 @@ import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { selectBlocksProps, selectBlocksStateWithProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
-import { BasicBlock, Blocks, ColumnBlockType, PageBlockType } from '../types';
+import { BasicBlock } from '../types/basicBlock';
 import { Config } from '../../../config';
-import { ColumnBlock } from './Blocks/Layout/ColumnBlock';
+import { ColumnBlock, ColumnBlockType } from './Blocks/Layout/ColumnBlock';
+import { Blocks } from '../types/blocks';
+
+export type PageBlockType = PageBlockProps;
+export type PageBlockProps = {
+	type: 'page';
+	blocks: string[];
+};
 
 export type PageContextType = {
 	blocks: { [key: string]: BasicBlock & Blocks };

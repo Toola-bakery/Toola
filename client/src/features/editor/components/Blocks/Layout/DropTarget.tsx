@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { useDrop } from 'react-dnd';
-import { BasicBlock, Blocks } from '../../../types';
+import { BasicBlock } from '../../../types/basicBlock';
+import { Blocks } from '../../../types/blocks';
 
 export function DropTarget({
 	vertical = false,

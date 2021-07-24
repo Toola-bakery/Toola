@@ -2,11 +2,23 @@ import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
 import { Button } from '@material-ui/core';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
-import { BasicBlock, CodeBlockType } from '../../../types';
+import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { Editor } from './Editor';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
 import { BlockInspector } from '../../Inspector/BlockInspector';
+
+export type CodeBlockType = CodeBlockProps & CodeBlockState;
+export type CodeBlockProps = {
+	type: 'code';
+	value: string;
+	language: 'javascript';
+	manualControl: boolean;
+};
+export type CodeBlockState = {
+	result?: unknown;
+	logs?: string[];
+};
 
 export type CodeBlockComponentProps = {
 	block: BasicBlock & CodeBlockType;

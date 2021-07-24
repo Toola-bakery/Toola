@@ -62,7 +62,7 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 			</List>
 
 			<List subheader={<ListSubheader>Infra</ListSubheader>}>
-				{['Gateway', 'Domains', 'Functions'].map((text) => (
+				{['Databases'].map((text) => (
 					<DrawerItem key={text} text={text} />
 				))}
 			</List>

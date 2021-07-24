@@ -26,6 +26,7 @@ module.exports = {
 		'consistent-return': 'off',
 		'no-console': 'off',
 		'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state'] }],
+		'no-underscore-dangle': ['error', { allow: ['_id'] }],
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'@typescript-eslint/no-explicit-any': 'off',
 		'import/prefer-default-export': 'off',

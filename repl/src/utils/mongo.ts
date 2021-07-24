@@ -4,7 +4,7 @@ import * as path from 'path';
 
 export const mongoRef: {
 	db?: Db;
-	connectionPromise?: Promise<MongoClient>;
+	connectionPromise?: Promise<{ client: MongoClient; databaseName: string }>;
 } = {};
 
 export async function mongoConnect() {
@@ -14,9 +14,9 @@ export async function mongoConnect() {
 		sslCA: path.resolve(__dirname, '../../ca-certificate.crt'),
 	};
 
-	mongoRef.connectionPromise = MongoClient.connect(process.env.DB_LINK, options).then(c => {
-		mongoRef.db = c.db(process.env.DB_NAME);
-		return c;
+	mongoRef.connectionPromise = MongoClient.connect(process.env.DB_LINK, options).then(client => {
+		mongoRef.db = client.db(process.env.DB_NAME);
+		return { client, databaseName: process.env.DB_NAME };
 	});
 
 	return mongoRef.connectionPromise;

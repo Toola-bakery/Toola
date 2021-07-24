@@ -3,7 +3,7 @@ import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { decode } from 'html-entities';
 import { useEditor } from '../../hooks/useEditor';
 import { useEventListener } from '../../hooks/useEvents';
-import { BasicBlock, TextBlockType } from '../../types';
+import { BasicBlock } from '../../types/basicBlock';
 import { useRefLatest } from '../../../../hooks/useRefLatest';
 import { getCaretIndex } from '../../helpers/getCaretIndex';
 import { useBlockMenu } from '../../hooks/useBlockMenu';
@@ -14,6 +14,8 @@ import { BlockInspector } from '../Inspector/BlockInspector';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 
 const CMD_KEY = '/';
+
+export type TextBlockType = { type: 'text'; value: string };
 
 export type EditableBlockProps = {
 	block: BasicBlock & TextBlockType;

@@ -1,15 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
 import { Block } from '../../Block';
-import { BasicBlock, Blocks, ColumnBlockType, RowBlockType } from '../../../types';
+import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext } from '../../../hooks/useReferences';
 import { DropTarget } from './DropTarget';
 import { useEditor } from '../../../hooks/useEditor';
-import { ColumnBlock } from './ColumnBlock';
+import { ColumnBlock, ColumnBlockType } from './ColumnBlock';
+import { Blocks } from '../../../types/blocks';
 
-export type RowBlockProps = {
-	block: BasicBlock & RowBlockType;
-	fake?: boolean;
-};
+export type RowBlockType = { type: 'row'; blocks: string[]; widths?: number[] };
 
 function addAfterEachElement<T, R>(array: T[], get: (perviousEl: T) => R) {
 	const newArray: (T | R)[] = [];
@@ -22,7 +20,7 @@ function addAfterEachElement<T, R>(array: T[], get: (perviousEl: T) => R) {
 	return newArray;
 }
 
-export function RowBlock({ block, fake = false }: RowBlockProps) {
+export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlockType; fake?: boolean }) {
 	const { blocks, pageId } = usePageContext();
 
 	const { addBlocks, addChildInsteadOf, addChildAfterId, addChild } = useEditor();

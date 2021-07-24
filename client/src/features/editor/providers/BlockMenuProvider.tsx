@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { usePromise } from '../../../hooks/usePromise';
-import { Blocks } from '../types';
+import { Blocks } from '../types/blocks';
 
 export type BlockMenuContextType = {
 	isOpen: boolean;
@@ -53,6 +53,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 					<MenuItem onClick={() => close('JSONView')}>JSON viewer</MenuItem>
 					<MenuItem onClick={() => close('table')}>Table</MenuItem>
 					<MenuItem onClick={() => close('image')}>Image</MenuItem>
+					<MenuItem onClick={() => close('input')}>Input</MenuItem>
 				</Menu>
 			</>
 		</BlockMenuContext.Provider>
