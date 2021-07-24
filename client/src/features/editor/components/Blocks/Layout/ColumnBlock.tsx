@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
-import { useDrop } from 'react-dnd';
+import React, { useMemo } from 'react';
 import { Block } from '../../Block';
 import { BasicBlock, Blocks, ColumnBlockType, RowBlockType } from '../../../types';
 import { usePageContext } from '../../../hooks/useReferences';

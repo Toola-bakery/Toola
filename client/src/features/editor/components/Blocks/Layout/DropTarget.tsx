@@ -2,7 +2,6 @@ import React from 'react';
 
 import { useDrop } from 'react-dnd';
 import { BasicBlock, Blocks } from '../../../types';
-import { useEditor } from '../../../hooks/useEditor';
 
 export function DropTarget({
 	vertical = false,

@@ -14,35 +14,13 @@ interface EditorState {
 }
 
 const initialState: EditorState = {
-	pages: {
-		rand: {
-			blocksProperties: {
-				rand: { id: 'rand', type: 'page', blocks: ['test3'], parentId: null, pageId: 'rand' },
-				test: {
-					id: 'test',
-					type: 'code',
-					value: 'test',
-					parentId: 'rand',
-					pageId: 'rand',
-					language: 'javascript',
-				},
-				test3: {
-					id: 'test3',
-					type: 'text',
-					value: 'test',
-					parentId: 'rand',
-					pageId: 'rand',
-				},
-			},
-			blocksState: {},
-		},
-	},
+	pages: {},
 };
 
 function getParentHelper(state: EditorState, pageId: string, blockId: string): (BasicBlock & LayoutBlocks) | null {
 	const { blocksProperties } = state.pages[pageId];
 	const { parentId } = blocksProperties[blockId] as BasicBlock;
-	console.log('getParentHelper', { block: blocksProperties[blockId] });
+
 	if (!parentId || !blocksProperties[parentId]) return null;
 	return blocksProperties[parentId] as BasicBlock & LayoutBlocks;
 }
@@ -62,7 +40,6 @@ function deleteBlockHelper(state: EditorState, pageId: string, blockId: string) 
 
 function deleteChildFromParentHelper(state: EditorState, pageId: string, blockId: string) {
 	const parent = getParentHelper(state, pageId, blockId);
-	console.log('deleteChildFromParentHelper', { pageId, blockId, parent, nP: !parent });
 	if (!parent) return;
 	parent.blocks = parent.blocks.filter((id) => id !== blockId);
 

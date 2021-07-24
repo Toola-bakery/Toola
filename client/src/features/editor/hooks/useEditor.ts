@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
-import update from 'immutability-helper';
+import { useCallback } from 'react';
 import { useEvents } from './useEvents';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import {
@@ -16,6 +15,7 @@ import {
 } from '../redux/editor';
 import { BasicBlock, Blocks } from '../types';
 import { usePageContext } from './useReferences';
+import { BlockCreators } from '../helpers/BlockCreators';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -161,15 +161,15 @@ export function useEditor(): UseEditorResponse {
 			const block = blocks[blockId];
 			const { parentId } = block;
 
+			const newBlock = BlockCreators[type](block);
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			const [{ id: newId }] = addBlocks([{ ...block, id: undefined, pageId, parentId, language: 'javascript', type }]);
+			const [{ id: newId }] = addBlocks([{ ...newBlock, pageId, parentId, type }]);
 
 			if (parentId) addChildInsteadOf(blockId, newId);
-
-			dispatch(deleteBlockAction({ id: blockId, pageId }));
+			deleteBlock(blockId);
 		},
-		[addBlocks, blocks, dispatch, pageId, addChildInsteadOf],
+		[blocks, addBlocks, pageId, addChildInsteadOf, deleteBlock],
 	);
 
 	return {

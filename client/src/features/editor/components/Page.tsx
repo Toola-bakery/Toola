@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ky from 'ky';
 import debounce from 'just-debounce';
 import { useParams } from 'react-router-dom';
@@ -7,7 +7,6 @@ import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { selectBlocksProps, selectBlocksStateWithProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
-import { Block } from './Block';
 import { BasicBlock, Blocks, ColumnBlockType, PageBlockType } from '../types';
 import { Config } from '../../../config';
 import { ColumnBlock } from './Blocks/Layout/ColumnBlock';

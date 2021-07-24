@@ -14,7 +14,7 @@ export function TableBlock({ block }: TableBlockProps) {
 	const { value, id } = block;
 
 	const state = useReferences(value);
-	console.log({ state });
+
 	const data = useMemo<any[]>(() => (Array.isArray(state) ? state : [state]), [state]);
 
 	const columns = useMemo<Column[]>(

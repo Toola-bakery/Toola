@@ -20,7 +20,7 @@ export type EditableBlockProps = {
 };
 
 export function TextBlock({ block }: EditableBlockProps): JSX.Element {
-	const { id, pageId, value: realValue = '', parentId } = block;
+	const { id, pageId, value: realValue = '' } = block;
 	const [value, setValue] = useState(realValue);
 
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
@@ -111,7 +111,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 			<ContentEditable
 				onContextMenu={onContextMenu}
 				className="Block"
-				onFocus={(e) => {
+				onFocus={() => {
 					if (!isEditingRef.current) setEditing(true);
 				}}
 				onBlur={() => isEditingRef.current && setEditing(false)}

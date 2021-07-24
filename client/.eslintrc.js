@@ -31,6 +31,7 @@ module.exports = {
 		'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state'] }],
 		'react/jsx-uses-react': 'off',
 		'react/react-in-jsx-scope': 'off',
+		'jsx-a11y/alt-text': 'off',
 		'jsx-a11y/no-static-element-interactions': 'off',
 		'jsx-a11y/no-noninteractive-element-interactions': 'off',
 		'jsx-a11y/click-events-have-key-events': 'off',
