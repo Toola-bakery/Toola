@@ -30,7 +30,11 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 	const { hovered, eventHandlers } = useHover();
 
 	return (
-		<div ref={dragPreview} {...eventHandlers} style={{ display: 'flex', flexDirection: 'row', opacity }}>
+		<div
+			ref={dragPreview}
+			{...eventHandlers}
+			style={{ display: 'flex', flexDirection: 'row', opacity, backgroundColor: 'blue' }}
+		>
 			<div ref={dragRef} style={{ flexShrink: 1, opacity: hovered ? 1 : 0 }}>
 				<DragIndicatorIcon />
 			</div>

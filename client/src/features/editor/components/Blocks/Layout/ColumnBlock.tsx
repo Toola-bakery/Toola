@@ -1,41 +1,42 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 import { Block } from '../../Block';
-import { BasicBlock, Blocks, ColumnBlockType } from '../../../types';
+import { BasicBlock, Blocks, ColumnBlockType, RowBlockType } from '../../../types';
 import { usePageContext } from '../../../hooks/useReferences';
 import { useEditor } from '../../../hooks/useEditor';
+import { RowBlock } from './RowBlock';
+import { DropTarget } from './DropTarget';
 
 export type ColumnBlockProps = {
 	block: BasicBlock & ColumnBlockType;
+	fake?: boolean;
 };
 
-function DropTarget({ afterId }: { afterId: string }) {
-	const { replaceBlockAfterId } = useEditor();
-	const [{ isOver }, drop] = useDrop(() => ({
-		accept: 'Block',
-		drop: (item: BasicBlock & Blocks, monitor) => {
-			replaceBlockAfterId(item.id, afterId);
-		},
-		collect: (monitor) => ({
-			isOver: monitor.isOver(),
-		}),
-	}));
+export function ColumnBlock({ block, fake }: ColumnBlockProps) {
+	const { blocks, pageId } = usePageContext();
+	const { moveBlockAfterId } = useEditor();
 
-	return <div style={{ backgroundColor: isOver ? 'red' : 'transparent', height: 5 }} ref={drop} />;
-}
-
-export function ColumnBlock({ block }: ColumnBlockProps) {
-	const { blocks } = usePageContext();
 	const elements = useMemo(() => {
 		return block.blocks.map((blockKey) => {
 			return (
 				<div key={`${blocks[blockKey].id}`}>
-					<Block block={blocks[blockKey]} />
-					<DropTarget afterId={blocks[blockKey].id} />
+					{(() => {
+						if (blocks[blockKey].type === 'row')
+							return <RowBlock block={blocks[blockKey] as BasicBlock & RowBlockType} />;
+						if (!fake) return <Block block={blocks[blockKey]} />;
+						return (
+							<RowBlock
+								fake
+								block={{ blocks: [blockKey], id: `fakeRow${blockKey}`, parentId: block.id, type: 'row', pageId }}
+							/>
+						);
+					})()}
+
+					<DropTarget onDrop={(item: BasicBlock & Blocks) => moveBlockAfterId(item.id, blockKey)} />
 				</div>
 			);
 		});
-	}, [block, blocks]);
+	}, [block.blocks, block.id, blocks, fake, moveBlockAfterId, pageId]);
 
 	return <>{elements}</>;
 }

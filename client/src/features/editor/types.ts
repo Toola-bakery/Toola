@@ -12,13 +12,12 @@ export type PageBlockProps = {
 	type: 'page';
 	blocks: string[];
 };
-export type PageBlockState = {
-	itemIterator: { [key: string]: number };
-};
+export type PageBlockState = {};
+
+export type ColumnBlockType = { type: 'column'; blocks: string[] };
+export type RowBlockType = { type: 'row'; blocks: string[]; widths?: number[] };
 
 export type TextBlockType = { type: 'text'; value: string };
-export type ColumnBlockType = { type: 'column'; blocks: string[] };
-export type RowBlockType = { type: 'raw'; blocks: string[]; widths?: number[] };
 
 export type CodeBlockType = CodeBlockProps & CodeBlockState;
 export type CodeBlockProps = {

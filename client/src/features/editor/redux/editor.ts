@@ -17,7 +17,7 @@ const initialState: EditorState = {
 	pages: {
 		rand: {
 			blocksProperties: {
-				rand: { id: 'rand', type: 'page', blocks: ['test3'], parentId: null, pageId: 'rand', itemIterator: {} },
+				rand: { id: 'rand', type: 'page', blocks: ['test3'], parentId: null, pageId: 'rand' },
 				test: {
 					id: 'test',
 					type: 'code',
@@ -39,12 +39,57 @@ const initialState: EditorState = {
 	},
 };
 
+function getParentHelper(state: EditorState, pageId: string, blockId: string): (BasicBlock & LayoutBlocks) | null {
+	const { blocksProperties } = state.pages[pageId];
+	const { parentId } = blocksProperties[blockId] as BasicBlock;
+	console.log('getParentHelper', { block: blocksProperties[blockId] });
+	if (!parentId || !blocksProperties[parentId]) return null;
+	return blocksProperties[parentId] as BasicBlock & LayoutBlocks;
+}
+function getBlockHelper(state: EditorState, pageId: string, blockId: string): BasicBlock & Blocks {
+	const { blocksProperties } = state.pages[pageId];
+	return blocksProperties[blockId] as BasicBlock & Blocks;
+}
+
+function deleteBlockHelper(state: EditorState, pageId: string, blockId: string) {
+	// allow recursive function
+	// eslint-disable-next-line @typescript-eslint/no-use-before-define
+	deleteChildFromParentHelper(state, pageId, blockId);
+
+	delete state.pages[pageId].blocksProperties[blockId];
+	delete state.pages[pageId].blocksState[blockId];
+}
+
+function deleteChildFromParentHelper(state: EditorState, pageId: string, blockId: string) {
+	const parent = getParentHelper(state, pageId, blockId);
+	console.log('deleteChildFromParentHelper', { pageId, blockId, parent, nP: !parent });
+	if (!parent) return;
+	parent.blocks = parent.blocks.filter((id) => id !== blockId);
+
+	if ((parent.type === 'column' || parent.type === 'row') && parent.blocks.length === 0)
+		deleteBlockHelper(state, pageId, parent.id);
+}
+
+function updateParentIdHelper(state: EditorState, pageId: string, blockId: string, newParentId: null | string) {
+	const { blocksProperties } = state.pages[pageId];
+	const block = blocksProperties[blockId] as BasicBlock;
+	if (!block) return;
+	block.parentId = newParentId;
+}
+
 export const editorSlice = createSlice({
 	name: 'editor',
 	initialState,
 	reducers: {
-		addBlock: (state, action: PayloadAction<BasicBlock & Blocks>) => {
-			state.pages[action.payload.pageId].blocksProperties[action.payload.id] = action.payload;
+		addBlocks: (state, action: PayloadAction<(BasicBlock & Blocks)[]>) => {
+			action.payload.forEach((block) => {
+				state.pages[block.pageId].blocksProperties[block.id] = block;
+			});
+		},
+		updateParentId(state, action: PayloadAction<{ blockId: string; parentId: string; pageId: string }>) {
+			const { pageId, blockId, parentId } = action.payload;
+			deleteChildFromParentHelper(state, pageId, blockId);
+			updateParentIdHelper(state, pageId, blockId, parentId);
 		},
 		updateBlockProps: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { blocksProperties } = state.pages[action.payload.pageId];
@@ -55,31 +100,43 @@ export const editorSlice = createSlice({
 			});
 		},
 
-		deleteChildFromParent: (state, action: PayloadAction<{ pageId: string; blockId: string }>) => {
-			const { pageId, blockId } = action.payload;
-			const { blocksProperties } = state.pages[pageId];
-			const block = blocksProperties[blockId] as BasicBlock;
-			if (!block.parentId) return;
-			const parent = blocksProperties[block.parentId] as LayoutBlocks;
-			parent.blocks = parent.blocks.filter((id) => id !== blockId);
+		addChildInsteadOf: (state, action: PayloadAction<{ pageId: string; blockId: string; replaceWithId: string }>) => {
+			const { pageId, blockId, replaceWithId } = action.payload;
+			const parent = getParentHelper(state, pageId, blockId);
+			if (!parent) return;
+			parent.blocks = parent.blocks.map((id) => (id !== blockId ? id : replaceWithId));
+			updateParentIdHelper(state, pageId, replaceWithId, parent.id);
+			updateParentIdHelper(state, pageId, blockId, null);
 		},
 		addChildAtIndex: (
 			state,
-			action: PayloadAction<{ pageId: string; parentId: string; blockId: string; index?: number }>,
+			action: PayloadAction<{ pageId: string; parentId: string; blocksId: string | string[]; index?: number }>,
 		) => {
-			const { pageId, blockId, index, parentId } = action.payload;
-			const { blocksProperties } = state.pages[pageId];
-			const parent = blocksProperties[parentId] as LayoutBlocks;
-			if (typeof index !== 'undefined') parent.blocks.splice(index, 0, blockId);
-			else parent.blocks.push(blockId);
+			const { pageId, blocksId, index, parentId } = action.payload;
+			const parent = getBlockHelper(state, pageId, parentId) as LayoutBlocks;
+			if (!parent) return;
+
+			(Array.isArray(blocksId) ? blocksId : [blocksId]).forEach((blockId, i) => {
+				deleteChildFromParentHelper(state, pageId, blockId);
+				updateParentIdHelper(state, pageId, blockId, parentId);
+
+				if (typeof index !== 'undefined') parent.blocks.splice(index, i, blockId);
+				else parent.blocks.push(blockId);
+			});
 		},
-		addChildAfterId: (state, action: PayloadAction<{ pageId: string; putAfterId: string; blockId: string }>) => {
-			const { pageId, blockId, putAfterId } = action.payload;
+		addChildAfterId(state, action: PayloadAction<{ pageId: string; putAfterId: string; blocksId: string | string[] }>) {
+			const { pageId, blocksId, putAfterId } = action.payload;
 			const { blocksProperties } = state.pages[pageId];
-			const { parentId, id: neighborId } = blocksProperties[putAfterId] as BasicBlock;
-			if (!parentId) return;
-			const parent = blocksProperties[parentId] as LayoutBlocks;
-			parent.blocks.splice(parent.blocks.indexOf(neighborId) + 1, 0, blockId);
+			const { id: neighborId } = blocksProperties[putAfterId] as BasicBlock;
+
+			const parent = getParentHelper(state, pageId, putAfterId);
+			if (!parent) return;
+
+			(Array.isArray(blocksId) ? blocksId : [blocksId]).forEach((blockId, i) => {
+				deleteChildFromParentHelper(state, pageId, blockId);
+				updateParentIdHelper(state, pageId, blockId, parent.id);
+				parent.blocks.splice(parent.blocks.indexOf(neighborId) + 1 + i, 0, blockId);
+			});
 		},
 
 		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
@@ -92,8 +149,12 @@ export const editorSlice = createSlice({
 			});
 		},
 		deleteBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
-			delete state.pages[action.payload.pageId].blocksProperties[action.payload.id];
-			delete state.pages[action.payload.pageId].blocksState[action.payload.id];
+			const { id: blockId, pageId } = action.payload;
+			deleteBlockHelper(state, pageId, blockId);
+		},
+		deleteChildFromParent: (state, action: PayloadAction<{ pageId: string; blockId: string }>) => {
+			const { pageId, blockId } = action.payload;
+			deleteChildFromParentHelper(state, pageId, blockId);
 		},
 		setPage: (state, action: PayloadAction<{ blocks: { [id: string]: BasicBlock & Blocks }; pageId: string }>) => {
 			if (!state.pages[action.payload.pageId])
@@ -110,8 +171,10 @@ export const {
 	updateBlockProps,
 	setPage,
 	updateBlockState,
-	addBlock,
+	addChildInsteadOf,
+	addBlocks,
 	deleteBlock,
+	updateParentId,
 } = editorSlice.actions;
 
 export const selectBlocksProps = (state: RootState, pageId: string) =>

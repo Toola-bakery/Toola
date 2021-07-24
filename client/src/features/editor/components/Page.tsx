@@ -16,12 +16,14 @@ export type PageContextType = {
 	blocks: { [key: string]: BasicBlock & Blocks };
 	globals: { pageId: string };
 	page: BasicBlock & PageBlockType;
+	pageId: string;
 };
 
 export const PageContext = React.createContext<PageContextType>({
 	blocks: {},
 	globals: { pageId: '' },
-	page: { id: '', pageId: '', parentId: '', type: 'page', itemIterator: {}, blocks: [] },
+	pageId: '',
+	page: { id: '', pageId: '', parentId: '', type: 'page', blocks: [] },
 });
 
 const putPage = debounce((pageId, blocksProps) => {
@@ -52,13 +54,13 @@ export function Page(): JSX.Element {
 		putPage(pageId, blocksProps);
 	}, [fetching, blocksProps, pageId]);
 
-	const value = useMemo<PageContextType>(() => ({ blocks, globals: { pageId }, page }), [blocks, pageId, page]);
+	const value = useMemo<PageContextType>(() => ({ blocks, pageId, globals: { pageId }, page }), [blocks, pageId, page]);
 
 	return (
 		<DndProvider backend={HTML5Backend}>
 			<PageContext.Provider value={value}>
 				<div style={{ width: '100%', overflowX: 'clip' }}>
-					{page ? <ColumnBlock block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
+					{page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
 					<CreateBlockAtTheEnd parentId={pageId} />
 				</div>
 			</PageContext.Provider>

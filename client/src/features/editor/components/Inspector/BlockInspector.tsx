@@ -29,12 +29,7 @@ export function BlockInspector({ isOpen, menu, close, context }: BlockInspectorP
 	if (!isOpen) return null;
 	return (
 		<>
-			<ClickAwayListener
-				onClickAway={() => {
-					console.log('onClickAway');
-					close(null);
-				}}
-			>
+			<ClickAwayListener onClickAway={() => close(null)}>
 				<div>
 					<Menu
 						anchorReference="anchorPosition"
