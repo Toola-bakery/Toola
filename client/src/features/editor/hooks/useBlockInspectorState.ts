@@ -1,9 +1,14 @@
 import { DependencyList, MouseEventHandler, useCallback, useMemo, useState } from 'react';
 import { usePromise } from '../../../hooks/usePromise';
-import { BlockInspectorProps } from '../components/Inspector/BlockInspector';
+import { BlockInspectorProps, MenuItemProps } from '../components/Inspector/BlockInspector';
+import { Blocks } from '../types/blocks';
 import { useEditor } from './useEditor';
 
-export function useBlockInspectorState(id: string, menuConfig: BlockInspectorProps['menu'], deps: DependencyList) {
+export function useBlockInspectorState<Block extends Blocks>(
+	id: string,
+	menuConfig: BlockInspectorProps<Block>['menu'],
+	deps: DependencyList,
+) {
 	const [isOpen, setOpen] = useState<[number, number] | false>(false);
 	const { cleanPromise, resolve } = usePromise();
 
@@ -35,7 +40,7 @@ export function useBlockInspectorState(id: string, menuConfig: BlockInspectorPro
 
 	const menu = useMemo<BlockInspectorProps['menu']>(
 		() => [
-			...menuConfig,
+			...(menuConfig as unknown as MenuItemProps[]),
 			{
 				key: 'Delete',
 				call: () => deleteBlock(id),

@@ -1,5 +1,6 @@
 import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
-import { Button } from '@material-ui/core';
+import Switch from '@material-ui/core/Switch';
+import Button from '@material-ui/core/Button';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -25,7 +26,7 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, pageId, value, language, logs = [], result } = block;
+	const { id, pageId, value, language, logs = [], result, manualControl } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
@@ -50,10 +51,20 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 			updateBlockProps({ id, pageId, value: v });
 		});
 
-		runCode(value);
-	}, [editorRef, id, pageId, runCode, updateBlockProps, value]);
+		if (!manualControl) runCode(value);
+	}, [editorRef, id, manualControl, pageId, runCode, updateBlockProps, value]);
 
-	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState(id, [], []);
+	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState<CodeBlockType>(
+		id,
+		[
+			{
+				key: 'Manual control',
+				call: ({ block: blc }) => updateBlockProps({ id, pageId, manualControl: !blc.manualControl }),
+				secondaryAction: ({ block: blc }) => <Switch checked={blc.manualControl} />,
+			},
+		],
+		[],
+	);
 
 	return (
 		<>

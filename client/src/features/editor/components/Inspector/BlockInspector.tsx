@@ -1,20 +1,24 @@
+import Typography from '@material-ui/core/Typography';
 import React, { useEffect, useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { ClickAwayListener } from '@material-ui/core';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { BasicBlock } from '../../types/basicBlock';
 import { Blocks } from '../../types/blocks';
 
-export type MenuItemProps = {
+export type InspectorContext<Block> = { id: string; block: BasicBlock & Block };
+export type MenuItemProps<Block extends Blocks = Blocks> = {
 	key: string;
 	icon?: string;
-	call?: () => void;
-	next?: React.FunctionComponent<BlockInspectorProps['context']> | MenuItemProps[];
+	secondaryAction?: React.FunctionComponent<InspectorContext<Block>>;
+	call?: (context: InspectorContext<Block>) => void;
+	next?: React.FunctionComponent<InspectorContext<Block>> | MenuItemProps[];
 };
 
-export type BlockInspectorProps = {
-	menu: MenuItemProps[];
-	context: { id: string; block: BasicBlock & Blocks };
+export type BlockInspectorProps<Block extends Blocks = Blocks> = {
+	menu: MenuItemProps<Block>[];
+	context: InspectorContext<Block>;
 	isOpen: [number, number] | false;
 	close: (value: unknown) => void;
 };
@@ -37,18 +41,23 @@ export function BlockInspector({ isOpen, menu, close, context }: BlockInspectorP
 						anchorPosition={isOpen ? { top: isOpen[1], left: isOpen[0] } : undefined}
 						open={!!isOpen}
 						onClose={() => close(null)}
+						sx={{ '& .MuiPaper-root': { width: 290 } }}
 					>
 						{Array.isArray(state)
-							? state.map(({ next, key, call }) => (
+							? state.map(({ secondaryAction, next, key, call }) => (
 									<MenuItem
 										key={key}
 										onClick={() => {
 											if (typeof next !== 'undefined') setState(() => next);
 											else close(null);
-											call?.();
+											call?.(context);
 										}}
 									>
-										{key}
+										<Typography variant="inherit">{key}</Typography>
+
+										{secondaryAction ? (
+											<ListItemSecondaryAction>{secondaryAction(context)}</ListItemSecondaryAction>
+										) : null}
 									</MenuItem>
 							  ))
 							: state(context)}
