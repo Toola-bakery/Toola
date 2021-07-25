@@ -64,7 +64,7 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 
 			if (i % 2 === 0)
 				return (
-					<div key={`rowItem${blockKey}`} style={{ flex: 1 }}>
+					<div key={`rowItem${blockKey}`} style={{ width: `calc(100% * ${(1 / block.blocks.length).toFixed(3)})` }}>
 						{columnBlock.type === 'column' ? (
 							<ColumnBlock block={columnBlock as BasicBlock & ColumnBlockType} />
 						) : (
@@ -86,7 +86,7 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 	}, [addColumnAfterAndPutItem, block.blocks, blocks, createRowAndColumns, fake]);
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'row' }}>
+		<div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
 			{fake ? (
 				<DropTarget vertical onDrop={(item) => createRowAndColumns(item, true)} />
 			) : (

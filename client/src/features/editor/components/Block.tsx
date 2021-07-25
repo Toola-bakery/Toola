@@ -35,11 +35,11 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 	const { hovered, eventHandlers } = useHover();
 
 	return (
-		<div ref={dragPreview} {...eventHandlers} style={{ display: 'flex', flexDirection: 'row', opacity }}>
-			<div ref={dragRef} style={{ flexShrink: 1, opacity: hovered ? 1 : 0 }}>
+		<div ref={dragPreview} {...eventHandlers} style={{ display: 'flex', flexDirection: 'row', opacity, width: '100%' }}>
+			<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered ? 1 : 0 }}>
 				<DragIndicatorIcon />
 			</div>
-			<div style={{ flexGrow: 1 }}>{get()}</div>
+			<div style={{ width: 'calc(100% - 25px)' }}>{get()}</div>
 		</div>
 	);
 }

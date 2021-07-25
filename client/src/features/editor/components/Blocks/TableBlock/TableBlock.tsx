@@ -1,36 +1,72 @@
-import { Column, useTable } from 'react-table';
-import { useMemo } from 'react';
+import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
+import { useEffect, useMemo } from 'react';
 import { BasicBlock } from '../../../types/basicBlock';
-import { useReferences } from '../../../hooks/useReferences';
+import { useReferenceEvaluator } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
 import { UpdateProperties } from '../../Inspector/UpdateProperties';
 import { BlockInspector } from '../../Inspector/BlockInspector';
+import { useEditor } from '../../../hooks/useEditor';
+import { TableStyles } from './TableStyles';
 
 export type TableBlockType = TableBlockProps & TableBlockState;
 export type TableBlockProps = {
 	type: 'table';
 	value: string;
+	columns?: TableColumnsProp;
 };
+type TableColumnsProp = { header: string; value: string }[];
 export type TableBlockState = {
 	page?: number;
 };
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
-	const { value, id } = block;
+	const { value, id, pageId, columns } = block;
 
-	const state = useReferences(value);
+	const { evaluate } = useReferenceEvaluator();
 
-	const data = useMemo<any[]>(() => (Array.isArray(state) ? state : [state]), [state]);
+	const { updateBlockState } = useEditor();
 
-	const columns = useMemo<Column[]>(
-		() =>
-			(typeof data[0] === 'object' && data[0] !== null ? Object.keys(data[0]) : []).map((accessor) => ({
-				accessor,
-			})),
-		[data],
+	const data = useMemo<any[]>(() => {
+		const state = evaluate(value);
+		return Array.isArray(state) ? state : [state];
+	}, [evaluate, value]);
+
+	const columnsProp = useMemo<TableColumnsProp>(() => {
+		if (columns) return columns;
+
+		return (typeof data[0] === 'object' && data[0] !== null ? Object.keys(data[0]) : []).map((accessor) => ({
+			header: accessor,
+			value: `\${current["${accessor}"]}`,
+		}));
+	}, [columns, data]);
+
+	useEffect(() => {
+		if (!columns && columnsProp.length > 0) {
+			updateBlockState({ id, pageId, columns: columnsProp });
+		}
+	}, [columns, columnsProp, id, pageId, updateBlockState]);
+
+	const calculatedColumns = useMemo<Column[]>(() => {
+		return columnsProp.map((col) => ({
+			Header: col.header,
+			accessor: (originalRow) => evaluate(col.value, originalRow),
+			minWidth: 100,
+			maxWidth: 300,
+			width: 150,
+		}));
+	}, [columnsProp, evaluate]);
+
+	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, selectedFlatRows } = useTable(
+		{
+			columns: calculatedColumns,
+			data,
+		},
+		useFlexLayout,
+		useResizeColumns,
+		useRowSelect,
 	);
 
-	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
+	console.log({ selectedFlatRows });
 
 	const { onContextMenu, isOpen, close, menu } = useBlockInspectorState(
 		id,
@@ -42,62 +78,44 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				),
 			},
 		],
-		[],
+		[columnsProp],
 	);
 
 	return (
 		<>
 			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
-			<div style={{ maxWidth: 'calc( 100vw - 300px )', maxHeight: 400, overflow: 'auto' }}>
-				<table
-					{...getTableProps()}
-					onContextMenu={onContextMenu}
-					style={{ border: 'solid 1px blue', minWidth: 100, height: 400 }}
-				>
-					<thead>
+			<TableStyles>
+				<div {...getTableProps()} style={undefined} className="table" onContextMenu={onContextMenu}>
+					<div>
 						{headerGroups.map((headerGroup) => (
-							<tr {...headerGroup.getHeaderGroupProps()}>
+							<div {...headerGroup.getHeaderGroupProps()} className="tr">
 								{headerGroup.headers.map((column) => (
-									<th
-										{...column.getHeaderProps()}
-										style={{
-											borderBottom: 'solid 3px red',
-											background: 'aliceblue',
-											color: 'black',
-											fontWeight: 'bold',
-										}}
-									>
-										{column.id}
-									</th>
+									<div {...column.getHeaderProps()} className="th">
+										{column.render('Header')}
+										<div {...column.getResizerProps()} className={`resizer ${column.isResizing ? 'isResizing' : ''}`} />
+									</div>
 								))}
-							</tr>
+							</div>
 						))}
-					</thead>
-					<tbody {...getTableBodyProps()}>
+					</div>
+					<div {...getTableBodyProps()} className="tbody">
 						{rows.map((row) => {
 							prepareRow(row);
 							return (
-								<tr {...row.getRowProps()}>
+								<div {...row.getRowProps()} onClick={() => row.toggleRowSelected()} className="tr">
 									{row.cells.map((cell) => {
 										return (
-											<td
-												{...cell.getCellProps()}
-												style={{
-													padding: '10px',
-													border: 'solid 1px gray',
-													background: 'papayawhip',
-												}}
-											>
+											<div className="td" {...cell.getCellProps()}>
 												{['string', 'number'].includes(typeof cell.value) ? cell.value : JSON.stringify(cell.value)}
-											</td>
+											</div>
 										);
 									})}
-								</tr>
+								</div>
 							);
 						})}
-					</tbody>
-				</table>
-			</div>
+					</div>
+				</div>
+			</TableStyles>
 		</>
 	);
 }

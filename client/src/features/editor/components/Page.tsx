@@ -11,6 +11,8 @@ import { BasicBlock } from '../types/basicBlock';
 import { Config } from '../../../config';
 import { ColumnBlock, ColumnBlockType } from './Blocks/Layout/ColumnBlock';
 import { Blocks } from '../types/blocks';
+import { PageBar } from './PageBar';
+import { useWindowSize } from '../../../hooks/useWindowSize';
 
 export type PageBlockType = PageBlockProps;
 export type PageBlockProps = {
@@ -61,11 +63,13 @@ export function Page(): JSX.Element {
 	}, [fetching, blocksProps, pageId]);
 
 	const value = useMemo<PageContextType>(() => ({ blocks, pageId, globals: { pageId }, page }), [blocks, pageId, page]);
+	const { width } = useWindowSize({ width: 1000 });
 
 	return (
 		<DndProvider backend={HTML5Backend}>
 			<PageContext.Provider value={value}>
-				<div style={{ width: '100%', overflowX: 'clip' }}>
+				<div style={{ width: width - 240 - 10, overflowX: 'clip' }}>
+					<PageBar />
 					{page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
 					<CreateBlockAtTheEnd parentId={pageId} />
 				</div>
