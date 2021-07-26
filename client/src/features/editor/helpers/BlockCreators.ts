@@ -21,5 +21,6 @@ export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: Blocks) => { ty
 	table: (anyBlock?: Blocks) => copyProps({ type: 'table', value: '' }, anyBlock),
 	text: (anyBlock?: Blocks) => copyProps({ type: 'text', value: '' }, anyBlock),
 	image: (anyBlock?: Blocks) => copyProps({ type: 'image', value: '' }, anyBlock),
+	button: (anyBlock?: Blocks) => copyProps({ type: 'button', name: 'run', value: '' }, anyBlock),
 	input: (anyBlock?: Blocks) => copyProps({ type: 'input', initialValue: '', label: '' }, anyBlock),
 };

@@ -1,3 +1,4 @@
+import { ButtonBlockProps, ButtonBlockType } from '../components/Blocks/ButtonBlock';
 import { ColumnBlockProps, ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { ImageBlockProps, ImageBlockType } from '../components/Blocks/ImageBlock';
 import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock';
@@ -15,7 +16,8 @@ export type Blocks =
 	| CodeBlockType
 	| JSONViewBlockType
 	| ImageBlockType
-	| LayoutBlocks;
+	| LayoutBlocks
+	| ButtonBlockType;
 export type LayoutBlocks = PageBlockType | ColumnBlockType | RowBlockType;
 
 export type BlockProps =
@@ -27,4 +29,5 @@ export type BlockProps =
 	| ImageBlockProps
 	| PageBlockProps
 	| RowBlockProps
-	| ColumnBlockProps;
+	| ColumnBlockProps
+	| ButtonBlockProps;

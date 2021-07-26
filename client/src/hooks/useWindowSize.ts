@@ -13,10 +13,10 @@ export function useWindowSize<W extends number | undefined, H extends number | u
 	}>({
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		width,
+		width: window?.innerWidth || width,
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		height,
+		height: window?.innerHeight || height,
 	});
 
 	useEffect(() => {

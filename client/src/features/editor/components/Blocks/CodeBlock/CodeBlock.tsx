@@ -1,6 +1,7 @@
 import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
+import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { usePageContext } from '../../../hooks/useReferences';
@@ -10,7 +11,7 @@ import { Editor } from './Editor';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
 import { BlockInspector } from '../../Inspector/BlockInspector';
 
-export type CodeBlockType = CodeBlockProps & CodeBlockState;
+export type CodeBlockType = CodeBlockProps & CodeBlockState & CodeBlockMethods;
 export type CodeBlockProps = {
 	type: 'code';
 	value: string;
@@ -21,6 +22,8 @@ export type CodeBlockState = {
 	result?: unknown;
 	logs?: string[];
 };
+
+export type CodeBlockMethods = { trigger: () => void };
 
 export type CodeBlockComponentProps = {
 	block: BasicBlock & CodeBlockType;
@@ -49,6 +52,12 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const { runCode } = useFunctionExecutor(listener);
 
+	const trigger = useCallback(() => {
+		updateBlockState({ id, pageId, logs: [], result: [] });
+		runCode(value);
+	}, [id, pageId, runCode, updateBlockState, value]);
+
+	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
 	const onEditorReady = useCallback(() => {
 		if (!editorRef.current) return;
 
@@ -79,14 +88,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 				<Button sx={{ marginRight: 1 }} variant="contained" color="primary" onClick={() => setShowLogs((v) => !v)}>
 					{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}
 				</Button>
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={() => {
-						updateBlockState({ id, pageId, logs: [], result: [] });
-						runCode(value);
-					}}
-				>
+				<Button variant="contained" color="primary" onClick={() => trigger()}>
 					Run CODE
 				</Button>
 				{showLogs ? (

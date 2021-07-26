@@ -40,6 +40,7 @@ module.exports = {
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'import/prefer-default-export': 'off',
 		'import/no-cycle': 'off',
+		'@typescript-eslint/no-explicit-any': 'off',
 		'spaced-comment': 'off',
 		'react/prop-types': 'off',
 		'prettier/prettier': [

@@ -1,6 +1,7 @@
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import { useDrag } from 'react-dnd';
 import { usePageContext } from '../hooks/useReferences';
+import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
 import { TextBlock, TextBlockType } from './Blocks/TextBlock';
 import { BasicBlock } from '../types/basicBlock';
 import { Blocks } from '../types/blocks';
@@ -19,6 +20,7 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 		if (block.type === 'table') return <TableBlock block={block as BasicBlock & TableBlockType} />;
 		if (block.type === 'image') return <ImageBlock block={block as BasicBlock & ImageBlockType} />;
 		if (block.type === 'input') return <InputBlock block={block as BasicBlock & InputBlockType} />;
+		if (block.type === 'button') return <ButtonBlock block={block as BasicBlock & ButtonBlockType} />;
 		return <></>;
 	}
 	const {

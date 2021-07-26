@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { useBlocks } from '../hooks/useBlocks';
 import { selectBlocksProps, selectBlocksStateWithProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { BasicBlock } from '../types/basicBlock';
@@ -24,14 +25,15 @@ export type PageBlockState = {
 };
 
 export type PageContextType = {
-	blocks: { [key: string]: BasicBlock & Blocks };
 	globals: { pageId: string };
 	page: BasicBlock & PageBlockType;
 	pageId: string;
-};
+} & ReturnType<typeof useBlocks>;
 
 export const PageContext = React.createContext<PageContextType>({
 	blocks: {},
+	deleteBlockMethods: () => {},
+	setBlockMethods: () => {},
 	globals: { pageId: '' },
 	pageId: '',
 	page: { id: '', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
@@ -47,7 +49,7 @@ export function Page(): JSX.Element {
 
 	const [fetching, setFetching] = useState(true);
 
-	const blocks = useAppSelector((state) => selectBlocksStateWithProps(state, pageId));
+	const { blocks, deleteBlockMethods, setBlockMethods } = useBlocks(pageId);
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 	const page = blocks?.[pageId] as BasicBlock & PageBlockType;
 
@@ -65,7 +67,10 @@ export function Page(): JSX.Element {
 		putPage(pageId, blocksProps);
 	}, [fetching, blocksProps, pageId]);
 
-	const value = useMemo<PageContextType>(() => ({ blocks, pageId, globals: { pageId }, page }), [blocks, pageId, page]);
+	const value = useMemo<PageContextType>(
+		() => ({ blocks, pageId, globals: { pageId }, page, deleteBlockMethods, setBlockMethods }),
+		[blocks, pageId, page, deleteBlockMethods, setBlockMethods],
+	);
 	const { width } = useWindowSize({ width: 1000 });
 
 	return (

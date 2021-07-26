@@ -4,7 +4,7 @@ import { decode } from 'html-entities';
 import { useEditor } from '../../hooks/useEditor';
 import { useEventListener } from '../../hooks/useEvents';
 import { BasicBlock } from '../../types/basicBlock';
-import { useRefLatest } from '../../../../hooks/useRefLatest';
+import { useRefsLatest } from '../../../../hooks/useRefLatest';
 import { getCaretIndex } from '../../helpers/getCaretIndex';
 import { useBlockMenu } from '../../hooks/useBlockMenu';
 import { selectBlockNeighborsProps } from '../../redux/editor';
@@ -27,19 +27,23 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
 	const [isEditing, setEditing] = useState(false);
-	const addBlockAfterRef = useRefLatest(addBlockAfter);
-	const updateBlockTypeRef = useRefLatest(updateBlockType);
-	const deleteBlockRef = useRefLatest(deleteBlock);
-	const valueRef = useRefLatest(value);
-	const isEditingRef = useRefLatest(isEditing);
 
 	const { previous } = useAppSelector((state) => selectBlockNeighborsProps(state, id));
-	const previousRef = useRefLatest(previous);
 
 	const contentEditable = useRef<HTMLElement>(null);
 
 	const { open } = useBlockMenu();
-	const openRef = useRefLatest(open);
+
+	const { addBlockAfterRef, deleteBlockRef, previousRef, openRef, updateBlockTypeRef, isEditingRef, valueRef } =
+		useRefsLatest({
+			previous,
+			addBlockAfter,
+			updateBlockType,
+			deleteBlock,
+			value,
+			isEditing,
+			open,
+		});
 
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
@@ -51,55 +55,42 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	useEventListener(id, (event) => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
 
-	const onKeyDownHandler = useCallback<KeyboardEventHandler>(
-		(e) => {
-			if (e.key === CMD_KEY) {
-				if (!contentEditable.current) return;
-				openRef.current(contentEditable.current).then((v) => {
-					if (!v) return;
-					updateBlockTypeRef.current(id, v);
-				});
-			}
-			if (e.key === 'Enter' && !e.shiftKey) {
-				if (!contentEditable.current) return;
-				const index = getCaretIndex(contentEditable.current);
-				addBlockAfterRef.current(id, {
-					type: 'text',
-					value: valueRef.current.slice(index),
-				});
-				updateBlockProps({ id, pageId, value: valueRef.current.slice(0, index) });
+	const onKeyDownHandler: KeyboardEventHandler = (e) => {
+		if (e.key === CMD_KEY) {
+			if (!contentEditable.current) return;
+			openRef.current(contentEditable.current).then((v) => {
+				if (!v) return;
+				updateBlockTypeRef.current(id, v);
+			});
+		}
+		if (e.key === 'Enter' && !e.shiftKey) {
+			if (!contentEditable.current) return;
+			const index = getCaretIndex(contentEditable.current);
+			addBlockAfterRef.current(id, {
+				type: 'text',
+				value: valueRef.current.slice(index),
+			});
+			updateBlockProps({ id, pageId, value: valueRef.current.slice(0, index) });
+			e.preventDefault();
+		}
+		if (e.key === 'Backspace') {
+			if (!contentEditable.current) return;
+			const index = getCaretIndex(contentEditable.current);
+			if (index === 0) {
 				e.preventDefault();
+				deleteBlockRef.current(id);
+				if (previousRef.current?.type === 'text')
+					updateBlockProps(
+						{
+							pageId,
+							id: previousRef.current.id,
+							value: previousRef.current.value + valueRef.current,
+						},
+						true,
+					);
 			}
-			if (e.key === 'Backspace') {
-				if (!contentEditable.current) return;
-				const index = getCaretIndex(contentEditable.current);
-				if (index === 0) {
-					e.preventDefault();
-					deleteBlockRef.current(id);
-					if (previousRef.current?.type === 'text')
-						updateBlockProps(
-							{
-								pageId,
-								id: previousRef.current.id,
-								value: previousRef.current.value + valueRef.current,
-							},
-							true,
-						);
-				}
-			}
-		},
-		[
-			openRef,
-			updateBlockTypeRef,
-			id,
-			addBlockAfterRef,
-			valueRef,
-			updateBlockProps,
-			pageId,
-			deleteBlockRef,
-			previousRef,
-		],
-	);
+		}
+	};
 
 	const html = useReferences(isEditing ? '' : realValue);
 

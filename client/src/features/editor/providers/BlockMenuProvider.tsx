@@ -54,6 +54,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 					<MenuItem onClick={() => close('table')}>Table</MenuItem>
 					<MenuItem onClick={() => close('image')}>Image</MenuItem>
 					<MenuItem onClick={() => close('input')}>Input</MenuItem>
+					<MenuItem onClick={() => close('button')}>Button</MenuItem>
 				</Menu>
 			</>
 		</BlockMenuContext.Provider>
