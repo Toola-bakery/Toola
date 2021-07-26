@@ -7,6 +7,7 @@ type EditorProps = {
 	editorRef: MutableRefObject<Copenhagen.Editor>;
 	language: CodeBlockType['language'];
 	value: CodeBlockType['value'];
+	disabled?: boolean;
 };
 
 export class Editor extends React.Component<EditorProps> {

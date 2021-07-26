@@ -9,21 +9,21 @@ import { getCaretIndex } from '../../helpers/getCaretIndex';
 import { useBlockMenu } from '../../hooks/useBlockMenu';
 import { selectBlockNeighborsProps } from '../../redux/editor';
 import { useAppSelector } from '../../../../redux/hooks';
-import { useReferences } from '../../hooks/useReferences';
+import { usePageContext, useReferences } from '../../hooks/useReferences';
 import { BlockInspector } from '../Inspector/BlockInspector';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 
 const CMD_KEY = '/';
 
-export type TextBlockType = { type: 'text'; value: string };
+export type TextBlockType = TextBlockProps;
+export type TextBlockProps = { type: 'text'; value: string };
 
-export type EditableBlockProps = {
-	block: BasicBlock & TextBlockType;
-};
-
-export function TextBlock({ block }: EditableBlockProps): JSX.Element {
+export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX.Element {
 	const { id, pageId, value: realValue = '' } = block;
 	const [value, setValue] = useState(realValue);
+	const {
+		page: { editing },
+	} = usePageContext();
 
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
 	const [isEditing, setEditing] = useState(false);
@@ -111,6 +111,7 @@ export function TextBlock({ block }: EditableBlockProps): JSX.Element {
 		<>
 			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
 			<ContentEditable
+				disabled={!editing}
 				onContextMenu={onContextMenu}
 				className="Block"
 				onFocus={() => {

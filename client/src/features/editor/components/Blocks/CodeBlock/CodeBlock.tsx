@@ -3,6 +3,7 @@ import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
+import { usePageContext } from '../../../hooks/useReferences';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { Editor } from './Editor';
@@ -31,6 +32,10 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
 	const [showLogs, setShowLogs] = useState(false);
+
+	const {
+		page: { editing },
+	} = usePageContext();
 
 	useEventListener(id, (event) => event.eventName === 'focus' && editorRef.current?.focus(), []);
 

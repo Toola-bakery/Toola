@@ -7,7 +7,8 @@ import { RowBlock, RowBlockType } from './RowBlock';
 import { DropTarget } from './DropTarget';
 import { Blocks } from '../../../types/blocks';
 
-export type ColumnBlockType = { type: 'column'; blocks: string[] };
+export type ColumnBlockType = ColumnBlockProps;
+export type ColumnBlockProps = { type: 'column'; blocks: string[] };
 
 export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockType; fake?: boolean }) {
 	const { blocks, pageId } = usePageContext();

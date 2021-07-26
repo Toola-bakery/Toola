@@ -1,8 +1,8 @@
-import { Blocks } from '../types/blocks';
+import { BlockProps, Blocks } from '../types/blocks';
 
-function copyProps<P extends Blocks['type']>(joinWith: { type: P } & Blocks, anyBlock?: Blocks) {
+function copyProps<P extends Blocks['type']>(joinWith: { type: P } & BlockProps, anyBlock?: Blocks) {
 	if (!anyBlock) return joinWith;
-	const copy: { type: P } & Blocks = joinWith;
+	const copy: { type: P } & BlockProps = joinWith;
 	(Object.keys(joinWith) as (keyof ({ type: P } & Blocks))[]).forEach((key) => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -11,7 +11,7 @@ function copyProps<P extends Blocks['type']>(joinWith: { type: P } & Blocks, any
 	return copy;
 }
 
-export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: Blocks) => { type: P } & Blocks } = {
+export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: Blocks) => { type: P } & BlockProps } = {
 	page: (anyBlock?: Blocks) => copyProps({ type: 'page', blocks: [] }, anyBlock),
 	column: (anyBlock?: Blocks) => copyProps({ type: 'column', blocks: [] }, anyBlock),
 	row: (anyBlock?: Blocks) => copyProps({ type: 'row', blocks: [] }, anyBlock),

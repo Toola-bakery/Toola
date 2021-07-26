@@ -1,5 +1,6 @@
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import { useDrag } from 'react-dnd';
+import { usePageContext } from '../hooks/useReferences';
 import { TextBlock, TextBlockType } from './Blocks/TextBlock';
 import { BasicBlock } from '../types/basicBlock';
 import { Blocks } from '../types/blocks';
@@ -20,23 +21,27 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 		if (block.type === 'input') return <InputBlock block={block as BasicBlock & InputBlockType} />;
 		return <></>;
 	}
+	const {
+		page: { editing },
+	} = usePageContext();
 
 	const [{ opacity }, dragRef, dragPreview] = useDrag(
 		() => ({
 			type: 'Block',
+			canDrag: editing,
 			item: { id: block.id },
 			collect: (monitor) => ({
 				opacity: monitor.isDragging() ? 0.5 : 1,
 			}),
 		}),
-		[block.id],
+		[block.id, editing],
 	);
 
 	const { hovered, eventHandlers } = useHover();
 
 	return (
 		<div ref={dragPreview} {...eventHandlers} style={{ display: 'flex', flexDirection: 'row', opacity, width: '100%' }}>
-			<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered ? 1 : 0 }}>
+			<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
 				<DragIndicatorIcon />
 			</div>
 			<div style={{ width: 'calc(100% - 25px)' }}>{get()}</div>

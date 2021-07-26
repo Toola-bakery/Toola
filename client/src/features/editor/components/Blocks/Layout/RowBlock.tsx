@@ -7,7 +7,8 @@ import { useEditor } from '../../../hooks/useEditor';
 import { ColumnBlock, ColumnBlockType } from './ColumnBlock';
 import { Blocks } from '../../../types/blocks';
 
-export type RowBlockType = { type: 'row'; blocks: string[]; widths?: number[] };
+export type RowBlockType = RowBlockProps;
+export type RowBlockProps = { type: 'row'; blocks: string[]; widths?: number[] };
 
 function addAfterEachElement<T, R>(array: T[], get: (perviousEl: T) => R) {
 	const newArray: (T | R)[] = [];

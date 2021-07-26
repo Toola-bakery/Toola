@@ -14,10 +14,13 @@ import { Blocks } from '../types/blocks';
 import { PageBar } from './PageBar';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 
-export type PageBlockType = PageBlockProps;
+export type PageBlockType = PageBlockProps & PageBlockState;
 export type PageBlockProps = {
 	type: 'page';
 	blocks: string[];
+};
+export type PageBlockState = {
+	editing: boolean;
 };
 
 export type PageContextType = {
@@ -31,7 +34,7 @@ export const PageContext = React.createContext<PageContextType>({
 	blocks: {},
 	globals: { pageId: '' },
 	pageId: '',
-	page: { id: '', pageId: '', parentId: '', type: 'page', blocks: [] },
+	page: { id: '', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
 });
 
 const putPage = debounce((pageId, blocksProps) => {
@@ -69,8 +72,12 @@ export function Page(): JSX.Element {
 		<DndProvider backend={HTML5Backend}>
 			<PageContext.Provider value={value}>
 				<div style={{ width: width - 240 - 10, overflowX: 'clip' }}>
-					<PageBar />
-					{page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
+					{page ? (
+						<>
+							<PageBar />
+							<ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} />
+						</>
+					) : null}
 					<CreateBlockAtTheEnd parentId={pageId} />
 				</div>
 			</PageContext.Provider>
