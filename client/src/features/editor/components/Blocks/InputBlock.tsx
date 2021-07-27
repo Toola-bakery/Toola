@@ -50,6 +50,7 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 			<div onContextMenu={onContextMenu}>
 				<TextField
 					id="outlined-basic"
+					sx={{ width: '100%' }}
 					label={label || id}
 					variant="outlined"
 					value={value}

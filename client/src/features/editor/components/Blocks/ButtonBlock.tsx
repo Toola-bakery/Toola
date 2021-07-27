@@ -45,6 +45,7 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 				<Button
 					variant="contained"
 					color="primary"
+					sx={{ width: '100%' }}
 					onClick={() => {
 						evaluate(value);
 					}}
