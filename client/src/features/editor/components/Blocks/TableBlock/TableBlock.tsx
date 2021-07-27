@@ -1,5 +1,7 @@
+import equal from 'fast-deep-equal/es6';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useEffect, useMemo } from 'react';
+import { usePrevious } from '../../../hooks/usePrevious';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useReferenceEvaluator } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
@@ -14,7 +16,7 @@ export type TableBlockProps = {
 	value: string;
 	columns?: TableColumnsProp;
 };
-type TableColumnsProp = { header: string; value: string }[];
+type TableColumnsProp = { header: string; value: string; width?: number }[];
 export type TableBlockState = {
 	page?: number;
 };
@@ -24,11 +26,13 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 
 	const { evaluate } = useReferenceEvaluator();
 
-	const { updateBlockState } = useEditor();
+	const { updateBlockProps } = useEditor();
 
 	const data = useMemo<any[]>(() => {
 		const state = evaluate(value);
-		return Array.isArray(state) ? state : [state];
+		if (Array.isArray(state)) return state;
+		if (typeof state === 'object') return [state];
+		return [];
 	}, [evaluate, value]);
 
 	const columnsProp = useMemo<TableColumnsProp>(() => {
@@ -42,9 +46,9 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 
 	useEffect(() => {
 		if (!columns && columnsProp.length > 0) {
-			updateBlockState({ id, pageId, columns: columnsProp });
+			updateBlockProps({ id, pageId, columns: columnsProp });
 		}
-	}, [columns, columnsProp, id, pageId, updateBlockState]);
+	}, [columns, columnsProp, id, pageId, updateBlockProps]);
 
 	const calculatedColumns = useMemo<Column[]>(() => {
 		return columnsProp.map((col) => ({
@@ -52,11 +56,11 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			accessor: (originalRow) => evaluate(col.value, originalRow),
 			minWidth: 100,
 			maxWidth: 300,
-			width: 150,
+			width: col.width || 150,
 		}));
 	}, [columnsProp, evaluate]);
 
-	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, selectedFlatRows } = useTable(
+	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state } = useTable(
 		{
 			columns: calculatedColumns,
 			data,
@@ -65,8 +69,21 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		useResizeColumns,
 		useRowSelect,
 	);
+	const { columnWidths, isResizingColumn } = state.columnResizing;
+	const isResizingColumnPrevious = usePrevious(isResizingColumn);
 
-	console.log({ selectedFlatRows });
+	useEffect(() => {
+		if (!isResizingColumn && isResizingColumnPrevious) {
+			updateBlockProps({
+				id,
+				pageId,
+				columns: columnsProp.map((v) => {
+					if (v.header === isResizingColumnPrevious) return { ...v, width: columnWidths[isResizingColumnPrevious] };
+					return v;
+				}),
+			});
+		}
+	}, [columnWidths, columnsProp, id, isResizingColumn, isResizingColumnPrevious, pageId, updateBlockProps]);
 
 	const { onContextMenu, isOpen, close, menu } = useBlockInspectorState(
 		id,
