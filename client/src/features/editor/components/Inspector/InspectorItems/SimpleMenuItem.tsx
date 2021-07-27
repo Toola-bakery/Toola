@@ -9,13 +9,15 @@ import { BasicItemProps, MenuItemProps } from '../BlockInspector';
 export type SimpleMenuItemProps = BasicItemProps & {
 	type: undefined | 'item';
 	call: () => void;
+	closeAfterCall?: boolean;
 };
 
-export function SimpleMenuItem({ item }: { item: SimpleMenuItemProps }) {
+export function SimpleMenuItem({ item, close }: { item: SimpleMenuItemProps; close: () => void }) {
 	return (
 		<MenuItem
 			onClick={() => {
 				item.call();
+				if (item.closeAfterCall) close();
 			}}
 		>
 			<Typography variant="inherit">{item.key}</Typography>

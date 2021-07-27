@@ -22,12 +22,12 @@ export type MenuItemProps =
 export type BlockInspectorProps = {
 	menu: MenuItemProps[];
 	isOpen: [number, number] | false;
-	close: (value: unknown) => void;
+	close: () => void;
 	path: string[];
 };
 
-export function InspectorItem({ item }: { item: MenuItemProps }) {
-	if (item.type === 'item') return <SimpleMenuItem item={item} />;
+export function InspectorItem({ item, close }: { item: MenuItemProps; close: () => void }) {
+	if (item.type === 'item') return <SimpleMenuItem item={item} close={close} />;
 	if (item.type === 'switch') return <SwitchMenuItem item={item} />;
 	if (item.type === 'nested') return <NestedMenuItem item={item} />;
 	if (item.type === 'view') return <ViewMenuItem item={item} />;
@@ -45,16 +45,18 @@ export function BlockInspector({ isOpen, menu, close, path }: BlockInspectorProp
 	if (!isOpen) return null;
 	return (
 		<>
-			<ClickAwayListener onClickAway={() => close(null)}>
+			<ClickAwayListener onClickAway={() => close()}>
 				<div>
 					<Menu
 						anchorReference="anchorPosition"
 						anchorPosition={isOpen ? { top: isOpen[1], left: isOpen[0] } : undefined}
 						open={!!isOpen}
-						onClose={() => close(null)}
+						onClose={() => close()}
 						sx={{ '& .MuiPaper-root': { width: 290 } }}
 					>
-						{Array.isArray(state) ? state.map((item) => <InspectorItem key={item.key} item={item} />) : state({})}
+						{Array.isArray(state)
+							? state.map((item) => <InspectorItem key={item.key} close={close} item={item} />)
+							: state({})}
 					</Menu>
 				</div>
 			</ClickAwayListener>

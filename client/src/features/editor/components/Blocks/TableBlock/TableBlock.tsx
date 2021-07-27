@@ -119,6 +119,16 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 					}),
 				value: col.type || 'text',
 			},
+			{
+				key: 'deleteColumn',
+				type: 'item',
+				closeAfterCall: true,
+				call: () =>
+					immerBlockProps<TableBlockProps>(id, (draft) => {
+						if (draft.columns?.[index]) draft.columns.splice(index, 1);
+					}),
+				value: col.type || 'text',
+			},
 		],
 	}));
 
