@@ -6,12 +6,14 @@ import { BasicBlock } from '../types/basicBlock';
 import { Blocks, LayoutBlocks } from '../types/blocks';
 import { PageBlockType } from '../components/Page';
 
+type PageState = {
+	blocksProperties: { [id: string]: BasicBlock & Blocks };
+	blocksState: { [id: string]: BasicBlock & Blocks };
+};
+
 interface EditorState {
 	pages: {
-		[pageId: string]: {
-			blocksProperties: { [id: string]: BasicBlock & Blocks };
-			blocksState: { [id: string]: BasicBlock & Blocks };
-		};
+		[pageId: string]: PageState;
 	};
 }
 
@@ -29,6 +31,11 @@ function getParentHelper(state: EditorState, pageId: string, blockId: string): (
 function getBlockHelper(state: EditorState, pageId: string, blockId: string): BasicBlock & Blocks {
 	const { blocksProperties } = state.pages[pageId];
 	return blocksProperties[blockId] as BasicBlock & Blocks;
+}
+
+function getPageHelper(state: EditorState, pageId: string): PageState {
+	if (!state.pages[pageId]) state.pages[pageId] = { blocksState: {}, blocksProperties: {} };
+	return state.pages[pageId];
 }
 
 function deleteBlockHelper(state: EditorState, pageId: string, blockId: string) {
@@ -62,7 +69,8 @@ export const editorSlice = createSlice({
 	reducers: {
 		addBlocks: (state, action: PayloadAction<(BasicBlock & Blocks)[]>) => {
 			action.payload.forEach((block) => {
-				state.pages[block.pageId].blocksProperties[block.id] = block;
+				const page = getPageHelper(state, block.pageId);
+				page.blocksProperties[block.id] = block;
 			});
 		},
 		updateParentId(state, action: PayloadAction<{ blockId: string; parentId: string; pageId: string }>) {
@@ -71,7 +79,7 @@ export const editorSlice = createSlice({
 			updateParentIdHelper(state, pageId, blockId, parentId);
 		},
 		updateBlockProps: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
-			const { blocksProperties } = state.pages[action.payload.pageId];
+			const { blocksProperties } = getPageHelper(state, action.payload.pageId);
 			blocksProperties[action.payload.id] = update(blocksProperties[action.payload.id], {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
@@ -105,7 +113,7 @@ export const editorSlice = createSlice({
 		},
 		addChildAfterId(state, action: PayloadAction<{ pageId: string; putAfterId: string; blocksId: string | string[] }>) {
 			const { pageId, blocksId, putAfterId } = action.payload;
-			const { blocksProperties } = state.pages[pageId];
+			const { blocksProperties } = getPageHelper(state, pageId);
 			const { id: neighborId } = blocksProperties[putAfterId] as BasicBlock;
 
 			const parent = getParentHelper(state, pageId, putAfterId);
@@ -119,7 +127,7 @@ export const editorSlice = createSlice({
 		},
 
 		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
-			const { blocksState } = state.pages[action.payload.pageId];
+			const { blocksState } = getPageHelper(state, action.payload.pageId);
 
 			blocksState[action.payload.id] = update(blocksState[action.payload.id] || {}, {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -136,9 +144,8 @@ export const editorSlice = createSlice({
 			deleteChildFromParentHelper(state, pageId, blockId);
 		},
 		setPage: (state, action: PayloadAction<{ blocks: { [id: string]: BasicBlock & Blocks }; pageId: string }>) => {
-			if (!state.pages[action.payload.pageId])
-				state.pages[action.payload.pageId] = { blocksState: {}, blocksProperties: {} };
-			state.pages[action.payload.pageId].blocksProperties = action.payload.blocks;
+			const page = getPageHelper(state, action.payload.pageId);
+			page.blocksProperties = action.payload.blocks;
 		},
 	},
 });

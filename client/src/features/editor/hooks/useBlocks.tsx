@@ -6,12 +6,6 @@ import { Blocks } from '../types/blocks';
 
 export type Methods = { [method: string]: (...args: any[]) => any };
 
-export type UseBlocks = {
-	deleteBlockMethods: (blockId: string) => void;
-	setBlockMethods: (blockId: string, methods: Methods) => void;
-	blocks: { [p: string]: BasicBlock & Blocks };
-};
-
 export function useBlocks(pageId: string) {
 	const blocksStateWithProps = useAppSelector((state) => selectBlocksStateWithProps(state, pageId));
 	const [methodsState, setMethods] = useState<{ [blockId: string]: Methods }>({});
