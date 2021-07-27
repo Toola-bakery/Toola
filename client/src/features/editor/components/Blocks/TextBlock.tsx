@@ -19,7 +19,7 @@ export type TextBlockType = TextBlockProps;
 export type TextBlockProps = { type: 'text'; value: string };
 
 export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX.Element {
-	const { id, pageId, value: realValue = '' } = block;
+	const { id, value: realValue = '' } = block;
 	const [value, setValue] = useState(realValue);
 	const {
 		page: { editing },
@@ -48,9 +48,9 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
 			setValue(e.target.value);
-			updateBlockProps({ id, pageId, value: decode(e.currentTarget.textContent) });
+			updateBlockProps({ id, value: decode(e.currentTarget.textContent) });
 		},
-		[id, pageId, updateBlockProps],
+		[id, updateBlockProps],
 	);
 
 	useEventListener(id, (event) => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
@@ -70,7 +70,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 				type: 'text',
 				value: valueRef.current.slice(index),
 			});
-			updateBlockProps({ id, pageId, value: valueRef.current.slice(0, index) });
+			updateBlockProps({ id, value: valueRef.current.slice(0, index) });
 			e.preventDefault();
 		}
 		if (e.key === 'Backspace') {
@@ -82,7 +82,6 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 				if (previousRef.current?.type === 'text')
 					updateBlockProps(
 						{
-							pageId,
 							id: previousRef.current.id,
 							value: previousRef.current.value + valueRef.current,
 						},
@@ -96,11 +95,11 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
-	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState(id, [], []);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, []);
 
 	return (
 		<>
-			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
+			<BlockInspector {...inspectorProps} />
 			<ContentEditable
 				disabled={!editing}
 				onContextMenu={onContextMenu}

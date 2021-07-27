@@ -1,35 +1,22 @@
-import { DependencyList, MouseEventHandler, useCallback, useMemo, useState } from 'react';
-import { usePromise } from '../../../hooks/usePromise';
+import React, { MouseEventHandler, useCallback, useState } from 'react';
 import { BlockInspectorProps, MenuItemProps } from '../components/Inspector/BlockInspector';
-import { Blocks } from '../types/blocks';
 import { useEditor } from './useEditor';
 
-export function useBlockInspectorState<Block extends Blocks>(
-	id: string,
-	menuConfig: BlockInspectorProps<Block>['menu'],
-	deps: DependencyList,
-) {
+export function useBlockInspectorState(id: string, menuConfig: BlockInspectorProps['menu']) {
+	const [path, setPath] = useState<string[]>([]);
 	const [isOpen, setOpen] = useState<[number, number] | false>(false);
-	const { cleanPromise, resolve } = usePromise();
 
-	const open = useCallback(
-		(x: number, y: number) => {
-			setOpen([x, y]);
-			return cleanPromise();
-		},
-		[cleanPromise],
-	);
+	const open = useCallback((x: number, y: number) => {
+		setOpen([x, y]);
+	}, []);
 
-	const close = useCallback(
-		(result) => {
-			resolve(result);
-			setOpen(false);
-		},
-		[resolve],
-	);
+	const close = useCallback(() => {
+		setOpen(false);
+	}, []);
 
-	const onContextMenu = useCallback<MouseEventHandler<HTMLDivElement>>(
-		(e) => {
+	const onContextMenu = useCallback(
+		(e: React.MouseEvent, _path: string[] = []) => {
+			setPath(_path);
 			open(e.pageX - window.scrollX, e.pageY - window.scrollY);
 			e.preventDefault();
 		},
@@ -38,17 +25,14 @@ export function useBlockInspectorState<Block extends Blocks>(
 
 	const { deleteBlock } = useEditor();
 
-	const menu = useMemo<BlockInspectorProps['menu']>(
-		() => [
-			...(menuConfig as unknown as MenuItemProps[]),
-			{
-				key: 'Delete',
-				call: () => deleteBlock(id),
-			},
-		],
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[...deps, deleteBlock, id],
-	);
+	const menu = [
+		...menuConfig,
+		{
+			type: 'item',
+			key: 'Delete',
+			call: () => deleteBlock(id),
+		},
+	] as unknown as MenuItemProps[];
 
-	return { menu, onContextMenu, close, open, isOpen };
+	return { onContextMenu, inspectorProps: { menu, close, open, isOpen, path } };
 }

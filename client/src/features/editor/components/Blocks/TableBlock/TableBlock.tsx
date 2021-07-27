@@ -1,12 +1,10 @@
-import equal from 'fast-deep-equal/es6';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useEffect, useMemo } from 'react';
 import { usePrevious } from '../../../hooks/usePrevious';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useReferenceEvaluator } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
-import { UpdateProperties } from '../../Inspector/UpdateProperties';
-import { BlockInspector } from '../../Inspector/BlockInspector';
+import { BlockInspector, MenuItemProps } from '../../Inspector/BlockInspector';
 import { useEditor } from '../../../hooks/useEditor';
 import { TableStyles } from './TableStyles';
 
@@ -16,9 +14,16 @@ export type TableBlockProps = {
 	value: string;
 	columns?: TableColumnsProp;
 };
-type TableColumnsProp = { header: string; value: string; width?: number }[];
+type TableColumnsProp = {
+	header: string;
+	value: string;
+	width?: number;
+	type?: 'text' | 'image';
+}[];
+
 export type TableBlockState = {
 	page?: number;
+	selectedRow?: unknown;
 };
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
@@ -26,7 +31,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 
 	const { evaluate } = useReferenceEvaluator();
 
-	const { updateBlockProps } = useEditor();
+	const { updateBlockProps, updateBlockState, immerBlockProps } = useEditor();
 
 	const data = useMemo<any[]>(() => {
 		const state = evaluate(value);
@@ -46,7 +51,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 
 	useEffect(() => {
 		if (!columns && columnsProp.length > 0) {
-			updateBlockProps({ id, pageId, columns: columnsProp });
+			updateBlockProps({ id, columns: columnsProp });
 		}
 	}, [columns, columnsProp, id, pageId, updateBlockProps]);
 
@@ -57,10 +62,11 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			minWidth: 100,
 			maxWidth: 300,
 			width: col.width || 150,
+			type: col.type,
 		}));
 	}, [columnsProp, evaluate]);
 
-	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state } = useTable(
+	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state, toggleAllRowsSelected } = useTable(
 		{
 			columns: calculatedColumns,
 			data,
@@ -69,45 +75,82 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		useResizeColumns,
 		useRowSelect,
 	);
+
 	const { columnWidths, isResizingColumn } = state.columnResizing;
 	const isResizingColumnPrevious = usePrevious(isResizingColumn);
 
 	useEffect(() => {
 		if (!isResizingColumn && isResizingColumnPrevious) {
-			updateBlockProps({
-				id,
-				pageId,
-				columns: columnsProp.map((v) => {
-					if (v.header === isResizingColumnPrevious) return { ...v, width: columnWidths[isResizingColumnPrevious] };
-					return v;
-				}),
+			immerBlockProps<TableBlockProps>(id, (r) => {
+				const col = r.columns?.find((c) => c.header === isResizingColumnPrevious);
+				if (col) col.width = columnWidths[isResizingColumnPrevious];
 			});
 		}
-	}, [columnWidths, columnsProp, id, isResizingColumn, isResizingColumnPrevious, pageId, updateBlockProps]);
+	}, [columnWidths, id, immerBlockProps, isResizingColumn, isResizingColumnPrevious]);
 
-	const { onContextMenu, isOpen, close, menu } = useBlockInspectorState(
-		id,
-		[
+	const columnMenus = columnsProp.map<MenuItemProps>((col, index) => ({
+		type: 'nested',
+		key: `col${index}`,
+		next: [
+			{
+				key: 'Header',
+				type: 'input',
+				onChange: (v) =>
+					immerBlockProps<TableBlockProps>(id, (draft) => {
+						if (draft.columns?.[index]) draft.columns[index].header = v;
+					}),
+				value: col.header,
+			},
 			{
 				key: 'Data Source',
-				next: ({ block: _block }) => (
-					<UpdateProperties block={_block} properties={[{ propertyName: 'value', type: 'code' }]} />
-				),
+				type: 'input',
+				onChange: (v) =>
+					immerBlockProps<TableBlockProps>(id, (draft) => {
+						if (draft.columns?.[index]) draft.columns[index].value = v;
+					}),
+				value: col.value,
+			},
+			{
+				key: 'type',
+				type: 'input',
+				onChange: (v) =>
+					immerBlockProps<TableBlockProps>(id, (draft) => {
+						if (draft.columns?.[index]) draft.columns[index].type = v as 'text' | 'image';
+					}),
+				value: col.type || 'text',
 			},
 		],
-		[columnsProp],
-	);
+	}));
+
+	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+		{
+			type: 'nested',
+			key: 'global',
+			next: [
+				{
+					key: 'Data Source',
+					type: 'input',
+					onChange: (v) =>
+						immerBlockProps<TableBlockProps>(id, (draft) => {
+							draft.value = v;
+						}),
+					value,
+				},
+			],
+		},
+		...columnMenus,
+	]);
 
 	return (
 		<>
-			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
+			<BlockInspector {...inspectorProps} />
 			<TableStyles>
-				<div {...getTableProps()} style={undefined} className="table" onContextMenu={onContextMenu}>
+				<div {...getTableProps()} style={undefined} className="table">
 					<div>
 						{headerGroups.map((headerGroup) => (
 							<div {...headerGroup.getHeaderGroupProps()} className="tr">
-								{headerGroup.headers.map((column) => (
-									<div {...column.getHeaderProps()} className="th">
+								{headerGroup.headers.map((column, index) => (
+									<div {...column.getHeaderProps()} onClick={(e) => onContextMenu(e, [`col${index}`])} className="th">
 										{column.render('Header')}
 										<div {...column.getResizerProps()} className={`resizer ${column.isResizing ? 'isResizing' : ''}`} />
 									</div>
@@ -115,15 +158,32 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 							</div>
 						))}
 					</div>
-					<div {...getTableBodyProps()} className="tbody">
+					<div {...getTableBodyProps()} onContextMenu={(e) => onContextMenu(e, ['global'])} className="tbody">
 						{rows.map((row) => {
 							prepareRow(row);
 							return (
-								<div {...row.getRowProps()} onClick={() => row.toggleRowSelected()} className="tr">
+								<div
+									{...row.getRowProps()}
+									onClick={() => {
+										const { isSelected } = row;
+										toggleAllRowsSelected(false);
+										if (!isSelected) row.toggleRowSelected();
+										updateBlockState({ id, selectedRow: isSelected ? null : row.original });
+									}}
+									className="tr"
+								>
 									{row.cells.map((cell) => {
+										const cellValue = ['string', 'number'].includes(typeof cell.value)
+											? cell.value
+											: JSON.stringify(cell.value);
+
 										return (
-											<div className="td" {...cell.getCellProps()}>
-												{['string', 'number'].includes(typeof cell.value) ? cell.value : JSON.stringify(cell.value)}
+											<div className="td" {...cell.getCellProps()} title={cellValue}>
+												{
+													// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+													// @ts-ignore
+													cell.column.type === 'image' ? <img src={cellValue} style={{ width: '100%' }} /> : cellValue
+												}
 											</div>
 										);
 									})}

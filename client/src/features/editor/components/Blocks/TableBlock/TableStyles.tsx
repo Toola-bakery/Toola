@@ -48,7 +48,7 @@ export const TableStyles = styled.div`
 			.resizer {
 				right: 0;
 				background: blue;
-				width: 10px;
+				width: 1px;
 				height: 100%;
 				position: absolute;
 				top: 0;

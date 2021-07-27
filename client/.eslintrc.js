@@ -28,7 +28,7 @@ module.exports = {
 	rules: {
 		'linebreak-style': 'off',
 		'consistent-return': 'off',
-		'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state'] }],
+		'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state', 'draft'] }],
 		'react/jsx-uses-react': 'off',
 		'react/react-in-jsx-scope': 'off',
 		'jsx-a11y/alt-text': 'off',

@@ -30,7 +30,7 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, pageId, value, language, logs = [], result, manualControl } = block;
+	const { id, value, language, logs = [], result, manualControl } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
@@ -44,45 +44,42 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const listener = useCallback<Parameters<typeof useFunctionExecutor>[0]>(
 		(data) => {
-			if (data.result) updateBlockState({ id, pageId, result: data.result });
-			else updateBlockState({ id, pageId, logs: [...logs, data.data] });
+			if (data.result) updateBlockState({ id, result: data.result });
+			else updateBlockState({ id, logs: [...logs, data.data] });
 		},
-		[id, logs, pageId, updateBlockState],
+		[id, logs, updateBlockState],
 	);
 
 	const { runCode } = useFunctionExecutor(listener);
 
 	const trigger = useCallback(() => {
-		updateBlockState({ id, pageId, logs: [], result: [] });
+		updateBlockState({ id, logs: [], result: [] });
 		runCode(value);
-	}, [id, pageId, runCode, updateBlockState, value]);
+	}, [id, runCode, updateBlockState, value]);
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
 	const onEditorReady = useCallback(() => {
 		if (!editorRef.current) return;
 
 		editorRef.current.on('change', (_, v) => {
-			updateBlockProps({ id, pageId, value: v });
+			updateBlockProps({ id, value: v });
 		});
 
 		if (!manualControl) runCode(value);
-	}, [editorRef, id, manualControl, pageId, runCode, updateBlockProps, value]);
+	}, [editorRef, id, manualControl, runCode, updateBlockProps, value]);
 
-	const { isOpen, close, onContextMenu, menu } = useBlockInspectorState<CodeBlockType>(
-		id,
-		[
-			{
-				key: 'Manual control',
-				call: ({ block: blc }) => updateBlockProps({ id, pageId, manualControl: !blc.manualControl }),
-				secondaryAction: ({ block: blc }) => <Switch checked={blc.manualControl} />,
-			},
-		],
-		[],
-	);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+		{
+			type: 'switch',
+			key: 'Manual control',
+			call: () => updateBlockProps({ id, manualControl: !block.manualControl }),
+			value: block.manualControl,
+		},
+	]);
 
 	return (
 		<>
-			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
+			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				<Editor onEditorReady={onEditorReady} value={value} language={language} editorRef={editorRef} />
 				<Button sx={{ marginRight: 1 }} variant="contained" color="primary" onClick={() => setShowLogs((v) => !v)}>

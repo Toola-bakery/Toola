@@ -10,15 +10,19 @@ export function useReferenceEvaluator() {
 	const evaluate = useCallback(
 		(sourceCode: string, current?: unknown) => {
 			if (!sourceCode.includes('${') || !sourceCode.includes('}')) return sourceCode;
-			if (sourceCode.startsWith('${') && sourceCode.endsWith('}') && sourceCode.indexOf('${', 1) === -1) {
-				// RETURN EXACT VALUE IF ONLY ONE REFERENCE
+			try {
+				if (sourceCode.startsWith('${') && sourceCode.endsWith('}') && sourceCode.indexOf('${', 1) === -1) {
+					// RETURN EXACT VALUE IF ONLY ONE REFERENCE
+					// eslint-disable-next-line @typescript-eslint/no-implied-eval
+					const evalFunction = Function(...['blocks', 'globals', 'current'], `return ${sourceCode.slice(2, -1)}`);
+					return evalFunction(blocks, globals, current);
+				}
 				// eslint-disable-next-line @typescript-eslint/no-implied-eval
-				const evalFunction = Function(...['blocks', 'globals', 'current'], `return ${sourceCode.slice(2, -1)}`);
+				const evalFunction = Function(...['blocks', 'globals', 'current'], `return \`${sourceCode}\``);
 				return evalFunction(blocks, globals, current);
+			} catch (e) {
+				return e.message;
 			}
-			// eslint-disable-next-line @typescript-eslint/no-implied-eval
-			const evalFunction = Function(...['blocks', 'globals', 'current'], `return \`${sourceCode}\``);
-			return evalFunction(blocks, globals, current);
 		},
 		[blocks, globals],
 	);

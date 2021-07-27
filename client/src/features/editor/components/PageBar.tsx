@@ -23,11 +23,7 @@ export function PageBar() {
 					</div>
 					<FormControlLabel
 						control={
-							<Switch
-								size="small"
-								checked={editing}
-								onChange={() => updateBlockState({ id, pageId: id, editing: !editing })}
-							/>
+							<Switch size="small" checked={editing} onChange={() => updateBlockState({ id, editing: !editing })} />
 						}
 						label="Editing"
 					/>

@@ -1,7 +1,6 @@
 import TextField from '@material-ui/core/TextField';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
-import { UpdateProperties } from '../Inspector/UpdateProperties';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 import { useEditor } from '../../hooks/useEditor';
 import { useOnMountedEffect } from '../../../../hooks/useOnMounted';
@@ -19,34 +18,30 @@ export type InputBlockState = {
 export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): JSX.Element {
 	const { id, value, pageId, label, initialValue } = block;
 
-	const { updateBlockState } = useEditor();
+	const { updateBlockState, updateBlockProps } = useEditor();
 
 	useOnMountedEffect(() => {
-		updateBlockState({ id, pageId, value: initialValue });
+		updateBlockState({ id, value: initialValue });
 	});
 
-	const { onContextMenu, isOpen, close, menu } = useBlockInspectorState(
-		id,
-		[
-			{
-				key: 'Initial Value',
-				next: ({ block: _block }) => (
-					<UpdateProperties
-						block={_block}
-						properties={[
-							{ propertyName: 'initialValue', type: 'code' },
-							{ propertyName: 'label', type: 'code' },
-						]}
-					/>
-				),
-			},
-		],
-		[],
-	);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+		{
+			key: 'Label',
+			type: 'input',
+			onChange: (v) => updateBlockProps({ id, label: v }),
+			value: label,
+		},
+		{
+			key: 'Initial Value',
+			type: 'input',
+			onChange: (v) => updateBlockProps({ id, initialValue: v }),
+			value: label,
+		},
+	]);
 
 	return (
 		<>
-			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
+			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				<TextField
 					id="outlined-basic"
@@ -56,7 +51,7 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 					value={value}
 					autoComplete="off"
 					onChange={(e) => {
-						updateBlockState({ id, pageId, value: e.target.value });
+						updateBlockState({ id, value: e.target.value });
 					}}
 				/>
 			</div>

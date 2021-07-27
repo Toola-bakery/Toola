@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { applyPatches, Patch } from 'immer';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
 import { BasicBlock } from '../types/basicBlock';
-import { Blocks, LayoutBlocks } from '../types/blocks';
-import { PageBlockType } from '../components/Page';
+import { BlockProps, BlockPropsAndState, Blocks, BlockStates, LayoutBlocks } from '../types/blocks';
 
 type PageState = {
-	blocksProperties: { [id: string]: BasicBlock & Blocks };
-	blocksState: { [id: string]: BasicBlock & Blocks };
+	blocksProperties: { [id: string]: BlockProps & BasicBlock };
+	blocksState: { [id: string]: BlockStates };
 };
 
 interface EditorState {
@@ -78,6 +78,14 @@ export const editorSlice = createSlice({
 			deleteChildFromParentHelper(state, pageId, blockId);
 			updateParentIdHelper(state, pageId, blockId, parentId);
 		},
+		setBlockPropsAction: (state, action: PayloadAction<BlockProps & BasicBlock>) => {
+			const { blocksProperties } = getPageHelper(state, action.payload.pageId);
+			blocksProperties[action.payload.id] = action.payload;
+		},
+		patchBlockPropsAction: (state, action: PayloadAction<{ patches: Patch[]; blockId: string; pageId: string }>) => {
+			const { blocksProperties } = getPageHelper(state, action.payload.pageId);
+			applyPatches(blocksProperties[action.payload.blockId], action.payload.patches);
+		},
 		updateBlockProps: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { blocksProperties } = getPageHelper(state, action.payload.pageId);
 			blocksProperties[action.payload.id] = update(blocksProperties[action.payload.id], {
@@ -135,6 +143,7 @@ export const editorSlice = createSlice({
 				$merge: action.payload,
 			});
 		},
+
 		deleteBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { id: blockId, pageId } = action.payload;
 			deleteBlockHelper(state, pageId, blockId);
@@ -161,6 +170,8 @@ export const {
 	addBlocks,
 	deleteBlock,
 	updateParentId,
+	setBlockPropsAction,
+	patchBlockPropsAction,
 } = editorSlice.actions;
 
 export const selectBlocksProps = (state: RootState, pageId: string) =>
@@ -174,15 +185,17 @@ export const selectBlockState = (state: RootState, pageId: string, blockId: stri
 
 export const selectBlockParentProps = (state: RootState, pageId: string, blockId: string) => {
 	const parent = selectBlockProps(state, pageId, blockId)?.parentId;
-	if (parent) return selectBlockProps(state, pageId, parent) as PageBlockType;
+	if (parent) return selectBlockProps(state, pageId, parent) as LayoutBlocks;
 };
 
 export const selectBlocksStateWithProps = createCachedSelector(
 	selectBlocksProps,
 	selectBlocksState,
 	(blocksProps, blocksState) => {
-		const response: { [p: string]: BasicBlock & Blocks } = {};
+		const response: { [p: string]: BasicBlock & BlockPropsAndState } = {};
 		Object.keys(blocksProps).forEach((key) => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			response[key] = { ...blocksProps[key], ...(blocksState[key] ? blocksState[key] : {}) };
 		});
 

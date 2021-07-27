@@ -2,7 +2,6 @@ import JSONTree from 'react-json-tree';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
 import { useReferences } from '../../hooks/useReferences';
-import { UpdateProperties } from '../Inspector/UpdateProperties';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 
 export type JSONViewBlockType = JSONViewBlockProps;
@@ -16,22 +15,18 @@ export function JSONViewBlock({ block }: { block: BasicBlock & JSONViewBlockType
 
 	const state = useReferences(value);
 
-	const { onContextMenu, isOpen, close, menu } = useBlockInspectorState(
-		id,
-		[
-			{
-				key: 'Data Source',
-				next: ({ block: _block }) => (
-					<UpdateProperties block={_block} properties={[{ propertyName: 'value', type: 'code' }]} />
-				),
-			},
-		],
-		[],
-	);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+		{
+			key: 'Data Source',
+			type: 'input',
+			onChange: (v) => {},
+			value,
+		},
+	]);
 
 	return (
 		<>
-			<BlockInspector context={{ block, id }} close={close} isOpen={isOpen} menu={menu} />
+			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				<JSONTree data={state} />
 			</div>

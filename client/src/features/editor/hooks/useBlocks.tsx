@@ -31,6 +31,8 @@ export function useBlocks(pageId: string) {
 	const blocks = useMemo(() => {
 		const response: { [p: string]: BasicBlock & Blocks } = {};
 		Object.keys(blocksStateWithProps).forEach((key) => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			response[key] = { ...blocksStateWithProps[key], ...(methodsState[key] ? methodsState[key] : {}) };
 		});
 		return response;

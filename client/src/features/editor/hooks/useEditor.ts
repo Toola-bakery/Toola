@@ -1,4 +1,7 @@
+import { produceWithPatches } from 'immer';
+import { Draft } from 'immer/dist/types/types-external';
 import { useCallback } from 'react';
+import { store } from '../../../redux';
 import { useEvents } from './useEvents';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import {
@@ -12,11 +15,12 @@ import {
 	addChildAfterId as addChildAfterIdAction,
 	updateParentId as updateParentIdAction,
 	selectBlocksProps,
+	patchBlockPropsAction,
 } from '../redux/editor';
 import { BasicBlock } from '../types/basicBlock';
 import { usePageContext } from './useReferences';
 import { BlockCreators } from '../helpers/BlockCreators';
-import { Blocks } from '../types/blocks';
+import { BlockProps, Blocks } from '../types/blocks';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -32,13 +36,19 @@ type UseEditorResponse = {
 	deleteBlock: (blockId: string) => void;
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
-	updateBlockProps: (block: Parameters<typeof updateBlockPropsAction>[0], focus?: boolean) => void;
 	updateBlockType: (blockId: string, type: Blocks['type']) => void;
-	updateBlockState: (block: Parameters<typeof updateBlockStateAction>[0], focus?: boolean) => void;
+	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean) => void;
+	immerBlockProps: <Block extends BlockProps = BlockProps, D = Draft<Block & BasicBlock>>(
+		blockId: string,
+		recipe: (draft: D) => undefined | void,
+	) => void;
+	updateBlockState: (block: Partial<Blocks> & Pick<BasicBlock, 'id'>, focus?: boolean) => void;
 	getNextId: (name: Blocks['type']) => string;
 };
 
 const cache: { [pageId: string]: { [key: string]: number } } = {};
+
+const getBlocks = (pageId: string) => selectBlocksProps(store.getState(), pageId);
 
 export function useEditor(): UseEditorResponse {
 	const { send } = useEvents();
@@ -46,8 +56,6 @@ export function useEditor(): UseEditorResponse {
 		globals: { pageId },
 	} = usePageContext();
 	const dispatch = useAppDispatch();
-
-	const blocks = useAppSelector((state) => selectBlocksProps(state, pageId));
 
 	const addChild = useCallback<UseEditorResponse['addChild']>(
 		(parentId, blocksId, index) => {
@@ -84,10 +92,10 @@ export function useEditor(): UseEditorResponse {
 
 	const updateBlockState = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
-			dispatch(updateBlockStateAction(block));
+			dispatch(updateBlockStateAction({ pageId, ...block }));
 			if (focus) send(block.id, { eventName: 'focus', waitListener: true });
 		},
-		[dispatch, send],
+		[dispatch, pageId, send],
 	);
 
 	const updateParentId = useCallback<UseEditorResponse['updateParentId']>(
@@ -102,12 +110,13 @@ export function useEditor(): UseEditorResponse {
 			if (!cache[pageId]) cache[pageId] = {};
 			if (!cache[pageId]?.[name]) cache[pageId][name] = 0;
 			cache[pageId][name] += 1;
+			const blocks = getBlocks(pageId);
 
 			while (blocks[`${name}${cache[pageId][name]}`]) cache[pageId][name] += 1;
 
 			return `${name}${cache[pageId][name]}`;
 		},
-		[blocks, pageId],
+		[pageId],
 	);
 
 	const addBlocks = useCallback<UseEditorResponse['addBlocks']>(
@@ -124,6 +133,7 @@ export function useEditor(): UseEditorResponse {
 
 	const addBlockAfter = useCallback<UseEditorResponse['addBlockAfter']>(
 		(putAfterId, block) => {
+			const blocks = getBlocks(pageId);
 			const { parentId } = blocks[putAfterId];
 
 			const payload = addBlocks([{ ...block, pageId, parentId }]);
@@ -132,7 +142,7 @@ export function useEditor(): UseEditorResponse {
 
 			send(payload[0].id, { eventName: 'focus', waitListener: true });
 		},
-		[addBlocks, addChildAfterId, blocks, pageId, send],
+		[addBlocks, addChildAfterId, pageId, send],
 	);
 
 	const addBlockIn = useCallback<UseEditorResponse['addBlockIn']>(
@@ -151,14 +161,23 @@ export function useEditor(): UseEditorResponse {
 
 	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
-			dispatch(updateBlockPropsAction(block));
+			dispatch(updateBlockPropsAction({ pageId, ...block }));
 			if (focus) send(block.id, { eventName: 'focus', waitListener: true });
 		},
-		[dispatch, send],
+		[dispatch, pageId, send],
+	);
+	const immerBlockProps = useCallback<UseEditorResponse['immerBlockProps']>(
+		(blockId, recipe) => {
+			const blocks = getBlocks(pageId);
+			const [ns, patches] = produceWithPatches(blocks[blockId], recipe);
+			dispatch(patchBlockPropsAction({ blockId, pageId, patches }));
+		},
+		[dispatch, pageId],
 	);
 
 	const updateBlockType = useCallback<UseEditorResponse['updateBlockType']>(
 		(blockId, type) => {
+			const blocks = getBlocks(pageId);
 			const block = blocks[blockId];
 			const { parentId } = block;
 
@@ -170,10 +189,11 @@ export function useEditor(): UseEditorResponse {
 			if (parentId) addChildInsteadOf(blockId, newId);
 			deleteBlock(blockId);
 		},
-		[blocks, addBlocks, pageId, addChildInsteadOf, deleteBlock],
+		[addBlocks, pageId, addChildInsteadOf, deleteBlock],
 	);
 
 	return {
+		immerBlockProps,
 		addChild,
 		addChildAfterId,
 		deleteFromParent,

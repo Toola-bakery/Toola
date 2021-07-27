@@ -69,8 +69,9 @@ export function CodeInput({ onChange, value, label }: { label: string; value: st
 	}, [isReference, suggestions, currentWord]);
 
 	return (
-		<div ref={ref}>
+		<div style={{ width: '100%' }} ref={ref}>
 			<TextField
+				sx={{ width: '100%' }}
 				id="outlined-basic"
 				label={label}
 				inputRef={inputRef}
