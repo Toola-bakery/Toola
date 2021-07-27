@@ -1,4 +1,4 @@
-import MenuItem from '@material-ui/core/MenuItem';
+import { ListItem } from '@material-ui/core';
 import React from 'react';
 import { BasicItemProps } from '../BlockInspector';
 import { CodeInput } from '../CodeInput';
@@ -11,8 +11,8 @@ export type InputMenuItemProps = BasicItemProps & {
 
 export function InputMenuItem({ item }: { item: InputMenuItemProps }) {
 	return (
-		<MenuItem>
-			<CodeInput label={item.key} value={item.value} onChange={item.onChange} />
-		</MenuItem>
+		<ListItem>
+			<CodeInput label={item.label} value={item.value} onChange={item.onChange} />
+		</ListItem>
 	);
 }

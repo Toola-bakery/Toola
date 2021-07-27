@@ -71,7 +71,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
 			type: 'switch',
-			key: 'Manual control',
+			label: 'Manual control',
 			call: () => updateBlockProps({ id, manualControl: !block.manualControl }),
 			value: block.manualControl,
 		},

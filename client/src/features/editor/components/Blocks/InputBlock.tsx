@@ -26,13 +26,13 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
-			key: 'Label',
+			label: 'Label',
 			type: 'input',
 			onChange: (v) => updateBlockProps({ id, label: v }),
 			value: label,
 		},
 		{
-			key: 'Initial Value',
+			label: 'Initial Value',
 			type: 'input',
 			onChange: (v) => updateBlockProps({ id, initialValue: v }),
 			value: label,

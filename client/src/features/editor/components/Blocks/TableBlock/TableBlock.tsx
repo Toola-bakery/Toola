@@ -1,3 +1,4 @@
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useEffect, useMemo } from 'react';
 import { usePrevious } from '../../../hooks/usePrevious';
@@ -90,10 +91,10 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 
 	const columnMenus = columnsProp.map<MenuItemProps>((col, index) => ({
 		type: 'nested',
-		key: `col${index}`,
+		label: `col${index}`,
 		next: [
 			{
-				key: 'Header',
+				label: 'Header',
 				type: 'input',
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
@@ -102,7 +103,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				value: col.header,
 			},
 			{
-				key: 'Data Source',
+				label: 'Data Source',
 				type: 'input',
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
@@ -111,8 +112,9 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				value: col.value,
 			},
 			{
-				key: 'type',
-				type: 'input',
+				label: 'Column Type',
+				type: 'select',
+				options: ['text', 'image'],
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
 						if (draft.columns?.[index]) draft.columns[index].type = v as 'text' | 'image';
@@ -120,14 +122,13 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				value: col.type || 'text',
 			},
 			{
-				key: 'deleteColumn',
+				label: 'deleteColumn',
 				type: 'item',
 				closeAfterCall: true,
 				call: () =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
 						if (draft.columns?.[index]) draft.columns.splice(index, 1);
 					}),
-				value: col.type || 'text',
 			},
 		],
 	}));
@@ -135,10 +136,10 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
 			type: 'nested',
-			key: 'global',
+			label: 'global',
 			next: [
 				{
-					key: 'Data Source',
+					label: 'Data Source',
 					type: 'input',
 					onChange: (v) =>
 						immerBlockProps<TableBlockProps>(id, (draft) => {
@@ -155,53 +156,64 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		<>
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
-				<div {...getTableProps()} style={undefined} className="table">
-					<div>
-						{headerGroups.map((headerGroup) => (
-							<div {...headerGroup.getHeaderGroupProps()} className="tr">
-								{headerGroup.headers.map((column, index) => (
-									<div {...column.getHeaderProps()} onClick={(e) => onContextMenu(e, [`col${index}`])} className="th">
-										{column.render('Header')}
-										<div {...column.getResizerProps()} className={`resizer ${column.isResizing ? 'isResizing' : ''}`} />
-									</div>
-								))}
-							</div>
-						))}
-					</div>
-					<div {...getTableBodyProps()} onContextMenu={(e) => onContextMenu(e, ['global'])} className="tbody">
-						{rows.map((row) => {
-							prepareRow(row);
-							return (
-								<div
-									{...row.getRowProps()}
-									onClick={() => {
-										const { isSelected } = row;
-										toggleAllRowsSelected(false);
-										if (!isSelected) row.toggleRowSelected();
-										updateBlockState({ id, selectedRow: isSelected ? null : row.original });
-									}}
-									className="tr"
-								>
-									{row.cells.map((cell) => {
-										const cellValue = ['string', 'number'].includes(typeof cell.value)
-											? cell.value
-											: JSON.stringify(cell.value);
+				<TableContainer component={Paper}>
+					<Table {...getTableProps()} style={undefined} className="table">
+						<TableHead>
+							{headerGroups.map((headerGroup) => (
+								<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
+									{headerGroup.headers.map((column, index) => (
+										<TableCell
+											{...column.getHeaderProps()}
+											onClick={(e) => onContextMenu(e, [`col${index}`])}
+											className="th"
+										>
+											{column.render('Header')}
+											<div
+												{...column.getResizerProps()}
+												className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
+											/>
+										</TableCell>
+									))}
+								</TableRow>
+							))}
+						</TableHead>
+						<TableBody {...getTableBodyProps()} onContextMenu={(e) => onContextMenu(e, ['global'])} className="tbody">
+							{rows.map((row) => {
+								prepareRow(row);
+								return (
+									<TableRow
+										{...row.getRowProps({
+											style: { backgroundColor: row.isSelected ? 'rgba(127, 180, 235, 0.3)' : undefined },
+										})}
+										onClick={() => {
+											const { isSelected } = row;
+											toggleAllRowsSelected(false);
+											if (!isSelected) row.toggleRowSelected();
+											updateBlockState({ id, selectedRow: isSelected ? null : row.original });
+										}}
+										className="tr"
+									>
+										{row.cells.map((cell) => {
+											const cellValue = ['string', 'number'].includes(typeof cell.value)
+												? cell.value
+												: JSON.stringify(cell.value);
 
-										return (
-											<div className="td" {...cell.getCellProps()} title={cellValue}>
-												{
-													// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-													// @ts-ignore
-													cell.column.type === 'image' ? <img src={cellValue} style={{ width: '100%' }} /> : cellValue
-												}
-											</div>
-										);
-									})}
-								</div>
-							);
-						})}
-					</div>
-				</div>
+											return (
+												<TableCell className="td" {...cell.getCellProps()} title={cellValue}>
+													{
+														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+														// @ts-ignore
+														cell.column.type === 'image' ? <img src={cellValue} style={{ width: '100%' }} /> : cellValue
+													}
+												</TableCell>
+											);
+										})}
+									</TableRow>
+								);
+							})}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			</TableStyles>
 		</>
 	);

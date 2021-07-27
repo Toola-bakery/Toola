@@ -25,14 +25,14 @@ export function useBlockInspectorState(id: string, menuConfig: BlockInspectorPro
 
 	const { deleteBlock } = useEditor();
 
-	const menu = [
+	const menu: MenuItemProps[] = [
 		...menuConfig,
 		{
 			type: 'item',
-			key: 'Delete',
+			label: 'Delete',
 			call: () => deleteBlock(id),
 		},
-	] as unknown as MenuItemProps[];
+	];
 
 	return { onContextMenu, inspectorProps: { menu, close, open, isOpen, path } };
 }

@@ -1,4 +1,5 @@
 import JSONTree from 'react-json-tree';
+import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
 import { useReferences } from '../../hooks/useReferences';
@@ -14,12 +15,16 @@ export function JSONViewBlock({ block }: { block: BasicBlock & JSONViewBlockType
 	const { id, value } = block;
 
 	const state = useReferences(value);
+	const { immerBlockProps } = useEditor();
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
-			key: 'Data Source',
+			label: 'Data Source',
 			type: 'input',
-			onChange: (v) => {},
+			onChange: (v) =>
+				immerBlockProps<JSONViewBlockProps>(id, (draft) => {
+					draft.value = v;
+				}),
 			value,
 		},
 	]);

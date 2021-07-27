@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import Menu from '@material-ui/core/Menu';
+import Popover from '@material-ui/core/Popover';
+import List from '@material-ui/core/List';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
+import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
 import { SimpleMenuItem, SimpleMenuItemProps } from './InspectorItems/SimpleMenuItem';
 import { SwitchMenuItem, SwitchMenuItemProps } from './InspectorItems/SwitchMenuItem';
 import { ViewMenuItem, ViewMenuItemProps } from './InspectorItems/ViewItem';
 
 export type BasicItemProps = {
-	key: string;
+	label: string;
 	icon?: string;
 };
 
@@ -17,6 +19,7 @@ export type MenuItemProps =
 	| SimpleMenuItemProps
 	| ViewMenuItemProps
 	| InputMenuItemProps
+	| SelectMenuItemProps
 	| SwitchMenuItemProps;
 
 export type BlockInspectorProps = {
@@ -32,34 +35,37 @@ export function InspectorItem({ item, close }: { item: MenuItemProps; close: () 
 	if (item.type === 'nested') return <NestedMenuItem item={item} />;
 	if (item.type === 'view') return <ViewMenuItem item={item} />;
 	if (item.type === 'input') return <InputMenuItem item={item} />;
+	if (item.type === 'select') return <SelectMenuItem item={item} />;
 	return <></>;
 }
 
 export function BlockInspector({ isOpen, menu, close, path }: BlockInspectorProps) {
 	const state = path.reduce<(NestedMenuItemProps | ViewMenuItemProps)['next']>((acc, key) => {
 		if (!Array.isArray(acc)) return acc;
-		const nextItem = acc.find((item) => item.key === key) as NestedMenuItemProps | ViewMenuItemProps;
+		const nextItem = acc.find((item) => item.label === key) as NestedMenuItemProps | ViewMenuItemProps;
 		return nextItem.next;
 	}, menu);
 
 	if (!isOpen) return null;
 	return (
 		<>
-			<ClickAwayListener onClickAway={() => close()}>
-				<div>
-					<Menu
-						anchorReference="anchorPosition"
-						anchorPosition={isOpen ? { top: isOpen[1], left: isOpen[0] } : undefined}
-						open={!!isOpen}
-						onClose={() => close()}
-						sx={{ '& .MuiPaper-root': { width: 290 } }}
-					>
-						{Array.isArray(state)
-							? state.map((item) => <InspectorItem key={item.key} close={close} item={item} />)
-							: state({})}
-					</Menu>
-				</div>
-			</ClickAwayListener>
+			<Popover
+				anchorReference="anchorPosition"
+				anchorPosition={isOpen ? { top: isOpen[1], left: isOpen[0] } : undefined}
+				open={!!isOpen}
+				onClose={() => close()}
+				sx={{ '& .MuiPaper-root': { width: 290 } }}
+			>
+				{Array.isArray(state) ? (
+					<List>
+						{state.map((item) => (
+							<InspectorItem key={item.label} close={close} item={item} />
+						))}
+					</List>
+				) : (
+					state({})
+				)}
+			</Popover>
 		</>
 	);
 }

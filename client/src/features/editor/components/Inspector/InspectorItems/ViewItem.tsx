@@ -11,7 +11,7 @@ export type ViewMenuItemProps = BasicItemProps & {
 export function ViewMenuItem({ item }: { item: ViewMenuItemProps }) {
 	return (
 		<MenuItem onClick={() => {}}>
-			<Typography variant="inherit">{item.key}</Typography>
+			<Typography variant="inherit">{item.label}</Typography>
 		</MenuItem>
 	);
 }

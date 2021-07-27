@@ -1,4 +1,4 @@
-import { Switch } from '@material-ui/core';
+import { ListItem, Switch } from '@material-ui/core';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
@@ -14,13 +14,14 @@ export type SimpleMenuItemProps = BasicItemProps & {
 
 export function SimpleMenuItem({ item, close }: { item: SimpleMenuItemProps; close: () => void }) {
 	return (
-		<MenuItem
+		<ListItem
+			button
 			onClick={() => {
 				item.call();
 				if (item.closeAfterCall) close();
 			}}
 		>
-			<Typography variant="inherit">{item.key}</Typography>
-		</MenuItem>
+			<Typography variant="inherit">{item.label}</Typography>
+		</ListItem>
 	);
 }

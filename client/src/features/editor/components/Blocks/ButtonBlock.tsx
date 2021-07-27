@@ -21,7 +21,7 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
-			key: 'Name',
+			label: 'Name',
 			type: 'input',
 			onChange: (v) => updateBlockProps({ id, name: v }),
 			value: name,

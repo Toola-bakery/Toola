@@ -17,7 +17,7 @@ export function ImageBlock({ block }: { block: BasicBlock & ImageBlockType }): J
 	const { updateBlockProps } = useEditor();
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
-			key: 'Data Source',
+			label: 'Data Source',
 			type: 'input',
 			onChange: (v) => updateBlockProps({ id, value: v }),
 			value,

@@ -1,4 +1,4 @@
-import { Switch } from '@material-ui/core';
+import { ListItem, Switch } from '@material-ui/core';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
@@ -15,12 +15,17 @@ export type SwitchMenuItemProps = BasicItemProps & {
 
 export function SwitchMenuItem({ item }: { item: SwitchMenuItemProps }) {
 	return (
-		<MenuItem onClick={() => {}}>
-			<Typography variant="inherit">{item.key}</Typography>
+		<ListItem
+			button
+			onClick={() => {
+				item.call();
+			}}
+		>
+			<Typography variant="inherit">{item.label}</Typography>
 
 			<ListItemSecondaryAction>
 				<Switch checked={item.value} />
 			</ListItemSecondaryAction>
-		</MenuItem>
+		</ListItem>
 	);
 }

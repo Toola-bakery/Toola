@@ -1,4 +1,4 @@
-import { Switch } from '@material-ui/core';
+import { ListItem, Switch } from '@material-ui/core';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
@@ -13,12 +13,12 @@ export type NestedMenuItemProps = BasicItemProps & {
 
 export function NestedMenuItem({ item }: { item: NestedMenuItemProps }) {
 	return (
-		<MenuItem
+		<ListItem
 			onClick={() => {
 				// item.call?.();
 			}}
 		>
-			<Typography variant="inherit">{item.key}</Typography>
-		</MenuItem>
+			<Typography variant="inherit">{item.label}</Typography>
+		</ListItem>
 	);
 }
