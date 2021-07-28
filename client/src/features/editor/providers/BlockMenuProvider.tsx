@@ -34,7 +34,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 	const value = useMemo<BlockMenuContextType>(() => ({ isOpen, anchorEl, open }), [isOpen, anchorEl, open]);
 
 	const close = useCallback(
-		(result: Blocks['type']) => {
+		(result: Blocks['type'] | null) => {
 			resolve(result);
 			setOpen(false);
 			setAnchorEl(undefined);
@@ -47,7 +47,7 @@ export function BlockMenuProvider({ children }: React.PropsWithChildren<{ a?: fa
 			<>
 				{children}
 
-				<Menu anchorEl={anchorEl} keepMounted open={isOpen}>
+				<Menu anchorEl={anchorEl} onClose={() => close(null)} keepMounted open={isOpen}>
 					<MenuItem onClick={() => close('text')}>Text</MenuItem>
 					<MenuItem onClick={() => close('code')}>Code</MenuItem>
 					<MenuItem onClick={() => close('JSONView')}>JSON viewer</MenuItem>

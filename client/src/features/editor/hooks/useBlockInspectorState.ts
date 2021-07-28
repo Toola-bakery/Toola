@@ -1,8 +1,11 @@
-import React, { MouseEventHandler, useCallback, useState } from 'react';
-import { BlockInspectorProps, MenuItemProps } from '../components/Inspector/BlockInspector';
+import React, { useCallback, useState } from 'react';
+import { MenuItemProps } from '../components/Inspector/BlockInspector';
 import { useEditor } from './useEditor';
 
-export function useBlockInspectorState(id: string, menuConfig: BlockInspectorProps['menu']) {
+export function useBlockInspectorState(
+	id: string,
+	menuConfig: ((defaultMenu: MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],
+) {
 	const [path, setPath] = useState<string[]>([]);
 	const [isOpen, setOpen] = useState<[number, number] | false>(false);
 
@@ -24,14 +27,18 @@ export function useBlockInspectorState(id: string, menuConfig: BlockInspectorPro
 	);
 
 	const { deleteBlock } = useEditor();
-
-	const menu: MenuItemProps[] = [
-		...menuConfig,
+	const defaultMenu: MenuItemProps[] = [
 		{
 			type: 'item',
 			label: 'Delete',
+			closeAfterCall: true,
 			call: () => deleteBlock(id),
 		},
+	];
+
+	const menu: MenuItemProps[] = [
+		...(typeof menuConfig === 'function' ? menuConfig(defaultMenu) : menuConfig),
+		...(typeof menuConfig === 'function' ? [] : defaultMenu),
 	];
 
 	return { onContextMenu, inspectorProps: { menu, close, open, isOpen, path } };

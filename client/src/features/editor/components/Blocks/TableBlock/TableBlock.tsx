@@ -141,7 +141,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		],
 	}));
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, (defaultMenu) => [
 		{
 			type: 'nested',
 			label: 'global',
@@ -155,6 +155,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 						}),
 					value,
 				},
+				...defaultMenu,
 			],
 		},
 		...columnMenus,

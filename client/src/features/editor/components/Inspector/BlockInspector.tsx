@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Popover from '@material-ui/core/Popover';
 import List from '@material-ui/core/List';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
 import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
@@ -43,10 +42,10 @@ export function BlockInspector({ isOpen, menu, close, path }: BlockInspectorProp
 	const state = path.reduce<(NestedMenuItemProps | ViewMenuItemProps)['next']>((acc, key) => {
 		if (!Array.isArray(acc)) return acc;
 		const nextItem = acc.find((item) => item.label === key) as NestedMenuItemProps | ViewMenuItemProps;
-		return nextItem.next;
+		return nextItem?.next;
 	}, menu);
 
-	if (!isOpen) return null;
+	if (!isOpen || !state) return null;
 	return (
 		<>
 			<Popover
