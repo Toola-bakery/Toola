@@ -188,21 +188,6 @@ export const selectBlockParentProps = (state: RootState, pageId: string, blockId
 	if (parent) return selectBlockProps(state, pageId, parent) as LayoutBlocks;
 };
 
-export const selectBlocksStateWithProps = createCachedSelector(
-	selectBlocksProps,
-	selectBlocksState,
-	(blocksProps, blocksState) => {
-		const response: { [p: string]: BasicBlock & BlockPropsAndState } = {};
-		Object.keys(blocksProps).forEach((key) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			response[key] = { ...blocksProps[key], ...(blocksState[key] ? blocksState[key] : {}) };
-		});
-
-		return response;
-	},
-)(() => 1);
-
 export const selectBlockStateWithProps = createCachedSelector(
 	(state) => state,
 	selectBlockProps,

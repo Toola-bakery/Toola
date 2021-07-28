@@ -26,6 +26,12 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 			onChange: (v) => updateBlockProps({ id, name: v }),
 			value: name,
 		},
+		{
+			label: 'Trigger',
+			type: 'input',
+			onChange: (v) => updateBlockProps({ id, value: v }),
+			value,
+		},
 	]);
 
 	return (

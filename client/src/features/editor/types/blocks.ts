@@ -2,7 +2,12 @@ import { ButtonBlockProps, ButtonBlockType } from '../components/Blocks/ButtonBl
 import { ColumnBlockProps, ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { ImageBlockProps, ImageBlockType } from '../components/Blocks/ImageBlock';
 import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock';
-import { CodeBlockProps, CodeBlockState, CodeBlockType } from '../components/Blocks/CodeBlock/CodeBlock';
+import {
+	CodeBlockMethods,
+	CodeBlockProps,
+	CodeBlockState,
+	CodeBlockType,
+} from '../components/Blocks/CodeBlock/CodeBlock';
 import { JSONViewBlockProps, JSONViewBlockType } from '../components/Blocks/JSONViewBlock';
 import { PageBlockProps, PageBlockState, PageBlockType } from '../components/Page';
 import { RowBlockProps, RowBlockType } from '../components/Blocks/Layout/RowBlock';
@@ -46,3 +51,4 @@ export type BlockPropsAndState =
 	| ButtonBlockProps;
 
 export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | PageBlockState;
+export type BlockMethods = CodeBlockMethods;

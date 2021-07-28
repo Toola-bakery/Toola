@@ -1,7 +1,7 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useEffect, useMemo } from 'react';
-import { usePrevious } from '../../../hooks/usePrevious';
+import { usePrevious } from '../../../../../hooks/usePrevious';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useReferenceEvaluator } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
