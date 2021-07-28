@@ -29,7 +29,3 @@ export const TableStyles = styled.div`
 		}
 	}
 `;
-
-export function TableS() {
-	return null;
-}

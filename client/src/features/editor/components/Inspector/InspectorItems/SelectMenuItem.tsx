@@ -17,7 +17,10 @@ export function SelectMenuItem({ item }: { item: SelectMenuItemProps }) {
 				<InputLabel>{item.label}</InputLabel>
 				<Select value={item.value} onChange={(v) => item.onChange(v.target.value)}>
 					{item.options.map((option) => (
-						<MenuItem value={typeof option === 'string' ? option : option.value}>
+						<MenuItem
+							key={typeof option === 'string' ? option : option.value}
+							value={typeof option === 'string' ? option : option.value}
+						>
 							{typeof option === 'string' ? option : option.name}
 						</MenuItem>
 					))}

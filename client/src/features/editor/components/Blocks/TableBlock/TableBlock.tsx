@@ -1,6 +1,7 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useEffect, useMemo } from 'react';
+import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../hooks/usePrevious';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useReferenceEvaluator } from '../../../hooks/useReferences';
@@ -16,6 +17,7 @@ export type TableBlockProps = {
 	columns?: TableColumnsProp;
 };
 type TableColumnsProp = {
+	id: string;
 	header: string;
 	value: string;
 	width?: number;
@@ -47,6 +49,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		return (typeof data[0] === 'object' && data[0] !== null ? Object.keys(data[0]) : []).map((accessor) => ({
 			header: accessor,
 			value: `\${current["${accessor}"]}`,
+			width: 150,
+			id: v4(),
 		}));
 	}, [columns, data]);
 
@@ -64,6 +68,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			maxWidth: 300,
 			width: col.width || 150,
 			type: col.type,
+			id: col.id,
 		}));
 	}, [columnsProp, evaluate]);
 
@@ -83,7 +88,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	useEffect(() => {
 		if (!isResizingColumn && isResizingColumnPrevious) {
 			immerBlockProps<TableBlockProps>(id, (r) => {
-				const col = r.columns?.find((c) => c.header === isResizingColumnPrevious);
+				const col = r.columns?.find((c) => c.id === isResizingColumnPrevious);
 				if (col) col.width = columnWidths[isResizingColumnPrevious];
 			});
 		}
@@ -98,7 +103,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				type: 'input',
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
-						if (draft.columns?.[index]) draft.columns[index].header = v;
+						const colDraft = draft.columns?.find((c) => c.id === col.id);
+						if (colDraft) colDraft.header = v;
 					}),
 				value: col.header,
 			},
@@ -107,7 +113,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				type: 'input',
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
-						if (draft.columns?.[index]) draft.columns[index].value = v;
+						const colDraft = draft.columns?.find((c) => c.id === col.id);
+						if (colDraft) colDraft.value = v;
 					}),
 				value: col.value,
 			},
@@ -117,7 +124,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				options: ['text', 'image'],
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
-						if (draft.columns?.[index]) draft.columns[index].type = v as 'text' | 'image';
+						const colDraft = draft.columns?.find((c) => c.id === col.id);
+						if (colDraft) colDraft.type = v as 'text' | 'image';
 					}),
 				value: col.type || 'text',
 			},
