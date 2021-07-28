@@ -157,7 +157,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
 				<TableContainer component={Paper}>
-					<Table {...getTableProps()} style={undefined} className="table">
+					<Table {...getTableProps()} onContextMenu={(e) => onContextMenu(e, ['global'])} className="table">
 						<TableHead>
 							{headerGroups.map((headerGroup) => (
 								<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
@@ -177,7 +177,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 								</TableRow>
 							))}
 						</TableHead>
-						<TableBody {...getTableBodyProps()} onContextMenu={(e) => onContextMenu(e, ['global'])} className="tbody">
+						<TableBody {...getTableBodyProps()} className="tbody">
 							{rows.map((row) => {
 								prepareRow(row);
 								return (

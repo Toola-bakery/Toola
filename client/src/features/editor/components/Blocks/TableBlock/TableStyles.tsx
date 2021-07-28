@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 export const TableStyles = styled.div`
 	.table {
+		min-height: 100px;
 		.tr {
 			max-height: 250px;
 			overflow-y: hidden;
