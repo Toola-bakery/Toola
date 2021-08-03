@@ -41,7 +41,7 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 	const [pages, setPages] = useState<string[]>([]);
 
 	useEffect(() => {
-		ky.get(`${Config.domain}/pages`)
+		ky.get(`${Config.domain}/pages/topLevelPages`)
 			.json<string[]>()
 			.then((v) =>
 				setPages(

@@ -33,7 +33,14 @@ export class Editor extends React.Component<EditorProps> {
 		onEditorReady();
 	}
 
-	shouldComponentUpdate(): boolean {
+	shouldComponentUpdate(nextProps: EditorProps): boolean {
+		const { disabled, editorRef } = this.props;
+
+		if (disabled !== nextProps.disabled) {
+			if (nextProps.disabled) editorRef.current.disable();
+			else editorRef.current.enable();
+		}
+
 		return false;
 	}
 

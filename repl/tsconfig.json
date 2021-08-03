@@ -1,14 +1,32 @@
 {
-	"compilerOptions": {
-		"target": "ES2018",
-		"module": "commonjs",
-		"outDir": "./build",
-		"moduleResolution": "node",
-		"noImplicitAny": false,
-		"declaration": true,
-		"skipLibCheck": true,
-		"esModuleInterop": true
-	},
-	"include": ["src"],
-	"exclude": ["node_modules", "**/__tests__/*", "test"]
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "outDir": "./build",
+    "baseUrl": "./src",
+    "paths": {
+      "types": [
+        "types/*"
+      ],
+      "services": [
+        "services/*"
+      ],
+      "utils": [
+        "utils/*"
+      ]
+    },
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/__tests__/*",
+    "test"
+  ]
 }

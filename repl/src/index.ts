@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
+import { getMongo } from './utils/mongo';
 
 dotenv.config();
 
-import('./api/api');
+getMongo().then(() => {
+	import('./startServices');
+});

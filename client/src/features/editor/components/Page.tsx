@@ -7,6 +7,7 @@ import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { useBlocks } from '../hooks/useBlocks';
 import { useInitialBlockState } from '../hooks/useInitialBlockState';
+import { useStateToWS } from '../hooks/useStateToWS';
 import { selectBlocksProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { BasicBlock } from '../types/basicBlock';
@@ -29,7 +30,7 @@ export type PageContextType = {
 	globals: { pageId: string };
 	page: BasicBlock & PageBlockType;
 	pageId: string;
-} & ReturnType<typeof useBlocks>;
+} & Omit<ReturnType<typeof useBlocks>, 'blocksMethods'>;
 
 export const PageContext = React.createContext<PageContextType>({
 	blocks: {},
@@ -41,7 +42,7 @@ export const PageContext = React.createContext<PageContextType>({
 });
 
 const putPage = debounce((pageId, blocksProps) => {
-	return ky.post(`${Config.domain}/page`, { json: { pageId, value: blocksProps } });
+	return ky.post(`${Config.domain}/pages/post`, { json: { pageId, value: blocksProps } });
 }, 300);
 
 export function Page(): JSX.Element {
@@ -50,12 +51,14 @@ export function Page(): JSX.Element {
 	useInitialBlockState<PageBlockState>({ editing: true }, pageId, pageId);
 	const [fetching, setFetching] = useState(true);
 
-	const { blocks, deleteBlockMethods, setBlockMethods } = useBlocks(pageId);
+	const { blocks, blocksMethods, deleteBlockMethods, setBlockMethods } = useBlocks(pageId);
+	useStateToWS(pageId, blocksMethods);
+
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 	const page = blocks?.[pageId] as BasicBlock & PageBlockType;
 
 	useEffect(() => {
-		ky.get(`${Config.domain}/page`, { searchParams: { pageId } })
+		ky.get(`${Config.domain}/pages/get`, { searchParams: { pageId } })
 			.json<{ value: { [key: string]: BasicBlock & Blocks } }>()
 			.then((v) => {
 				dispatch(setPage({ blocks: v.value, pageId }));

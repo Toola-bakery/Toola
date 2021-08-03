@@ -81,7 +81,13 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		<>
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
-				<Editor onEditorReady={onEditorReady} value={value} language={language} editorRef={editorRef} />
+				<Editor
+					onEditorReady={onEditorReady}
+					value={value}
+					language={language}
+					editorRef={editorRef}
+					disabled={!editing}
+				/>
 				<Button sx={{ marginRight: 1 }} variant="contained" color="primary" onClick={() => setShowLogs((v) => !v)}>
 					{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}
 				</Button>
@@ -89,7 +95,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 					Run CODE
 				</Button>
 				{showLogs ? (
-					<pre>
+					<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
 						{logs.join('')}
 						{JSON.stringify(result)}
 					</pre>

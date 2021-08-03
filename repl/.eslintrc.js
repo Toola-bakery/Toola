@@ -25,7 +25,8 @@ module.exports = {
 		'max-classes-per-file': 'off',
 		'consistent-return': 'off',
 		'no-console': 'off',
-		'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state'] }],
+		'object-shorthand': ['error', 'always', { avoidQuotes: false }],
+		'no-param-reassign': 'off',
 		'no-underscore-dangle': ['error', { allow: ['_id'] }],
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'@typescript-eslint/no-explicit-any': 'off',
@@ -34,8 +35,11 @@ module.exports = {
 		'prettier/prettier': [
 			'error',
 			{
-				endOfLine: 'auto',
 				printWidth: 120,
+				trailingComma: 'all',
+				singleQuote: true,
+				useTabs: true,
+				arrowParens: 'avoid',
 			},
 		],
 	},

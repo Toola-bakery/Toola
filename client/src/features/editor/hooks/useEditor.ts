@@ -93,7 +93,7 @@ export function useEditor(): UseEditorResponse {
 	const updateBlockState = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
 			dispatch(updateBlockStateAction({ pageId, ...block }));
-			if (focus) send(block.id, { eventName: 'focus', waitListener: true });
+			if (focus) send(block.id, { action: 'focus', waitListener: true });
 		},
 		[dispatch, pageId, send],
 	);
@@ -140,7 +140,7 @@ export function useEditor(): UseEditorResponse {
 
 			addChildAfterId(putAfterId, payload[0].id);
 
-			send(payload[0].id, { eventName: 'focus', waitListener: true });
+			send(payload[0].id, { action: 'focus', waitListener: true });
 		},
 		[addBlocks, addChildAfterId, pageId, send],
 	);
@@ -149,7 +149,7 @@ export function useEditor(): UseEditorResponse {
 		(parentId, block) => {
 			const payload = addBlocks([{ ...block, pageId, parentId }]);
 			addChild(parentId, payload[0].id);
-			send(payload[0].id, { eventName: 'focus', waitListener: true });
+			send(payload[0].id, { action: 'focus', waitListener: true });
 		},
 		[addBlocks, addChild, pageId, send],
 	);
@@ -162,7 +162,7 @@ export function useEditor(): UseEditorResponse {
 	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
 			dispatch(updateBlockPropsAction({ pageId, ...block }));
-			if (focus) send(block.id, { eventName: 'focus', waitListener: true });
+			if (focus) send(block.id, { action: 'focus', waitListener: true });
 		},
 		[dispatch, pageId, send],
 	);

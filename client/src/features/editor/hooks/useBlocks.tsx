@@ -57,5 +57,5 @@ export function useBlocks(pageId: string) {
 		return response;
 	}, [blockParticles, blocksMethods, blocksProps, blocksState, joinedBlock]);
 
-	return { deleteBlockMethods, setBlockMethods, blocks };
+	return { deleteBlockMethods, setBlockMethods, blocks, blocksMethods };
 }

@@ -5,12 +5,14 @@ type ExecuteFunctionOptions = {
 	output: (chunk: Buffer) => void;
 	callArgs?: any[];
 	mainFunctionName?: string;
+	env?: { [key: string]: string };
 };
 
 export function executeFunction({
 	code,
 	output,
 	callArgs,
+	env,
 	mainFunctionName = 'main',
 }: ExecuteFunctionOptions): Promise<number | string | void> {
 	return new Promise((resolve, reject) => {
@@ -23,6 +25,7 @@ export function executeFunction({
 		const source = `"${code.replace(/(["$`])/g, '\\$1')}; ${callFunctionWithArgs}"`;
 		const node = spawn('node', ['-e', source], {
 			shell: true,
+			env,
 		});
 
 		let mentionedOnce = false;

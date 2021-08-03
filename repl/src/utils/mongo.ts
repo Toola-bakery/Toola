@@ -1,6 +1,8 @@
 import { MongoClient, MongoClientOptions, Db } from 'mongodb';
-import * as fs from 'fs';
 import * as path from 'path';
+
+// eslint-disable-next-line import/no-mutable-exports
+export let mongoDB: Db;
 
 export const mongoRef: {
 	db?: Db;
@@ -16,6 +18,7 @@ export async function mongoConnect() {
 
 	mongoRef.connectionPromise = MongoClient.connect(process.env.DB_LINK, options).then(client => {
 		mongoRef.db = client.db(process.env.DB_NAME);
+		mongoDB = mongoRef.db;
 		return { client, databaseName: process.env.DB_NAME };
 	});
 
@@ -26,4 +29,3 @@ export async function getMongo() {
 	await mongoConnect();
 	return mongoRef.db;
 }
-getMongo();

@@ -12,7 +12,7 @@ import { JSONViewBlockProps, JSONViewBlockType } from '../components/Blocks/JSON
 import { PageBlockProps, PageBlockState, PageBlockType } from '../components/Page';
 import { RowBlockProps, RowBlockType } from '../components/Blocks/Layout/RowBlock';
 import { TableBlockProps, TableBlockState, TableBlockType } from '../components/Blocks/TableBlock/TableBlock';
-import { InputBlockProps, InputBlockState, InputBlockType } from '../components/Blocks/InputBlock';
+import { InputBlockMethods, InputBlockProps, InputBlockState, InputBlockType } from '../components/Blocks/InputBlock';
 
 export type Blocks =
 	| InputBlockType
@@ -51,4 +51,4 @@ export type BlockPropsAndState =
 	| ButtonBlockProps;
 
 export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | PageBlockState;
-export type BlockMethods = CodeBlockMethods;
+export type BlockMethods = CodeBlockMethods | InputBlockMethods;

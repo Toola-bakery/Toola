@@ -1,0 +1,91 @@
+diff --git a/node_modules/moleculer/index.d.ts b/node_modules/moleculer/index.d.ts
+index 754b4ff..ad01acb 100644
+--- a/node_modules/moleculer/index.d.ts
++++ b/node_modules/moleculer/index.d.ts
+@@ -1,4 +1,5 @@
+ import { EventEmitter2 } from "eventemitter2";
++import { ValidationRule } from "fastest-validator";
+ 
+ declare namespace Moleculer {
+ 	/**
+@@ -44,11 +45,10 @@ declare namespace Moleculer {
+ 		trace(...args: any[]): void;
+ 	}
+ 
+-	type ActionHandler<T = any, S = ServiceSettingSchema> = (
++	type ActionHandler<ActionProps = any, T = any, S = ServiceSettingSchema> = (
+ 		this: Service<S>,
+-		ctx: Context<any, any>
++		ctx: Context<Omit<ActionProps, 'meta'>, ActionProps['meta']>
+ 	) => Promise<T> | T;
+-	type ActionParamSchema = { [key: string]: any };
+ 	type ActionParamTypes =
+ 		| "any"
+ 		| "array"
+@@ -66,8 +66,8 @@ declare namespace Moleculer {
+ 		| "uuid"
+ 		| boolean
+ 		| string
+-		| ActionParamSchema;
+-	type ActionParams = { [key: string]: ActionParamTypes };
++		| ValidationRule;
++	type ActionParams<T = any> = { [key in keyof T]: ActionParamTypes };
+ 
+ 	interface HotReloadOptions {
+ 		modules?: Array<string>;
+@@ -460,14 +460,14 @@ declare namespace Moleculer {
+ 		basePath?: string,
+ 	}
+ 
+-	interface ActionSchema {
++	interface ActionSchema<ActionProps> {
+ 		name?: string;
+ 		rest?: RestSchema | string | string[],
+ 		visibility?: ActionVisibility;
+-		params?: ActionParams;
++		params?: ActionParams<Omit<ActionProps, 'meta'>>;
+ 		service?: Service;
+ 		cache?: boolean | ActionCacheOptions;
+-		handler?: ActionHandler;
++		handler?: ActionHandler<ActionProps>;
+ 		tracing?: boolean | TracingActionOptions;
+ 		bulkhead?: BulkheadOptions;
+ 		circuitBreaker?: BrokerCircuitBreakerOptions;
+@@ -491,7 +491,7 @@ declare namespace Moleculer {
+ 		[key: string]: any;
+ 	}
+ 
+-	type ServiceActionsSchema = { [key: string]: ActionSchema | ActionHandler | boolean; };
++	type ServiceActionsSchema<Actions> = { [Key in keyof Actions]: ActionSchema<Actions[Key]> | ActionHandler<Actions[Key]> | boolean; };
+ 
+ 	class BrokerNode {
+ 		id: string;
+@@ -681,13 +681,15 @@ declare namespace Moleculer {
+ 		version?: string | number;
+ 	}
+ 
+-	interface ServiceSchema<S = ServiceSettingSchema> {
+-		name: string;
++	type ActionsDeclaration = {[key:string]: ({meta?:any} & {[key:string]:any})}
++
++	interface ServiceSchema<Name extends string = "", Actions extends ActionsDeclaration = any, S = ServiceSettingSchema> {
++		name: Name;
+ 		version?: string | number;
+ 		settings?: S;
+ 		dependencies?: string | ServiceDependency | Array<string | ServiceDependency>;
+ 		metadata?: GenericObject;
+-		actions?: ServiceActionsSchema;
++		actions?: ServiceActionsSchema<Actions>;
+ 		mixins?: Array<Partial<ServiceSchema>>;
+ 		methods?: ServiceMethods;
+ 		hooks?: ServiceHooks;
+@@ -1086,8 +1088,7 @@ declare namespace Moleculer {
+ 
+ 		findNextActionEndpoint(actionName: string, opts?: GenericObject, ctx?: Context): ActionEndpoint | Errors.MoleculerRetryableError;
+ 
+-		call<T>(actionName: string): Promise<T>;
+-		call<T, P>(actionName: string, params: P, opts?: CallingOptions): Promise<T>;
++		call<Actions, ActionName = keyof Actions>(actionName: ActionName, params:Actions[ActionName]): Promise<T>;
+ 
+ 		mcall<T>(def: Array<MCallDefinition> | { [name: string]: MCallDefinition }, opts?: MCallCallingOptions): Promise<Array<T> | T>;
+ 

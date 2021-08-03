@@ -9,7 +9,7 @@ export type EventListeners = {
 
 export type EventChannelStorage = Event[];
 
-export type Event = { eventName: string; waitListener?: boolean } & unknown;
+export type Event = { action: string; waitListener?: boolean } & unknown;
 
 const events: EventStorage = {};
 const eventListeners: EventListeners = {};
@@ -52,9 +52,9 @@ export function useEvents(): UseEventsResponse {
 	);
 }
 
-export function useEventListener<U extends Event = Event>(
+export function useEventListener<U = Record<string, never>>(
 	id: string,
-	effect: (event: U) => void,
+	effect: (event: U & Event) => void,
 	deps: DependencyList,
 ) {
 	const { addEventListener, send } = useEvents();

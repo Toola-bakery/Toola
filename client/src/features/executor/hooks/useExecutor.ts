@@ -1,11 +1,7 @@
 import { useCallback, useContext, useState } from 'react';
 import { v4 } from 'uuid';
-import { ExecutorProviderContext } from '../components/ExecutorProvider';
 import { useEventListener } from '../../editor/hooks/useEvents';
-
-export function useExecutor() {
-	return useContext(ExecutorProviderContext);
-}
+import { useWS } from '../../ws/hooks/useWS';
 
 export type FunctionExecutorAction = {
 	id: string;
@@ -15,13 +11,13 @@ export type FunctionExecutorAction = {
 };
 
 export function useFunctionExecutor(listener: (event: FunctionExecutorAction) => void) {
-	const { sendWS } = useExecutor();
+	const { sendWS } = useWS();
 
 	const [UUID, setUUID] = useState(v4());
 	const [lastEvent, setLastEvent] = useState<FunctionExecutorAction['eventName']>();
 
 	useEventListener<FunctionExecutorAction>(
-		UUID,
+		`ws/${UUID}`,
 		(event) => {
 			listener(event);
 			setLastEvent(event.eventName);
@@ -35,8 +31,8 @@ export function useFunctionExecutor(listener: (event: FunctionExecutorAction) =>
 			setUUID(newUUID);
 			setLastEvent(undefined);
 			sendWS({
-				type: 'function',
-				id: newUUID,
+				action: 'functions.run',
+				reqId: newUUID,
 				code,
 				callArgs: code.includes('main') ? [] : undefined,
 			});

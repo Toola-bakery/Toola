@@ -2,33 +2,34 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useEvents } from '../../editor/hooks/useEvents';
 import { Config } from '../../../config';
 
-export type ExecutorProviderContextType = {
+export type WSProviderContextType = {
 	ws?: WebSocket;
 	sendWS: (data: unknown) => void;
 };
 
-export const ExecutorProviderContext = React.createContext<ExecutorProviderContextType>({
+export const WSProviderContext = React.createContext<WSProviderContextType>({
 	sendWS: () => {},
 });
 
-export function ExecutorProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
+export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
 	const [ws] = useState(() => new WebSocket(Config.websocket));
 	const { send } = useEvents();
 
 	useEffect(() => {
 		ws.onmessage = (event) => {
 			const jsonEvent = JSON.parse(event.data);
-			send(jsonEvent.id || 'ws', { eventName: jsonEvent.type, ...jsonEvent });
+			if (jsonEvent.id) send(`ws/${jsonEvent.id}`, jsonEvent);
+			if (jsonEvent.action) send(`ws/${jsonEvent.action}`, jsonEvent);
 		};
 	}, [send, ws]);
 
 	const sendWS = useCallback((data: unknown) => ws.send(JSON.stringify(data)), [ws]);
 
-	const value = useMemo<ExecutorProviderContextType>(() => ({ ws, sendWS }), [ws, sendWS]);
+	const value = useMemo<WSProviderContextType>(() => ({ ws, sendWS }), [ws, sendWS]);
 
 	return (
-		<ExecutorProviderContext.Provider value={value}>
+		<WSProviderContext.Provider value={value}>
 			<>{children}</>
-		</ExecutorProviderContext.Provider>
+		</WSProviderContext.Provider>
 	);
 }
