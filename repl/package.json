@@ -21,6 +21,7 @@
 		"moleculer": "^0.14.16",
 		"moleculer-web": "^0.10.0",
 		"mongodb": "^4.0.1",
+		"page-state": "/Users/levankvirkvelia/projects/workspace/packages/page-state",
 		"patch-package": "^6.4.7",
 		"postinstall-postinstall": "^2.1.0",
 		"prettier": "^1.18.2",
