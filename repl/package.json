@@ -14,6 +14,7 @@
 		"@types/uuid": "^8.3.1",
 		"@types/ws": "^7.4.6",
 		"axios": "^0.21.1",
+		"connection-string-parser": "^1.0.3",
 		"dotenv": "^8.0.0",
 		"fastify": "^3.19.1",
 		"fastify-cors": "^6.0.2",

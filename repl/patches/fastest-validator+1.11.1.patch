@@ -1,0 +1,13 @@
+diff --git a/node_modules/fastest-validator/dist/index.d.ts b/node_modules/fastest-validator/dist/index.d.ts
+index c005775..b81566d 100644
+--- a/node_modules/fastest-validator/dist/index.d.ts
++++ b/node_modules/fastest-validator/dist/index.d.ts
+@@ -317,7 +317,7 @@ export interface RuleObject extends RuleCustom {
+ 	 * if true any properties which are not defined on the schema will throw an error.
+ 	 * @default false
+ 	 */
+-	strict?: boolean;
++	strict?: boolean | 'remove';
+ 	/**
+ 	 * List of properties that should be validated by this rule
+ 	 */

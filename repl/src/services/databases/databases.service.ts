@@ -1,36 +1,49 @@
-import { Context, ServiceSchema } from 'moleculer';
-import { v4, version } from 'uuid';
+import { ServiceSchema } from 'moleculer';
+import { v4 } from 'uuid';
+import { DatabaseSchema } from '../../types/database.types';
 import { mongoDB } from '../../utils/mongo';
-
-type DatabaseSchema = {
-	_id: string;
-	type: 'mongodb';
-	name: string;
-	host: string;
-	connectionFormat: 'dns' | 'standard';
-	dbName: string;
-	username: string;
-	password: string;
-	ssl: boolean;
-	CA?: string;
-	clientKeyAndCert?: string;
-};
 
 const databaseCollection = mongoDB.collection<DatabaseSchema>('databases');
 
-export const DatabasesService: ServiceSchema = {
+export const DatabasesService: ServiceSchema<
+	'databases',
+	{
+		post: {
+			database: DatabaseSchema;
+		};
+		get: {
+			id: string;
+		};
+		getAll: Record<string, never>;
+	}
+> = {
 	name: 'databases',
 	settings: {},
 	actions: {
 		post: {
 			params: {
-				pageId: { type: 'string' },
-				value: { type: 'object' },
+				database: [
+					{
+						type: 'object',
+						strict: 'remove',
+						props: {
+							_id: { type: 'uuid', version: 4, optional: true },
+							type: { type: 'equal', value: 'mongodb' },
+							name: { type: 'string', min: 5, max: 50 },
+							host: { type: 'string', max: 200 },
+							connectionFormat: { type: 'enum', values: ['dns', 'standard'] },
+							dbName: { type: 'string', max: 50 },
+							username: { type: 'string', max: 50 },
+							password: { type: 'string', max: 50 },
+							ssl: { type: 'boolean', convert: true },
+							CA: { type: 'string', optional: true },
+							clientKeyAndCert: { type: 'string', optional: true },
+						},
+					},
+				],
 			},
-			async handler(ctx: Context<DatabaseSchema>) {
-				const database = ctx.params;
-
-				if (database._id && version(database._id) !== 4) throw new Error('bad _id');
+			async handler(ctx) {
+				const { database } = ctx.params;
 
 				const newId = database._id || v4();
 
@@ -43,8 +56,16 @@ export const DatabasesService: ServiceSchema = {
 				return { ok: true };
 			},
 		},
+		get: {
+			params: {
+				id: { type: 'uuid', version: 4 },
+			},
+			async handler(ctx) {
+				const { id } = ctx.params;
+				return databaseCollection.findOne({ _id: id });
+			},
+		},
 		getAll: {
-			params: {},
 			async handler(ctx) {
 				return databaseCollection.find().toArray();
 			},

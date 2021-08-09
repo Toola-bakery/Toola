@@ -6,6 +6,9 @@ export const TableStyles = styled.div`
 		.tr {
 			max-height: 250px;
 			overflow-y: hidden;
+			.td {
+				padding: 5px;
+			}
 		}
 
 		.th,

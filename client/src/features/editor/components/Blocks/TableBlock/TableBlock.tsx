@@ -1,4 +1,5 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import JSONTree from 'react-json-tree';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
@@ -16,12 +17,19 @@ export type TableBlockProps = {
 	value: string;
 	columns?: TableColumnsProp;
 };
+
+enum ColumnTypes {
+	json = 'json',
+	image = 'image',
+	text = 'text',
+}
+
 type TableColumnsProp = {
 	id: string;
 	header: string;
 	value: string;
 	width?: number;
-	type?: 'text' | 'image';
+	type?: ColumnTypes;
 }[];
 
 export type TableBlockState = {
@@ -121,13 +129,13 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			{
 				label: 'Column Type',
 				type: 'select',
-				options: ['text', 'image'],
+				options: Object.values(ColumnTypes),
 				onChange: (v) =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
 						const colDraft = draft.columns?.find((c) => c.id === col.id);
-						if (colDraft) colDraft.type = v as 'text' | 'image';
+						if (colDraft) colDraft.type = v as ColumnTypes;
 					}),
-				value: col.type || 'text',
+				value: col.type || ColumnTypes.text,
 			},
 			{
 				label: 'deleteColumn',
@@ -209,11 +217,15 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 
 											return (
 												<TableCell className="td" {...cell.getCellProps()} title={cellValue}>
-													{
+													{(() => {
 														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 														// @ts-ignore
-														cell.column.type === 'image' ? <img src={cellValue} style={{ width: '100%' }} /> : cellValue
-													}
+														const type = cell.column.type as string;
+														console.log('type', { type });
+														if (type === ColumnTypes.image) return <img src={cellValue} style={{ width: '100%' }} />;
+														if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
+														return cellValue;
+													})()}
 												</TableCell>
 											);
 										})}

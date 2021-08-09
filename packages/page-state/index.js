@@ -13,11 +13,7 @@ function awaitMessageResponse(messageId) {
 
 const ws = new WebSocket("ws://localhost:8080");
 
-const isWsReadyPromise = new Promise((ok) => {
-  ws.on("open", async () => {
-    ok();
-  });
-});
+const isWsReadyPromise = new Promise((resolve) => ws.on("open", resolve));
 
 isWsReadyPromise.then();
 

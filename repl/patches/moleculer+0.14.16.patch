@@ -1,5 +1,5 @@
 diff --git a/node_modules/moleculer/index.d.ts b/node_modules/moleculer/index.d.ts
-index 754b4ff..ab00f74 100644
+index 754b4ff..3088dfa 100644
 --- a/node_modules/moleculer/index.d.ts
 +++ b/node_modules/moleculer/index.d.ts
 @@ -1,4 +1,5 @@
@@ -79,11 +79,14 @@ index 754b4ff..ab00f74 100644
  		mixins?: Array<Partial<ServiceSchema>>;
  		methods?: ServiceMethods;
  		hooks?: ServiceHooks;
-@@ -1088,6 +1090,7 @@ declare namespace Moleculer {
+@@ -1086,8 +1088,9 @@ declare namespace Moleculer {
  
+ 		findNextActionEndpoint(actionName: string, opts?: GenericObject, ctx?: Context): ActionEndpoint | Errors.MoleculerRetryableError;
+ 
++		// call<T, Actions, ActionName = keyof Actions>(actionName: ActionName, params:Actions[ActionName]): Promise<T>;
  		call<T>(actionName: string): Promise<T>;
- 		call<T, P>(actionName: string, params: P, opts?: CallingOptions): Promise<T>;
-+		call<Actions, ActionName = keyof Actions>(actionName: ActionName, params:Actions[ActionName]): Promise<T>;
+-		call<T, P>(actionName: string, params: P, opts?: CallingOptions): Promise<T>;
++		call<T, P = any>(actionName: string, params: P, opts?: CallingOptions): Promise<T>;
  
  		mcall<T>(def: Array<MCallDefinition> | { [name: string]: MCallDefinition }, opts?: MCallCallingOptions): Promise<Array<T> | T>;
  

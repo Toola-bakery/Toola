@@ -45,8 +45,8 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 		{
 			label: 'Initial Value',
 			type: 'input',
-			onChange: (v) => setValue(v),
-			value: label,
+			onChange: (v) => updateBlockProps({ id, initialValue: v }),
+			value: initialValue,
 		},
 	]);
 

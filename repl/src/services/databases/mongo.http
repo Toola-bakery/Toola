@@ -1,0 +1,19 @@
+POST http://localhost:8080/mongo/find
+Content-Type: application/json
+
+{
+  "id": "b9a401ad-133d-43c0-9a27-167648ee1e01",
+  "collection": "databases"
+}
+
+###
+
+POST http://localhost:8080/mongo/findOne
+Content-Type: application/json
+
+{
+  "id": "b9a401ad-133d-43c0-9a27-167648ee1e01",
+  "collection": "databases"
+}
+
+###
