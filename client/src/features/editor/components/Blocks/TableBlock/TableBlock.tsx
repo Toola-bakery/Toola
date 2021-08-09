@@ -1,7 +1,7 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import JSONTree from 'react-json-tree';
 import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../hooks/usePrevious';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -69,7 +69,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	}, [columns, columnsProp, id, pageId, updateBlockProps]);
 
 	const calculatedColumns = useMemo<Column[]>(() => {
-		return columnsProp.map((col) => ({
+		const cols: Column[] = columnsProp.map((col) => ({
 			Header: col.header,
 			accessor: (originalRow) => evaluate(col.value, originalRow),
 			minWidth: 100,
@@ -78,6 +78,16 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			type: col.type,
 			id: col.id,
 		}));
+		cols.push({
+			id: 'add',
+			Header: '+',
+			accessor: () => '',
+			maxWidth: 20,
+			minWidth: 20,
+			width: 20,
+			// type: ColumnTypes.text,
+		});
+		return cols;
 	}, [columnsProp, evaluate]);
 
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state, toggleAllRowsSelected } = useTable(
@@ -102,9 +112,9 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		}
 	}, [columnWidths, id, immerBlockProps, isResizingColumn, isResizingColumnPrevious]);
 
-	const columnMenus = columnsProp.map<MenuItemProps>((col, index) => ({
+	const columnMenus = columnsProp.map<MenuItemProps>((col) => ({
 		type: 'nested',
-		label: `col${index}`,
+		label: `col${col.id}`,
 		next: [
 			{
 				label: 'Header',
@@ -143,7 +153,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				closeAfterCall: true,
 				call: () =>
 					immerBlockProps<TableBlockProps>(id, (draft) => {
-						if (draft.columns?.[index]) draft.columns.splice(index, 1);
+						const colIndex = draft.columns?.findIndex((c) => c.id === col.id);
+						if (typeof colIndex !== 'undefined' && colIndex >= 0 && draft.columns) draft.columns.splice(colIndex, 1);
 					}),
 			},
 		],
@@ -169,6 +180,13 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		...columnMenus,
 	]);
 
+	const addColumn = useCallback(() => {
+		immerBlockProps<TableBlockProps>(id, (draft) => {
+			if (!draft.columns) draft.columns = [];
+			draft.columns.push({ id: v4(), header: 'column', type: ColumnTypes.text, value: '' });
+		});
+	}, [id, immerBlockProps]);
+
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
@@ -178,10 +196,13 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 						<TableHead>
 							{headerGroups.map((headerGroup) => (
 								<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
-									{headerGroup.headers.map((column, index) => (
+									{headerGroup.headers.map((column) => (
 										<TableCell
 											{...column.getHeaderProps()}
-											onClick={(e) => onContextMenu(e, [`col${index}`])}
+											onClick={(e) => {
+												if (column.id === 'add') addColumn();
+												else onContextMenu(e, [`col${column.id}`]);
+											}}
 											className="th"
 										>
 											{column.render('Header')}
@@ -221,7 +242,6 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 														// @ts-ignore
 														const type = cell.column.type as string;
-														console.log('type', { type });
 														if (type === ColumnTypes.image) return <img src={cellValue} style={{ width: '100%' }} />;
 														if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
 														return cellValue;

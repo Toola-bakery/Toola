@@ -31,6 +31,7 @@ export const DatabasesService: ServiceSchema<
 							type: { type: 'equal', value: 'mongodb' },
 							name: { type: 'string', min: 5, max: 50 },
 							host: { type: 'string', max: 200 },
+							port: { type: 'string', max: 5, optional: true },
 							connectionFormat: { type: 'enum', values: ['dns', 'standard'] },
 							dbName: { type: 'string', max: 50 },
 							username: { type: 'string', max: 50 },
