@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ky from 'ky';
 import debounce from 'just-debounce';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -20,6 +20,7 @@ import { useWindowSize } from '../../../hooks/useWindowSize';
 export type PageBlockType = PageBlockProps & PageBlockState;
 export type PageBlockProps = {
 	type: 'page';
+	title: string;
 	blocks: string[];
 };
 export type PageBlockState = {
@@ -38,27 +39,29 @@ export const PageContext = React.createContext<PageContextType>({
 	setBlockMethods: () => {},
 	globals: { pageId: '' },
 	pageId: '',
-	page: { id: '', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
+	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
 });
 
 const putPage = debounce((pageId, blocksProps) => {
-	return ky.post(`${Config.domain}/pages/post`, { json: { pageId, value: blocksProps } });
+	return ky.post(`${Config.domain}/pages/post`, { json: { id: pageId, value: blocksProps } });
 }, 300);
 
 export function Page(): JSX.Element {
 	const dispatch = useAppDispatch();
 	const { pageId } = useParams<{ pageId: string }>();
-	useInitialBlockState<PageBlockState>({ editing: true }, pageId, pageId);
+	const { state: pageParams } = useLocation();
+
+	useInitialBlockState<PageBlockState>({ editing: true }, 'page', pageId);
 	const [fetching, setFetching] = useState(true);
 
 	const { blocks, blocksMethods, deleteBlockMethods, setBlockMethods } = useBlocks(pageId);
 	useStateToWS(pageId, blocksMethods);
 
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
-	const page = blocks?.[pageId] as BasicBlock & PageBlockType;
+	const page = blocks?.page as BasicBlock & PageBlockType;
 
 	useEffect(() => {
-		ky.get(`${Config.domain}/pages/get`, { searchParams: { pageId } })
+		ky.get(`${Config.domain}/pages/get`, { searchParams: { id: pageId } })
 			.json<{ value: { [key: string]: BasicBlock & Blocks } }>()
 			.then((v) => {
 				dispatch(setPage({ blocks: v.value, pageId }));
@@ -72,8 +75,8 @@ export function Page(): JSX.Element {
 	}, [fetching, blocksProps, pageId]);
 
 	const value = useMemo<PageContextType>(
-		() => ({ blocks, pageId, globals: { pageId }, page, deleteBlockMethods, setBlockMethods }),
-		[blocks, pageId, page, deleteBlockMethods, setBlockMethods],
+		() => ({ blocks, pageId, globals: { pageId, pageParams }, page, deleteBlockMethods, setBlockMethods }),
+		[blocks, pageId, pageParams, page, deleteBlockMethods, setBlockMethods],
 	);
 	const { width } = useWindowSize({ width: 1000 });
 
@@ -87,7 +90,7 @@ export function Page(): JSX.Element {
 							<ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} />
 						</>
 					) : null}
-					<CreateBlockAtTheEnd parentId={pageId} />
+					<CreateBlockAtTheEnd parentId="page" />
 				</div>
 			</PageContext.Provider>
 		</DndProvider>

@@ -1,6 +1,7 @@
 import { ButtonBlockProps, ButtonBlockType } from '../components/Blocks/ButtonBlock';
 import { ColumnBlockProps, ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { ImageBlockProps, ImageBlockType } from '../components/Blocks/ImageBlock';
+import { SubPageBlockProps, SubPageBlockType } from '../components/Blocks/SubPageBlock';
 import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock';
 import {
 	CodeBlockMethods,
@@ -22,6 +23,7 @@ export type Blocks =
 	| JSONViewBlockType
 	| ImageBlockType
 	| LayoutBlocks
+	| SubPageBlockType
 	| ButtonBlockType;
 
 export type LayoutBlocks = PageBlockType | ColumnBlockType | RowBlockType;
@@ -36,6 +38,7 @@ export type BlockProps =
 	| PageBlockProps
 	| RowBlockProps
 	| ColumnBlockProps
+	| SubPageBlockProps
 	| ButtonBlockProps;
 
 export type BlockPropsAndState =
@@ -47,6 +50,7 @@ export type BlockPropsAndState =
 	| ImageBlockProps
 	| (PageBlockProps & PageBlockState)
 	| RowBlockProps
+	| SubPageBlockProps
 	| ColumnBlockProps
 	| ButtonBlockProps;
 

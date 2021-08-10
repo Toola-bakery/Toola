@@ -16,10 +16,20 @@ import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
 const CMD_KEY = '/';
 
 export type TextBlockType = TextBlockProps;
-export type TextBlockProps = { type: 'text'; value: string };
+
+export type TextBlockStyles = 'text' | 'heading1' | 'heading2' | 'heading3';
+
+const textBlockStyleTag = {
+	text: 'p',
+	heading1: 'h1',
+	heading2: 'h2',
+	heading3: 'h3',
+};
+
+export type TextBlockProps = { type: 'text'; style?: TextBlockStyles; value: string };
 
 export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX.Element {
-	const { id, value: realValue = '' } = block;
+	const { id, value: realValue = '', style } = block;
 	const [value, setValue] = useState(realValue);
 	const {
 		page: { editing },
@@ -110,7 +120,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 				onBlur={() => isEditingRef.current && setEditing(false)}
 				innerRef={contentEditable}
 				html={isEditing ? value : htmlString}
-				tagName="p"
+				tagName={textBlockStyleTag[style || 'text']}
 				style={{ margin: 0, marginBottom: 10 }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}

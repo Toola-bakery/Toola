@@ -36,7 +36,7 @@ type UseEditorResponse = {
 	deleteBlock: (blockId: string) => void;
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
-	updateBlockType: (blockId: string, type: Blocks['type']) => void;
+	updateBlockType: (blockId: string, type: Blocks['type'] | ({ type: Blocks['type'] } & BlockProps)) => void;
 	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean) => void;
 	immerBlockProps: <Block extends BlockProps = BlockProps, D = Draft<Block & BasicBlock>>(
 		blockId: string,
@@ -176,15 +176,19 @@ export function useEditor(): UseEditorResponse {
 	);
 
 	const updateBlockType = useCallback<UseEditorResponse['updateBlockType']>(
-		(blockId, type) => {
+		(blockId, typeOrBlock) => {
+			const type = typeof typeOrBlock === 'string' ? typeOrBlock : typeOrBlock.type;
 			const blocks = getBlocks(pageId);
 			const block = blocks[blockId];
 			const { parentId } = block;
 
 			const newBlock = BlockCreators[type](block);
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const [{ id: newId }] = addBlocks([{ ...newBlock, pageId, parentId, type }]);
+
+			const [{ id: newId }] = addBlocks([
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				{ ...newBlock, ...(typeOrBlock === 'string' ? {} : typeOrBlock), pageId, parentId, type },
+			]);
 
 			if (parentId) addChildInsteadOf(blockId, newId);
 			deleteBlock(blockId);

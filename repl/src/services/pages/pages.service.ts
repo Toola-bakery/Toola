@@ -1,63 +1,79 @@
-import { Context, ServiceSchema } from 'moleculer';
+import { ServiceSchema } from 'moleculer';
+import { v4 } from 'uuid';
 import { mongoDB } from '../../utils/mongo';
 
 type PageSchema = {
+	_id: string;
 	value: any;
-	pageId: string;
 };
 
 const pagesCollection = mongoDB.collection<PageSchema>('pages');
 
-export const PagesService: ServiceSchema = {
+export const PagesService: ServiceSchema<
+	'pages',
+	{
+		create: { id: string; parentPageId: string | null; title: string };
+		get: { id: string };
+		post: { id: string; title?: string; value: any };
+		topLevelPages: Record<string, never>;
+	}
+> = {
 	name: 'pages',
 	settings: {},
 	actions: {
+		create: {
+			params: {
+				id: { type: 'uuid', version: 4, optional: true },
+				parentPageId: { type: 'uuid', version: 4, nullable: true },
+				title: { type: 'string', optional: true, default: 'Untitled' },
+			},
+			async handler(ctx) {
+				const { id = v4(), parentPageId, title } = ctx.params;
+				try {
+					await pagesCollection.insertOne({
+						_id: id,
+						value: { page: { id: 'page', title, pageId: id, blocks: [], parentId: parentPageId, type: 'page' } },
+					});
+					return { ok: true };
+				} catch (e) {
+					if (e.message.includes('E11000')) return { ok: true };
+					throw e;
+				}
+			},
+		},
 		get: {
 			params: {
-				pageId: { type: 'string' },
+				id: { type: 'string' },
 			},
-			async handler(ctx: Context<{ pageId: string }>) {
-				const { pageId } = ctx.params;
-				const resp = await pagesCollection.findOne({ pageId });
-				if (!resp || !resp.value || !resp.value[pageId])
-					return {
-						value: {
-							[pageId]: { id: pageId, type: 'page', blocks: [], parentId: null, pageId },
-						},
-					};
+			async handler(ctx) {
+				const { id } = ctx.params;
+				const resp = await pagesCollection.findOne({ _id: id });
+				if (!resp || !resp.value || !resp.value.page) throw new Error('Cant find page');
 				return resp;
 			},
 		},
 		post: {
 			params: {
-				pageId: { type: 'string' },
+				id: { type: 'string' },
 				value: { type: 'object' },
 			},
-			async handler(ctx: Context<{ pageId: string; value: any }>) {
-				const { pageId, value } = ctx.params;
-				return pagesCollection.updateOne({ pageId }, { $set: { value } }, { upsert: true });
+			async handler(ctx) {
+				const { id, value } = ctx.params;
+				return pagesCollection.updateOne({ _id: id }, { $set: { value } });
 			},
 		},
 		topLevelPages: {
 			params: {},
 			async handler(ctx) {
 				const resp = await pagesCollection
-					.aggregate<{ names: string[] }>([
-						{
-							$group: { _id: null, names: { $addToSet: '$pageId' } },
-						},
+					.aggregate<{ pages: { title: string; id: string }[] }>([
+						{ $match: { 'value.page.parentId': null } },
+						{ $group: { _id: null, pages: { $addToSet: { title: '$value.page.title', id: '$_id' } } } },
 					])
 					.toArray();
-				return resp[0].names;
+				return resp[0].pages;
 			},
 		},
-	},
-	methods: {},
-	async started() {
-		this.working = true;
-	},
-	async stopped() {
-		this.working = false;
 	},
 };
 

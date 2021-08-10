@@ -1,6 +1,6 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import JSONTree from 'react-json-tree';
-import { Column, useFlexLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
+import { Column, useBlockLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useCallback, useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../hooks/usePrevious';
@@ -95,7 +95,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			columns: calculatedColumns,
 			data,
 		},
-		useFlexLayout,
+		useBlockLayout,
 		useResizeColumns,
 		useRowSelect,
 	);
@@ -191,27 +191,34 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		<>
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
-				<TableContainer component={Paper}>
-					<Table {...getTableProps()} onContextMenu={(e) => onContextMenu(e, ['global'])} className="table">
-						<TableHead>
+				<TableContainer sx={{ maxHeight: 500 }} component={Paper}>
+					<Table
+						{...getTableProps()}
+						stickyHeader
+						onContextMenu={(e) => onContextMenu(e, ['global'])}
+						className="table"
+					>
+						<TableHead style={{ position: 'sticky', top: 0 }}>
 							{headerGroups.map((headerGroup) => (
 								<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
-									{headerGroup.headers.map((column) => (
-										<TableCell
-											{...column.getHeaderProps()}
-											onClick={(e) => {
-												if (column.id === 'add') addColumn();
-												else onContextMenu(e, [`col${column.id}`]);
-											}}
-											className="th"
-										>
-											{column.render('Header')}
-											<div
-												{...column.getResizerProps()}
-												className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
-											/>
-										</TableCell>
-									))}
+									{headerGroup.headers.map((column) => {
+										return (
+											<TableCell
+												{...column.getHeaderProps({ style: { position: 'sticky' } })}
+												onClick={(e) => {
+													if (column.id === 'add') addColumn();
+													else onContextMenu(e, [`col${column.id}`]);
+												}}
+												className="th"
+											>
+												{column.render('Header')}
+												<div
+													{...column.getResizerProps()}
+													className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
+												/>
+											</TableCell>
+										);
+									})}
 								</TableRow>
 							))}
 						</TableHead>
@@ -242,7 +249,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 														// @ts-ignore
 														const type = cell.column.type as string;
-														if (type === ColumnTypes.image) return <img src={cellValue} style={{ width: '100%' }} />;
+														if (type === ColumnTypes.image)
+															return cellValue ? <img src={cellValue} style={{ width: '100%' }} /> : null;
 														if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
 														return cellValue;
 													})()}

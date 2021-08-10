@@ -1,4 +1,5 @@
 import * as React from 'react';
+import AddIcon from '@material-ui/icons/Add';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
@@ -12,9 +13,9 @@ import { useEffect, useState } from 'react';
 import ky from 'ky';
 import { Config } from '../../config';
 
-function DrawerItem({ text }: { text: string }) {
+function DrawerItem({ page }: { page: { title: string; id: string } }) {
 	return (
-		<Link to={`/${text}`}>
+		<Link to={`/${page.id}`}>
 			<ListItem
 				sx={{
 					pt: { sm: 0.5 },
@@ -25,46 +26,57 @@ function DrawerItem({ text }: { text: string }) {
 					},
 				}}
 				button
-				key={text}
 			>
 				<ListItemIcon sx={{ minWidth: 20 }}>
 					<DescriptionIcon style={{ fontSize: 16 }} />
 				</ListItemIcon>
 
-				<ListItemText primary={text} />
+				<ListItemText primary={page.title} />
 			</ListItem>
 		</Link>
 	);
 }
 
 export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Element {
-	const [pages, setPages] = useState<string[]>([]);
+	const [pages, setPages] = useState<{ title: string; id: string }[]>([]);
 
 	useEffect(() => {
 		ky.get(`${Config.domain}/pages/topLevelPages`)
-			.json<string[]>()
+			.json<{ title: string; id: string }[]>()
 			.then((v) =>
 				setPages(
 					v.sort((a, b) => {
-						if (a.toLowerCase() < b.toLowerCase()) return -1;
-						if (a.toLowerCase() > b.toLowerCase()) return 1;
+						if (a.title?.toLowerCase() < b.title?.toLowerCase()) return -1;
+						if (a.title?.toLowerCase() > b.title?.toLowerCase()) return 1;
 						return 0;
 					}),
 				),
 			);
 	}, []);
+
 	const menu = (
 		<div>
-			<List subheader={<ListSubheader>Pages</ListSubheader>}>
-				{pages.map((text) => (
-					<DrawerItem key={text} text={text} />
+			<List
+				subheader={
+					<ListSubheader style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+						Pages
+						<AddIcon
+							onClick={() => {
+								console.log('click');
+							}}
+						/>
+					</ListSubheader>
+				}
+			>
+				{pages.map((page) => (
+					<DrawerItem key={page.id} page={page} />
 				))}
 			</List>
 
 			<List subheader={<ListSubheader>Infra</ListSubheader>}>
-				{['Databases'].map((text) => (
-					<DrawerItem key={text} text={text} />
-				))}
+				{/*{['Databases'].map((text) => (*/}
+				{/*	<DrawerItem key={text} text={text} />*/}
+				{/*))}*/}
 			</List>
 		</div>
 	);
