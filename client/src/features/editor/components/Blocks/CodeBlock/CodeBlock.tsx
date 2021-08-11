@@ -5,6 +5,8 @@ import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { usePageContext } from '../../../hooks/useReferences';
+import { SateGetEvent } from '../../../hooks/useStateToWS';
+import { useWatchList } from '../../../hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { Editor } from './Editor';
@@ -21,6 +23,7 @@ export type CodeBlockProps = {
 export type CodeBlockState = {
 	result?: unknown;
 	logs?: string[];
+	loading?: boolean;
 };
 
 export type CodeBlockMethods = { trigger: () => void };
@@ -44,20 +47,36 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const listener = useCallback<Parameters<typeof useFunctionExecutor>[0]>(
 		(data) => {
-			if (data.result) updateBlockState({ id, result: data.result });
+			if (data.result) updateBlockState({ id, result: data.result, loading: false });
 			else updateBlockState({ id, logs: [...logs, data.data] });
 		},
 		[id, logs, updateBlockState],
 	);
 
-	const { runCode } = useFunctionExecutor(listener);
+	const { runCode, UUID } = useFunctionExecutor(listener);
 
 	const trigger = useCallback(() => {
-		updateBlockState({ id, logs: [], result: [] });
+		updateBlockState({ id, logs: [], result: [], loading: true });
 		runCode(value);
 	}, [id, runCode, updateBlockState, value]);
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
+
+	const { watchList, addToWatchList } = useWatchList({
+		onUpdate() {
+			trigger();
+		},
+	});
+
+	useEventListener<SateGetEvent>(
+		`ws/page.getState`,
+		(event) => {
+			const { blockId, reqId, property } = event;
+			if (UUID === reqId) addToWatchList(blockId, property);
+		},
+		[UUID],
+	);
+
 	const onEditorReady = useCallback(() => {
 		if (!editorRef.current) return;
 

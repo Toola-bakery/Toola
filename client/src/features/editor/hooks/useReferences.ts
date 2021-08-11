@@ -1,5 +1,6 @@
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { PageContext } from '../components/Page';
+import { useWatchList } from './useWatchList';
 
 export function usePageContext() {
 	return useContext(PageContext);
@@ -7,6 +8,26 @@ export function usePageContext() {
 
 export function useReferenceEvaluator() {
 	const { blocks, globals } = usePageContext();
+
+	const { watchList, isLoading, addToWatchList } = useWatchList();
+
+	const blockProxy = useMemo(
+		() =>
+			new Proxy(blocks, {
+				get: (target1, key1: string) => {
+					return new Proxy(target1[key1], {
+						get: (target2, key2: string) => {
+							if (key2 in target2) addToWatchList(key1, key2);
+							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+							// @ts-ignore
+							return target2[key2];
+						},
+					});
+				},
+			}),
+		[addToWatchList, blocks],
+	);
+
 	const evaluate = useCallback(
 		(sourceCode: string, current?: unknown) => {
 			if (!sourceCode.includes('${') || !sourceCode.includes('}')) return sourceCode;
@@ -15,19 +36,19 @@ export function useReferenceEvaluator() {
 					// RETURN EXACT VALUE IF ONLY ONE REFERENCE
 					// eslint-disable-next-line @typescript-eslint/no-implied-eval
 					const evalFunction = Function(...['blocks', 'globals', 'current'], `return ${sourceCode.slice(2, -1)}`);
-					return evalFunction(blocks, globals, current);
+					return evalFunction(blockProxy, globals, current);
 				}
 				// eslint-disable-next-line @typescript-eslint/no-implied-eval
 				const evalFunction = Function(...['blocks', 'globals', 'current'], `return \`${sourceCode}\``);
-				return evalFunction(blocks, globals, current);
+				return evalFunction(blockProxy, globals, current);
 			} catch (e) {
 				return e.message;
 			}
 		},
-		[blocks, globals],
+		[blockProxy, globals],
 	);
 
-	return { evaluate };
+	return { evaluate, watchList, isLoading };
 }
 export function useReferences<T extends string | string[]>(_sourceCode: T): T {
 	const { evaluate } = useReferenceEvaluator();

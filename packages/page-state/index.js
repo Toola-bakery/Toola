@@ -31,6 +31,7 @@ function sendToUser(message, awaitResp) {
       ...message,
       messageId,
       destinationId: process.env.wsId,
+      reqId: process.env.reqId,
     })
   );
   return awaitResp ? awaitMessageResponse(messageId) : true;

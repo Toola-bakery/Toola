@@ -40,7 +40,7 @@ export type TableBlockState = {
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { value, id, pageId, columns } = block;
 
-	const { evaluate } = useReferenceEvaluator();
+	const { evaluate, isLoading } = useReferenceEvaluator();
 
 	const { updateBlockProps, updateBlockState, immerBlockProps } = useEditor();
 

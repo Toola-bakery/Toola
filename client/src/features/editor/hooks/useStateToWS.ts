@@ -2,13 +2,14 @@ import { useAppSelector } from '../../../redux/hooks';
 import { useWS } from '../../ws/hooks/useWS';
 import { selectBlocksState } from '../redux/editor';
 import { BlockMethods } from '../types/blocks';
-import { useEventListener } from './useEvents';
+import { useEventListener, useEvents } from './useEvents';
 
 export type SateGetEvent = {
 	property: string;
 	blockId: string;
 	pageId: string;
 	redirectedFrom: string;
+	reqId: string;
 	messageId: string;
 };
 
@@ -18,17 +19,18 @@ export type PageCallEvent = {
 	blockId: string;
 	pageId: string;
 	redirectedFrom: string;
+	reqId: string;
 	messageId: string;
 };
 
 export function useStateToWS(pageId: string, blockMethods: { [p: string]: BlockMethods }) {
 	const { sendWS } = useWS();
 	const blocksState = useAppSelector((state) => selectBlocksState(state, pageId));
+	const { send } = useEvents();
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
 		(event) => {
 			const { property, pageId: pageIdReq, blockId, redirectedFrom, messageId } = event;
-			console.log(event);
 			if (property && pageId && blockId && redirectedFrom) {
 				sendWS({
 					action: 'state.getResponse',

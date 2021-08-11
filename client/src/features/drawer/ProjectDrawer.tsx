@@ -11,7 +11,10 @@ import { Link } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 import ky from 'ky';
+import { v4 } from 'uuid';
 import { Config } from '../../config';
+import { PageBlockProps } from '../editor/components/Page';
+import { BasicBlock } from '../editor/types/basicBlock';
 
 function DrawerItem({ page }: { page: { title: string; id: string } }) {
 	return (
@@ -62,7 +65,9 @@ export function ProjectDrawer({ drawerWidth }: { drawerWidth: number }): JSX.Ele
 						Pages
 						<AddIcon
 							onClick={() => {
-								console.log('click');
+								ky.get(`${Config.domain}/pages/create`, { searchParams: { id: v4() } }).json<{
+									value: { page: BasicBlock & PageBlockProps };
+								}>();
 							}}
 						/>
 					</ListSubheader>

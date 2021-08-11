@@ -36,7 +36,7 @@ export function useFunctionExecutor(listener: (event: FunctionExecutorAction) =>
 				code,
 				callArgs: code.includes('main') ? [] : undefined,
 			});
-			return code;
+			return newUUID;
 		},
 		[sendWS],
 	);

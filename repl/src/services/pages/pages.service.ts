@@ -24,7 +24,7 @@ export const PagesService: ServiceSchema<
 		create: {
 			params: {
 				id: { type: 'uuid', version: 4, optional: true },
-				parentPageId: { type: 'uuid', version: 4, nullable: true },
+				parentPageId: { type: 'uuid', version: 4, nullable: true, default: null, optional: true },
 				title: { type: 'string', optional: true, default: 'Untitled' },
 			},
 			async handler(ctx) {
