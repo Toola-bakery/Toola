@@ -10,7 +10,7 @@ import { SimpleMenuItemProps } from './SimpleMenuItem';
 export type SwitchMenuItemProps = BasicItemProps & {
 	type: 'switch';
 	value: boolean;
-	call: () => void;
+	onChange: (nextValue: boolean) => void;
 };
 
 export function SwitchMenuItem({ item }: { item: SwitchMenuItemProps }) {
@@ -18,7 +18,7 @@ export function SwitchMenuItem({ item }: { item: SwitchMenuItemProps }) {
 		<ListItem
 			button
 			onClick={() => {
-				item.call();
+				item.onChange(!item.value);
 			}}
 		>
 			<Typography variant="inherit">{item.label}</Typography>

@@ -4,7 +4,7 @@ import { selectBlockState } from '../redux/editor';
 import { useEditor } from './useEditor';
 import { usePageContext } from './useReferences';
 
-export function useInitialBlockState<T>(
+export function useBlockStateDefault<T>(
 	initialState: (() => Partial<T>) | Partial<T>,
 	blockId: string,
 	_pageId?: string,

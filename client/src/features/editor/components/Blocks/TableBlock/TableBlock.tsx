@@ -1,9 +1,21 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import {
+	Paper,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableFooter,
+	TableHead,
+	TablePagination,
+	TableRow,
+} from '@material-ui/core';
 import JSONTree from 'react-json-tree';
-import { Column, useBlockLayout, useResizeColumns, useRowSelect, useTable } from 'react-table';
+import { Column, useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import { useCallback, useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../hooks/usePrevious';
+import { useBlockSetState } from '../../../hooks/useBlockSetState';
+import { useBlockStateDefault } from '../../../hooks/useBlockStateDefault';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useReferenceEvaluator } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
@@ -16,6 +28,7 @@ export type TableBlockProps = {
 	type: 'table';
 	value: string;
 	columns?: TableColumnsProp;
+	manualPagination: boolean;
 };
 
 enum ColumnTypes {
@@ -35,10 +48,12 @@ type TableColumnsProp = {
 export type TableBlockState = {
 	page?: number;
 	selectedRow?: unknown;
+	pageIndex: number;
+	pageSize: number;
 };
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
-	const { value, id, pageId, columns } = block;
+	const { value, id, pageId, columns, manualPagination = true } = block;
 
 	const { evaluate, isLoading } = useReferenceEvaluator();
 
@@ -90,18 +105,36 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		return cols;
 	}, [columnsProp, evaluate]);
 
-	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state, toggleAllRowsSelected } = useTable(
+	const {
+		getTableProps,
+		getTableBodyProps,
+		headerGroups,
+		page,
+		rows,
+		prepareRow,
+		state,
+		toggleAllRowsSelected,
+		gotoPage,
+		setPageSize,
+	} = useTable(
 		{
 			columns: calculatedColumns,
 			data,
+			manualPagination,
+			pageCount: manualPagination ? -1 : undefined,
 		},
 		useBlockLayout,
 		useResizeColumns,
+		usePagination,
 		useRowSelect,
 	);
 
-	const { columnWidths, isResizingColumn } = state.columnResizing;
+	const { pageIndex, pageSize, columnResizing } = state;
+	const { columnWidths, isResizingColumn } = columnResizing;
 	const isResizingColumnPrevious = usePrevious(isResizingColumn);
+
+	useBlockSetState<TableBlockState>('pageIndex', pageIndex);
+	useBlockSetState<TableBlockState>('pageSize', pageSize);
 
 	useEffect(() => {
 		if (!isResizingColumn && isResizingColumnPrevious) {
@@ -174,6 +207,15 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 						}),
 					value,
 				},
+				{
+					label: 'Server Side Pagination',
+					type: 'switch',
+					value: Boolean(manualPagination),
+					onChange: (v) =>
+						immerBlockProps<TableBlockProps>(id, (draft) => {
+							draft.manualPagination = v;
+						}),
+				},
 				...defaultMenu,
 			],
 		},
@@ -191,78 +233,91 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		<>
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
-				<TableContainer sx={{ maxHeight: 500 }} component={Paper}>
-					<Table
-						{...getTableProps()}
-						stickyHeader
-						onContextMenu={(e) => onContextMenu(e, ['global'])}
-						className="table"
-					>
-						<TableHead style={{ position: 'sticky', top: 0 }}>
-							{headerGroups.map((headerGroup) => (
-								<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
-									{headerGroup.headers.map((column) => {
-										return (
-											<TableCell
-												{...column.getHeaderProps({ style: { position: 'sticky' } })}
-												onClick={(e) => {
-													if (column.id === 'add') addColumn();
-													else onContextMenu(e, [`col${column.id}`]);
-												}}
-												className="th"
-											>
-												{column.render('Header')}
-												<div
-													{...column.getResizerProps()}
-													className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
-												/>
-											</TableCell>
-										);
-									})}
-								</TableRow>
-							))}
-						</TableHead>
-						<TableBody {...getTableBodyProps()} className="tbody">
-							{rows.map((row) => {
-								prepareRow(row);
-								return (
-									<TableRow
-										{...row.getRowProps({
-											style: { backgroundColor: row.isSelected ? 'rgba(127, 180, 235, 0.3)' : undefined },
-										})}
-										onClick={() => {
-											const { isSelected } = row;
-											toggleAllRowsSelected(false);
-											if (!isSelected) row.toggleRowSelected();
-											updateBlockState({ id, selectedRow: isSelected ? null : row.original });
-										}}
-										className="tr"
-									>
-										{row.cells.map((cell) => {
-											const cellValue = ['string', 'number'].includes(typeof cell.value)
-												? cell.value
-												: JSON.stringify(cell.value);
-
+				<Paper>
+					<TableContainer sx={{ maxHeight: 500 }}>
+						<Table
+							{...getTableProps()}
+							stickyHeader
+							onContextMenu={(e) => onContextMenu(e, ['global'])}
+							className="table"
+						>
+							<TableHead style={{ position: 'sticky', top: 0 }}>
+								{headerGroups.map((headerGroup) => (
+									<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
+										{headerGroup.headers.map((column) => {
 											return (
-												<TableCell className="td" {...cell.getCellProps()} title={cellValue}>
-													{(() => {
-														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-														// @ts-ignore
-														const type = cell.column.type as string;
-														if (type === ColumnTypes.image)
-															return cellValue ? <img src={cellValue} style={{ width: '100%' }} /> : null;
-														if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
-														return cellValue;
-													})()}
+												<TableCell
+													{...column.getHeaderProps({ style: { position: 'sticky' } })}
+													onClick={(e) => {
+														if (column.id === 'add') addColumn();
+														else onContextMenu(e, [`col${column.id}`]);
+													}}
+													className="th"
+												>
+													{column.render('Header')}
+													<div
+														{...column.getResizerProps()}
+														className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
+													/>
 												</TableCell>
 											);
 										})}
 									</TableRow>
-								);
-							})}
-						</TableBody>
-					</Table>
-				</TableContainer>
+								))}
+							</TableHead>
+							<TableBody {...getTableBodyProps()} className="tbody">
+								{page.map((row) => {
+									prepareRow(row);
+									return (
+										<TableRow
+											{...row.getRowProps({
+												style: { backgroundColor: row.isSelected ? 'rgba(127, 180, 235, 0.3)' : undefined },
+											})}
+											onClick={() => {
+												const { isSelected } = row;
+												toggleAllRowsSelected(false);
+												if (!isSelected) row.toggleRowSelected();
+												updateBlockState({ id, selectedRow: isSelected ? null : row.original });
+											}}
+											className="tr"
+										>
+											{row.cells.map((cell) => {
+												const cellValue = ['string', 'number'].includes(typeof cell.value)
+													? cell.value
+													: JSON.stringify(cell.value);
+
+												return (
+													<TableCell className="td" {...cell.getCellProps()} title={cellValue}>
+														{(() => {
+															// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+															// @ts-ignore
+															const type = cell.column.type as string;
+															if (type === ColumnTypes.image)
+																return cellValue ? <img src={cellValue} style={{ width: '100%' }} /> : null;
+															if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
+															return cellValue;
+														})()}
+													</TableCell>
+												);
+											})}
+										</TableRow>
+									);
+								})}
+							</TableBody>
+						</Table>
+					</TableContainer>
+					<TablePagination
+						rowsPerPageOptions={[1, 5, 10, 25]}
+						component="div"
+						count={manualPagination ? -1 : rows.length}
+						rowsPerPage={pageSize}
+						page={pageIndex}
+						onPageChange={(_, pageNumber) => {
+							gotoPage(pageNumber);
+						}}
+						onRowsPerPageChange={(event) => setPageSize(+event.target.value)}
+					/>
+				</Paper>
 			</TableStyles>
 		</>
 	);

@@ -106,7 +106,6 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, []);
-
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />

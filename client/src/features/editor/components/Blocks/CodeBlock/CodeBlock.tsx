@@ -56,17 +56,13 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	const { runCode, UUID } = useFunctionExecutor(listener);
 
 	const trigger = useCallback(() => {
-		updateBlockState({ id, logs: [], result: [], loading: true });
+		updateBlockState({ id, logs: [], loading: true });
 		runCode(value);
 	}, [id, runCode, updateBlockState, value]);
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
 
-	const { watchList, addToWatchList } = useWatchList({
-		onUpdate() {
-			trigger();
-		},
-	});
+	const { addToWatchList } = useWatchList({ onUpdate: trigger });
 
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
@@ -91,7 +87,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		{
 			type: 'switch',
 			label: 'Manual control',
-			call: () => updateBlockProps({ id, manualControl: !block.manualControl }),
+			onChange: (nextValue: boolean) => updateBlockProps({ id, manualControl: nextValue }),
 			value: block.manualControl,
 		},
 	]);

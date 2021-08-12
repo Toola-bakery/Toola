@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import { useDrag } from 'react-dnd';
 import { usePageContext } from '../hooks/useReferences';
@@ -12,6 +13,10 @@ import { TableBlock, TableBlockType } from './Blocks/TableBlock/TableBlock';
 import { useHover } from '../../../hooks/useHover';
 import { ImageBlock, ImageBlockType } from './Blocks/ImageBlock';
 import { InputBlock, InputBlockType } from './Blocks/InputBlock';
+
+export type BlockContextType = null | (BasicBlock & Blocks);
+
+export const BlockContext = React.createContext<BlockContextType>(null);
 
 export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 	function get() {
@@ -44,11 +49,17 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 	const { hovered, eventHandlers } = useHover();
 
 	return (
-		<div ref={dragPreview} {...eventHandlers} style={{ display: 'flex', flexDirection: 'row', opacity, width: '100%' }}>
-			<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
-				<DragIndicatorIcon />
+		<BlockContext.Provider value={block}>
+			<div
+				ref={dragPreview}
+				{...eventHandlers}
+				style={{ display: 'flex', flexDirection: 'row', opacity, width: '100%' }}
+			>
+				<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
+					<DragIndicatorIcon />
+				</div>
+				<div style={{ width: 'calc(100% - 25px)' }}>{get()}</div>
 			</div>
-			<div style={{ width: 'calc(100% - 25px)' }}>{get()}</div>
-		</div>
+		</BlockContext.Provider>
 	);
 }

@@ -6,7 +6,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { useBlocks } from '../hooks/useBlocks';
-import { useInitialBlockState } from '../hooks/useInitialBlockState';
+import { useBlockStateDefault } from '../hooks/useBlockStateDefault';
 import { useStateToWS } from '../hooks/useStateToWS';
 import { selectBlocksProps, setPage } from '../redux/editor';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
@@ -51,7 +51,7 @@ export function Page(): JSX.Element {
 	const { pageId } = useParams<{ pageId: string }>();
 	const { state: pageParams } = useLocation();
 
-	useInitialBlockState<PageBlockState>({ editing: true }, 'page', pageId);
+	useBlockStateDefault<PageBlockState>({ editing: true }, 'page', pageId);
 	const [fetching, setFetching] = useState(true);
 
 	const { blocks, blocksMethods, deleteBlockMethods, setBlockMethods } = useBlocks(pageId);
