@@ -19,7 +19,7 @@ export function useWatchList({
 	onUpdate?: () => void;
 	onLoading?: (isLoading: boolean) => void;
 } = {}) {
-	const { blocks } = usePageContext();
+	const { blocks, pageId } = usePageContext();
 	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() => ({}));
 
 	useOnMountedEffect(() => {
@@ -41,21 +41,22 @@ export function useWatchList({
 	);
 
 	const previousBlocks = usePrevious(blocks);
+	const previousPageId = usePrevious(pageId);
 
 	const [isLoading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (!previousBlocks || previousBlocks === blocks) return;
+		if (previousPageId !== pageId || !previousBlocks || previousBlocks === blocks) return;
 		let isUpdated = false;
 		let newIsLoading = false;
 
 		watchList.forEach(([blockId, property]) => {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			const newValue = blocks[blockId][property];
+			const newValue = blocks?.[blockId]?.[property];
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			const oldValue = previousBlocks[blockId][property];
+			const oldValue = previousBlocks?.[blockId]?.[property];
 
 			isUpdated = isUpdated || newValue !== oldValue;
 
@@ -64,7 +65,7 @@ export function useWatchList({
 
 		setLoading(newIsLoading);
 		if (isUpdated) onUpdate?.();
-	}, [blocks, onUpdate, previousBlocks, watchList]);
+	}, [blocks, onUpdate, pageId, previousBlocks, previousPageId, watchList]);
 
 	return { watchList, addToWatchList, isLoading };
 }

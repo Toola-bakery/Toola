@@ -53,7 +53,7 @@ export type TableBlockState = {
 };
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
-	const { value, id, pageId, columns, manualPagination = true } = block;
+	const { value, id, pageId, columns, manualPagination } = block;
 
 	const { evaluate, isLoading } = useReferenceEvaluator();
 

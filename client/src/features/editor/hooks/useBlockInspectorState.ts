@@ -1,17 +1,26 @@
 import React, { useCallback, useState } from 'react';
 import { MenuItemProps } from '../components/Inspector/BlockInspector';
 import { useEditor } from './useEditor';
+import { usePageContext } from './useReferences';
 
 export function useBlockInspectorState(
 	id: string,
 	menuConfig: ((defaultMenu: MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],
 ) {
+	const {
+		page: { editing },
+	} = usePageContext();
+
 	const [path, setPath] = useState<string[]>([]);
 	const [isOpen, setOpen] = useState<[number, number] | false>(false);
 
-	const open = useCallback((x: number, y: number) => {
-		setOpen([x, y]);
-	}, []);
+	const open = useCallback(
+		(x: number, y: number) => {
+			if (!editing) return;
+			setOpen([x, y]);
+		},
+		[editing],
+	);
 
 	const close = useCallback(() => {
 		setOpen(false);

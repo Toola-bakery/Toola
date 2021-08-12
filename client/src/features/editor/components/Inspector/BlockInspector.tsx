@@ -1,6 +1,7 @@
 import React from 'react';
 import Popover from '@material-ui/core/Popover';
 import List from '@material-ui/core/List';
+import { usePageContext } from '../../hooks/useReferences';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
 import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
@@ -46,6 +47,7 @@ export function BlockInspector({ isOpen, menu, close, path }: BlockInspectorProp
 	}, menu);
 
 	if (!isOpen || !state) return null;
+
 	return (
 		<>
 			<Popover
