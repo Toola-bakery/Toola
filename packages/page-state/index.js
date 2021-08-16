@@ -1,6 +1,19 @@
 const WebSocket = require("ws");
 const { v4 } = require("uuid");
 
+const preloadState = JSON.parse(process.env.preloadState);
+
+const watchListKeyGetter = (p1, p2) => `["${p1}"]["${p2}"]`;
+
+function getPreloadedState(p1, p2) {
+  const key = watchListKeyGetter(p1, p2);
+  const value = preloadState[key];
+  if (typeof value !== "undefined") {
+    delete preloadState[key];
+    return value;
+  }
+}
+
 const mesPromises = {};
 
 function awaitMessageResponse(messageId) {
@@ -39,6 +52,9 @@ function sendToUser(message, awaitResp) {
 
 async function getProperty(blockId, property) {
   await isWsReadyPromise;
+  const value = getPreloadedState(blockId, property);
+  if (typeof value !== "undefined") return value;
+
   const resp = await sendToUser(
     {
       action: "page.getState",

@@ -4,33 +4,32 @@ import { usePrevious } from '../../../hooks/usePrevious';
 import { usePageContext } from './useReferences';
 
 type WatchListObj = { [key: string]: [string, string] };
-type List = [string, string][];
+type WatchList = [string, string][];
 
-const keyFromProps = (p1: string, p2: string) => `["${p1}"]["${p2}"]`;
+export const watchListKeyGetter = (p1: string, p2: string) => `["${p1}"]["${p2}"]`;
 
-export function useWatchList({
-	initialList,
-	onListChanged,
-	onUpdate,
-}: {
-	initialList?: List;
-	onListChanged?: (newList: List) => void;
+export type WatchListProps = {
+	initialList?: WatchList;
+	onListChanged?: (newList: WatchList) => void;
 	watchUpdates?: boolean;
 	onUpdate?: () => void;
 	onLoading?: (isLoading: boolean) => void;
-} = {}) {
+};
+
+export function useWatchList({ initialList, onListChanged, onUpdate: onUpdateInitial }: WatchListProps = {}) {
 	const { blocks, pageId } = usePageContext();
 	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() => ({}));
-
+	const [onUpdate, setOnUpdate] = useState<(() => void) | undefined>(onUpdateInitial);
 	useOnMountedEffect(() => {
-		if (initialList) setWatchListObj(initialList.reduce((acc, v) => ({ ...acc, [keyFromProps(v[0], v[1])]: v }), {}));
+		if (initialList)
+			setWatchListObj(initialList.reduce((acc, v) => ({ ...acc, [watchListKeyGetter(v[0], v[1])]: v }), {}));
 	});
 
 	const watchList = useMemo(() => Object.values(watchListObj), [watchListObj]);
 
 	const addToWatchList = useCallback(
 		(blockId: string, property: string) => {
-			const key = keyFromProps(blockId, property);
+			const key = watchListKeyGetter(blockId, property);
 			setWatchListObj((wl) => {
 				const newObj = { ...wl, [key]: [blockId, property] as [string, string] };
 				if (!(key in wl)) onListChanged?.(Object.values(newObj));
@@ -67,5 +66,5 @@ export function useWatchList({
 		if (isUpdated) onUpdate?.();
 	}, [blocks, onUpdate, pageId, previousBlocks, previousPageId, watchList]);
 
-	return { watchList, addToWatchList, isLoading };
+	return { watchList, addToWatchList, isLoading, setOnUpdate };
 }

@@ -21,6 +21,7 @@ declare namespace Copenhagen {
 		getValue();
 
 		open(element: HTMLElement, focus?: boolean, replaceText?: boolean);
+		close();
 
 		on(event: 'contextmenu', fn: (editor: Editor, event: MouseEvent<HTMLElement>) => void);
 		on(event: 'save', fn: (editor: Editor, value: string) => void);

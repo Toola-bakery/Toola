@@ -2,6 +2,7 @@ import React, { MutableRefObject, MouseEventHandler } from 'react';
 import { CodeBlockType } from './CodeBlock';
 
 type EditorProps = {
+	id: string;
 	onContextMenu?: MouseEventHandler<HTMLDivElement>;
 	onEditorReady: () => void;
 	editorRef: MutableRefObject<Copenhagen.Editor>;
@@ -20,21 +21,17 @@ export class Editor extends React.Component<EditorProps> {
 	}
 
 	componentDidMount() {
-		const { editorRef, onEditorReady, language, value, onContextMenu } = this.props;
-		const editor = new Copenhagen.Editor({ language });
-		// eslint-disable-next-line no-param-reassign,prefer-destructuring
-		editorRef.current = editor;
-		if (this.editorRef.current) editor.open(this.editorRef.current);
-		editor.on('contextmenu', (_, event) => {
-			event.preventDefault();
-			onContextMenu?.(event);
-		});
-		if (typeof value !== 'undefined') editor.setValue(value);
-		onEditorReady();
+		this.initEditor(this.props);
 	}
 
 	shouldComponentUpdate(nextProps: EditorProps): boolean {
-		const { disabled, editorRef } = this.props;
+		const { disabled, editorRef, id } = this.props;
+
+		if (nextProps.id !== id) {
+			editorRef.current.close();
+			this.initEditor(nextProps);
+			return true;
+		}
 
 		if (disabled !== nextProps.disabled) {
 			if (nextProps.disabled) editorRef.current.disable();
@@ -42,6 +39,21 @@ export class Editor extends React.Component<EditorProps> {
 		}
 
 		return false;
+	}
+
+	initEditor(props: EditorProps) {
+		const { editorRef, onEditorReady, language, value, onContextMenu } = props;
+		const editor = new Copenhagen.Editor({ language });
+
+		editorRef.current = editor;
+
+		if (this.editorRef.current) editor.open(this.editorRef.current);
+		editor.on('contextmenu', (_, event) => {
+			event.preventDefault();
+			onContextMenu?.(event);
+		});
+		if (typeof value !== 'undefined') editor.setValue(value);
+		onEditorReady();
 	}
 
 	render() {

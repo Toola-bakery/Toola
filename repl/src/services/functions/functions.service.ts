@@ -10,6 +10,7 @@ export const FunctionsService: ServiceSchema<
 			callArgs?: unknown[];
 			reqId: string;
 			meta: { wsId: string };
+			preloadState: { [key: string]: unknown };
 		};
 	}
 > = {
@@ -21,9 +22,10 @@ export const FunctionsService: ServiceSchema<
 				code: { type: 'string' },
 				callArgs: { type: 'array', optional: true },
 				reqId: { type: 'string', optional: true },
+				preloadState: { type: 'object', optional: true, default: {} },
 			},
 			async handler(ctx) {
-				const { code, callArgs, reqId } = ctx.params;
+				const { code, callArgs, reqId, preloadState } = ctx.params;
 				const { wsId } = ctx.meta;
 				if (!wsId) throw new Error('Set websocket id');
 
@@ -37,7 +39,7 @@ export const FunctionsService: ServiceSchema<
 							message: { action: 'function.output', id: reqId, data: data.toString('utf-8') },
 						}),
 					callArgs,
-					env: { wsId, reqId },
+					env: { wsId, reqId, preloadState: JSON.stringify(preloadState) },
 				})
 					.then(result =>
 						this.broker.broadcast('ws.send', {

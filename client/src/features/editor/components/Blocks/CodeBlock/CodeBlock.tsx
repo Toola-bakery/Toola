@@ -1,5 +1,4 @@
-import React, { useRef, MutableRefObject, useCallback, useState } from 'react';
-import Switch from '@material-ui/core/Switch';
+import React, { useRef, MutableRefObject, useCallback, useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
@@ -33,7 +32,7 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, value, language, logs = [], result, manualControl } = block;
+	const { id, value, language, logs = [], result, manualControl, pageId } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
@@ -53,16 +52,20 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		[id, logs, updateBlockState],
 	);
 
+	const { addToWatchList, watchList, setOnUpdate } = useWatchList();
+
 	const { runCode, UUID } = useFunctionExecutor(listener);
 
 	const trigger = useCallback(() => {
 		updateBlockState({ id, logs: [], loading: true });
-		runCode(value);
-	}, [id, runCode, updateBlockState, value]);
+		runCode(value, watchList);
+	}, [id, runCode, updateBlockState, value, watchList]);
+
+	useEffect(() => {
+		setOnUpdate(() => trigger);
+	}, [setOnUpdate, trigger]);
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
-
-	const { addToWatchList } = useWatchList({ onUpdate: trigger });
 
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
@@ -80,8 +83,8 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 			updateBlockProps({ id, value: v });
 		});
 
-		if (!manualControl) runCode(value);
-	}, [editorRef, id, manualControl, runCode, updateBlockProps, value]);
+		if (!manualControl) trigger();
+	}, [editorRef, id, manualControl, trigger, updateBlockProps]);
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
 		{
@@ -97,6 +100,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				<Editor
+					id={`${id}${pageId}`}
 					onEditorReady={onEditorReady}
 					value={value}
 					language={language}
