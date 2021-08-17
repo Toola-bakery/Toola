@@ -4,7 +4,6 @@ import {
 	TableBody,
 	TableCell,
 	TableContainer,
-	TableFooter,
 	TableHead,
 	TablePagination,
 	TableRow,
@@ -15,12 +14,13 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../hooks/usePrevious';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
-import { useBlockStateDefault } from '../../../hooks/useBlockStateDefault';
+import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useReferenceEvaluator } from '../../../hooks/useReferences';
 import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
 import { BlockInspector, MenuItemProps } from '../../Inspector/BlockInspector';
 import { useEditor } from '../../../hooks/useEditor';
+import { ColumnDnD } from './ColumnDnD';
 import { TableStyles } from './TableStyles';
 
 export type TableBlockType = TableBlockProps & TableBlockState;
@@ -29,6 +29,7 @@ export type TableBlockProps = {
 	value: string;
 	columns?: TableColumnsProp;
 	manualPagination: boolean;
+	connectedPage: string;
 };
 
 enum ColumnTypes {
@@ -53,7 +54,7 @@ export type TableBlockState = {
 };
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
-	const { value, id, pageId, columns, manualPagination } = block;
+	const { value, id, pageId, columns, manualPagination, connectedPage } = block;
 
 	const { evaluate, isLoading } = useReferenceEvaluator();
 
@@ -78,7 +79,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	}, [columns, data]);
 
 	useEffect(() => {
-		if (!columns && columnsProp.length > 0) {
+		if ((!columns || columns.length === 0) && columnsProp.length > 0) {
 			updateBlockProps({ id, columns: columnsProp });
 		}
 	}, [columns, columnsProp, id, pageId, updateBlockProps]);
@@ -181,7 +182,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 				value: col.type || ColumnTypes.text,
 			},
 			{
-				label: 'deleteColumn',
+				label: 'Delete column',
 				type: 'item',
 				closeAfterCall: true,
 				call: () =>
@@ -198,6 +199,15 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			type: 'nested',
 			label: 'global',
 			next: [
+				{
+					label: 'Connected Page Id',
+					type: 'input',
+					onChange: (v) =>
+						immerBlockProps<TableBlockProps>(id, (draft) => {
+							draft.connectedPage = v;
+						}),
+					value: connectedPage,
+				},
 				{
 					label: 'Data Source',
 					type: 'input',
@@ -229,6 +239,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		});
 	}, [id, immerBlockProps]);
 
+	const { navigate } = usePageNavigator();
+
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
@@ -246,20 +258,14 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 									<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
 										{headerGroup.headers.map((column) => {
 											return (
-												<TableCell
-													{...column.getHeaderProps({ style: { position: 'sticky' } })}
+												<ColumnDnD
+													column={column}
+													tableId={id}
 													onClick={(e) => {
 														if (column.id === 'add') addColumn();
 														else onContextMenu(e, [`col${column.id}`]);
 													}}
-													className="th"
-												>
-													{column.render('Header')}
-													<div
-														{...column.getResizerProps()}
-														className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
-													/>
-												</TableCell>
+												/>
 											);
 										})}
 									</TableRow>
@@ -279,6 +285,11 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 												if (!isSelected) row.toggleRowSelected();
 												updateBlockState({ id, selectedRow: isSelected ? null : row.original });
 											}}
+											onDoubleClick={() => {
+												if (connectedPage) {
+													navigate(connectedPage, row.original);
+												}
+											}}
 											className="tr"
 										>
 											{row.cells.map((cell) => {
@@ -292,8 +303,11 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 															// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 															// @ts-ignore
 															const type = cell.column.type as string;
-															if (type === ColumnTypes.image)
+															if (type === ColumnTypes.image) {
+																if (Array.isArray(cell.value))
+																	return cell.value.map((url) => <img src={url} style={{ width: '100%' }} />);
 																return cellValue ? <img src={cellValue} style={{ width: '100%' }} /> : null;
+															}
 															if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
 															return cellValue;
 														})()}

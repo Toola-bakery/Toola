@@ -47,7 +47,15 @@ export function CodeHints({ hints, select }: { select: (value: string | null) =>
 	);
 }
 
-export function CodeInput({ onChange, value, label }: { label: string; value: string; onChange: (v: string) => void }) {
+export function CodeInput({
+	onChange,
+	value = '',
+	label,
+}: {
+	label: string;
+	value: string;
+	onChange: (v: string) => void;
+}) {
 	const ref = useRef<HTMLDivElement>(null);
 	const context = usePageContext();
 
