@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useOnMountedEffect } from '../../../hooks/useOnMounted';
 import { usePrevious } from '../../../hooks/usePrevious';
+import { useBlock } from './useBlock';
+import { useEditor } from './useEditor';
 import { usePageContext } from './useReferences';
 
-type WatchListObj = { [key: string]: [string, string] };
-type WatchList = [string, string][];
+export type WatchListObj = { [key: string]: [string, string] };
+export type WatchList = [string, string][];
 
 export const watchListKeyGetter = (p1: string, p2: string) => `["${p1}"]["${p2}"]`;
 
@@ -14,9 +16,15 @@ export type WatchListProps = {
 	watchUpdates?: boolean;
 	onUpdate?: () => void;
 	onLoading?: (isLoading: boolean) => void;
+	syncWithBlockProps?: boolean;
 };
 
-export function useWatchList({ initialList, onListChanged, onUpdate: onUpdateInitial }: WatchListProps = {}) {
+export function useWatchList({
+	initialList,
+	onListChanged,
+	onUpdate: onUpdateInitial,
+	syncWithBlockProps,
+}: WatchListProps = {}) {
 	const { blocks, pageId } = usePageContext();
 	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() => ({}));
 	const [onUpdate, setOnUpdate] = useState<(() => void) | undefined>(onUpdateInitial);
@@ -26,6 +34,15 @@ export function useWatchList({ initialList, onListChanged, onUpdate: onUpdateIni
 	});
 
 	const watchList = useMemo(() => Object.values(watchListObj), [watchListObj]);
+
+	const block = useBlock(true);
+	const id = block?.id;
+
+	const { updateBlockProps } = useEditor();
+
+	useEffect(() => {
+		if (syncWithBlockProps && id) updateBlockProps({ id, watchList });
+	}, [id, syncWithBlockProps, updateBlockProps, watchList]);
 
 	const addToWatchList = useCallback(
 		(blockId: string, property: string) => {

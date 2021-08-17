@@ -5,7 +5,7 @@ import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { usePageContext } from '../../../hooks/useReferences';
 import { SateGetEvent } from '../../../hooks/useStateToWS';
-import { useWatchList } from '../../../hooks/useWatchList';
+import { useWatchList, WatchList } from '../../../hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { Editor } from './Editor';
@@ -18,6 +18,7 @@ export type CodeBlockProps = {
 	value: string;
 	language: 'javascript';
 	manualControl: boolean;
+	watchList?: WatchList;
 };
 export type CodeBlockState = {
 	result?: unknown;
@@ -32,7 +33,7 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, value, language, logs = [], result, manualControl, pageId } = block;
+	const { id, value, language, logs = [], result, manualControl, pageId, watchList: watchListProp } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
 
@@ -52,7 +53,10 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		[id, logs, updateBlockState],
 	);
 
-	const { addToWatchList, watchList, setOnUpdate } = useWatchList();
+	const { addToWatchList, watchList, setOnUpdate } = useWatchList({
+		initialList: watchListProp,
+		syncWithBlockProps: true,
+	});
 
 	const { runCode, UUID } = useFunctionExecutor(listener);
 
