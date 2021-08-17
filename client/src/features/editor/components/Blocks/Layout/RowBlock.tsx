@@ -65,7 +65,10 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 
 			if (i % 2 === 0)
 				return (
-					<div key={`rowItem${blockKey}`} style={{ width: `calc(100% * ${(1 / block.blocks.length).toFixed(3)})` }}>
+					<div
+						key={`rowItem${blockKey}`}
+						style={{ width: `calc(100% * ${(1 / block.blocks.length).toFixed(3)} - 5px * ${block.blocks.length + 1})` }}
+					>
 						{columnBlock.type === 'column' ? (
 							<ColumnBlock block={columnBlock as BasicBlock & ColumnBlockType} />
 						) : (
