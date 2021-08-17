@@ -1,6 +1,7 @@
 import TextField from '@material-ui/core/TextField';
 import { useCallback } from 'react';
 import { useDeclareBlockMethods } from '../../hooks/useDeclareBlockMethods';
+import { useReferenceEvaluator } from '../../hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
 import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
@@ -23,8 +24,10 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 
 	const { updateBlockState, updateBlockProps } = useEditor();
 
+	const { evaluate } = useReferenceEvaluator();
+
 	useOnMountedEffect(() => {
-		updateBlockState({ id, value: initialValue });
+		updateBlockState({ id, value: evaluate(initialValue) });
 	});
 
 	const setValue = useCallback<InputBlockMethods['setValue']>(
