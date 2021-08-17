@@ -1,21 +1,25 @@
-import { ListItem, Switch } from '@material-ui/core';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import MenuItem from '@material-ui/core/MenuItem';
+import { ListItem } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import { Blocks } from '../../../types/blocks';
-import { BasicItemProps, MenuItemProps } from '../BlockInspector';
+import { BasicItemProps, BlockInspectorProps, MenuItemProps } from '../BlockInspector';
 
 export type NestedMenuItemProps = BasicItemProps & {
 	type: 'nested';
 	next: MenuItemProps[];
 };
 
-export function NestedMenuItem({ item }: { item: NestedMenuItemProps }) {
+export function NestedMenuItem({
+	item,
+	setPath,
+}: {
+	item: NestedMenuItemProps;
+	setPath: BlockInspectorProps['setPath'];
+}) {
 	return (
 		<ListItem
+			button
 			onClick={() => {
-				// item.call?.();
+				setPath((path) => [...path, item.label]);
 			}}
 		>
 			<Typography variant="inherit">{item.label}</Typography>

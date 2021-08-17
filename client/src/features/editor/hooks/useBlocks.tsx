@@ -5,7 +5,7 @@ import { selectBlocksProps, selectBlocksState } from '../redux/editor';
 import { BasicBlock } from '../types/basicBlock';
 import { BlockMethods, BlockProps, Blocks, BlockStates } from '../types/blocks';
 
-export function useBlocks(pageId: string) {
+export function useBlocks(pageId: string, editing: boolean) {
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
 
@@ -39,10 +39,11 @@ export function useBlocks(pageId: string) {
 			const newProps = blocksProps[blockId];
 			const newState = blocksState[blockId] || null;
 			const newMethods = blocksMethods[blockId] || null;
+			const newShow = editing || !newProps.display?.hide;
 
 			if (particles) {
 				const [oldProps, oldState, oldMethods] = particles;
-				if (oldProps === newProps && oldState === newState && newMethods === oldMethods) {
+				if (oldProps === newProps && oldState === newState && newMethods === oldMethods && newShow === newProps.show) {
 					const oldJoinedBlock = joinedBlock.get(blockId);
 					if (oldJoinedBlock) {
 						response[blockId] = oldJoinedBlock;
@@ -50,12 +51,17 @@ export function useBlocks(pageId: string) {
 					}
 				}
 			}
-			response[blockId] = { ...newProps, ...(newState || {}), ...(newMethods || {}) } as BasicBlock & Blocks;
+			response[blockId] = {
+				...newProps,
+				...(newState || {}),
+				...(newMethods || {}),
+				show: newShow,
+			} as BasicBlock & Blocks;
 			joinedBlock.set(blockId, response[blockId]);
 			blockParticles.set(blockId, [newProps, newState, newMethods]);
 		});
 		return response;
-	}, [blockParticles, blocksMethods, blocksProps, blocksState, joinedBlock]);
+	}, [blockParticles, blocksMethods, blocksProps, blocksState, editing, joinedBlock]);
 
 	return { deleteBlockMethods, setBlockMethods, blocks, blocksMethods };
 }

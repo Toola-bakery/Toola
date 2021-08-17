@@ -1,5 +1,6 @@
 import React, { useRef, MutableRefObject, useCallback, useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
+import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
@@ -81,16 +82,20 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	);
 
 	const onEditorReady = useCallback(() => {
+		if (!manualControl) trigger();
+
 		if (!editorRef.current) return;
 
 		editorRef.current.on('change', (_, v) => {
 			updateBlockProps({ id, value: v });
 		});
-
-		if (!manualControl) trigger();
 	}, [editorRef, id, manualControl, trigger, updateBlockProps]);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+	useOnMountedEffect(() => {
+		if (!block.show) onEditorReady();
+	});
+
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
 			type: 'switch',
 			label: 'Manual control',
@@ -98,6 +103,8 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 			value: block.manualControl,
 		},
 	]);
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

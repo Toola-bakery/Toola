@@ -1,4 +1,5 @@
 import Button from '@material-ui/core/Button';
+import React from 'react';
 import JSONTree from 'react-json-tree';
 import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
@@ -19,7 +20,7 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 	const { evaluate } = useReferenceEvaluator();
 	const nameRef = useReferences(name);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
 			label: 'Name',
 			type: 'input',
@@ -33,6 +34,8 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 			value,
 		},
 	]);
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

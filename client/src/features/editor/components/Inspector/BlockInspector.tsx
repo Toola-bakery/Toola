@@ -27,19 +27,28 @@ export type BlockInspectorProps = {
 	isOpen: [number, number] | false;
 	close: () => void;
 	path: string[];
+	setPath: (state: ((oldPath: string[]) => string[]) | string[]) => void;
 };
 
-export function InspectorItem({ item, close }: { item: MenuItemProps; close: () => void }) {
+export function InspectorItem({
+	item,
+	close,
+	setPath,
+}: {
+	item: MenuItemProps;
+	close: () => void;
+	setPath: BlockInspectorProps['setPath'];
+}) {
 	if (item.type === 'item') return <SimpleMenuItem item={item} close={close} />;
 	if (item.type === 'switch') return <SwitchMenuItem item={item} />;
-	if (item.type === 'nested') return <NestedMenuItem item={item} />;
+	if (item.type === 'nested') return <NestedMenuItem setPath={setPath} item={item} />;
 	if (item.type === 'view') return <ViewMenuItem item={item} />;
 	if (item.type === 'input') return <InputMenuItem item={item} />;
 	if (item.type === 'select') return <SelectMenuItem item={item} />;
 	return <></>;
 }
 
-export function BlockInspector({ isOpen, menu, close, path }: BlockInspectorProps) {
+export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInspectorProps) {
 	const state = path.reduce<(NestedMenuItemProps | ViewMenuItemProps)['next']>((acc, key) => {
 		if (!Array.isArray(acc)) return acc;
 		const nextItem = acc.find((item) => item.label === key) as NestedMenuItemProps | ViewMenuItemProps;
@@ -60,7 +69,7 @@ export function BlockInspector({ isOpen, menu, close, path }: BlockInspectorProp
 				{Array.isArray(state) ? (
 					<List>
 						{state.map((item) => (
-							<InspectorItem key={item.label} close={close} item={item} />
+							<InspectorItem key={item.label} close={close} item={item} setPath={setPath} />
 						))}
 					</List>
 				) : (

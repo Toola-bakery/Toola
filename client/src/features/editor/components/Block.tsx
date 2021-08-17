@@ -51,25 +51,29 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 
 	return (
 		<BlockContext.Provider value={block}>
-			<div
-				ref={dragPreview}
-				{...eventHandlers}
-				style={{
-					display: 'flex',
-					flexDirection: 'row',
-					opacity,
-					width: '100%',
-					overflow: 'hidden',
-					transform: 'translate3d(0, 0, 0)',
-				}}
-			>
-				<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
-					<DragIndicatorIcon />
+			{!block.show ? (
+				<BlockSelector block={block} />
+			) : (
+				<div
+					ref={dragPreview}
+					{...eventHandlers}
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+						opacity,
+						width: '100%',
+						overflow: 'hidden',
+						transform: 'translate3d(0, 0, 0)',
+					}}
+				>
+					<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
+						<DragIndicatorIcon />
+					</div>
+					<div style={{ width: 'calc(100% - 25px)' }}>
+						<BlockSelector block={block} />
+					</div>
 				</div>
-				<div style={{ width: 'calc(100% - 25px)' }}>
-					<BlockSelector block={block} />
-				</div>
-			</div>
+			)}
 		</BlockContext.Provider>
 	);
 }

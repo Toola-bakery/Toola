@@ -21,6 +21,8 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 					{(() => {
 						if (blocks[blockKey].type === 'row')
 							return <RowBlock block={blocks[blockKey] as BasicBlock & RowBlockType} />;
+						if (!blocks[blockKey].show) return null;
+
 						if (!fake) return <Block block={blocks[blockKey]} />;
 						return (
 							<RowBlock
@@ -35,6 +37,8 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 			);
 		});
 	}, [block.blocks, block.id, blocks, fake, moveBlockAfterId, pageId]);
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

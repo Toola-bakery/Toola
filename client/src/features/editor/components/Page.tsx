@@ -4,11 +4,13 @@ import debounce from 'just-debounce';
 import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { useBlocks } from '../hooks/useBlocks';
 import { useBlockStateDefault } from '../hooks/useBlockStateDefault';
 import { useStateToWS } from '../hooks/useStateToWS';
 import { selectBlocksProps, setPage } from '../redux/editor';
+import { Block } from './Block';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { BasicBlock } from '../types/basicBlock';
 import { Config } from '../../../config';
@@ -51,14 +53,28 @@ export function Page(): JSX.Element {
 	const { pageId } = useParams<{ pageId: string }>();
 	const { state: pageParams } = useLocation();
 
-	useBlockStateDefault<PageBlockState>({ editing: true }, 'page', pageId);
+	const [editing, setEditing] = useLocalStorage('editing', true);
+	useBlockStateDefault<PageBlockState>({ editing }, 'page', pageId);
 	const [fetching, setFetching] = useState(true);
 
-	const { blocks, blocksMethods, deleteBlockMethods, setBlockMethods } = useBlocks(pageId);
+	const { blocks, blocksMethods, deleteBlockMethods, setBlockMethods } = useBlocks(pageId, editing);
 	useStateToWS(pageId, blocksMethods);
+
+	const hiddenBlocks = useMemo(() => {
+		const blockKeys = Object.keys(blocks);
+		const response: (BasicBlock & Blocks)[] = [];
+		blockKeys.forEach((key) => {
+			if (!blocks[key].show) response.push(blocks[key]);
+		});
+		return response;
+	}, [blocks]);
 
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 	const page = blocks?.page as BasicBlock & PageBlockType;
+
+	useEffect(() => {
+		if (typeof page?.editing !== 'undefined' && editing !== page?.editing) setEditing(page?.editing);
+	}, [editing, page, setEditing]);
 
 	useEffect(() => {
 		ky.get(`${Config.domain}/pages/get`, { searchParams: { id: pageId } })
@@ -91,6 +107,11 @@ export function Page(): JSX.Element {
 						</>
 					) : null}
 					<CreateBlockAtTheEnd parentId="page" />
+				</div>
+				<div>
+					{hiddenBlocks.map((block) => (
+						<Block block={block} />
+					))}
 				</div>
 			</PageContext.Provider>
 		</DndProvider>

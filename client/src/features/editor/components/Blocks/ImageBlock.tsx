@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../Inspector/BlockInspector';
@@ -15,7 +16,7 @@ export function ImageBlock({ block }: { block: BasicBlock & ImageBlockType }): J
 
 	const state = useReferences(value);
 	const { updateBlockProps } = useEditor();
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
 			label: 'Data Source',
 			type: 'input',
@@ -23,6 +24,8 @@ export function ImageBlock({ block }: { block: BasicBlock & ImageBlockType }): J
 			value,
 		},
 	]);
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

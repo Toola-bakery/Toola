@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import JSONTree from 'react-json-tree';
 import { Column, useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../hooks/usePrevious';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
@@ -100,6 +100,8 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			draft.columns.push({ id: v4(), header: 'column', type: ColumnTypes.text, value: '' });
 		});
 	}, [id, immerBlockProps]);
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

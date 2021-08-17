@@ -62,6 +62,7 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 			const columnBlock = blocks[blockKey];
 			if (!columnBlock) return null;
 			if (columnBlock.type === 'column' && columnBlock.blocks.length === 0) return null;
+			// if (!columnBlock.show) return null;
 
 			if (i % 2 === 0)
 				return (
@@ -88,6 +89,8 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 			);
 		});
 	}, [addColumnAfterAndPutItem, block.blocks, blocks, createRowAndColumns, fake]);
+
+	if (!block.show && !fake) return <></>;
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>

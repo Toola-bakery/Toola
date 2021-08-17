@@ -1,5 +1,5 @@
 import TextField from '@material-ui/core/TextField';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useDeclareBlockMethods } from '../../hooks/useDeclareBlockMethods';
 import { useReferenceEvaluator } from '../../hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
@@ -38,7 +38,7 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 	);
 
 	useDeclareBlockMethods<InputBlockMethods>(id, { setValue }, [setValue]);
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
 			label: 'Label',
 			type: 'input',
@@ -52,6 +52,8 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 			value: initialValue,
 		},
 	]);
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

@@ -24,7 +24,7 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 	const { id, subpageId, pageId, state = '', isCreated = false } = block;
 	const { immerBlockProps, updateBlockProps } = useEditor();
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, [
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
 			label: 'Page Params',
 			type: 'input',
@@ -62,6 +62,8 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 	);
 
 	const { evaluate } = useReferenceEvaluator();
+
+	if (!block.show) return <></>;
 
 	return (
 		<>

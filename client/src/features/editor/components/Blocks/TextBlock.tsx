@@ -1,4 +1,4 @@
-import { KeyboardEventHandler, useCallback, useRef, useState } from 'react';
+import React, { KeyboardEventHandler, useCallback, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { decode } from 'html-entities';
 import { useEditor } from '../../hooks/useEditor';
@@ -105,7 +105,10 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState(id, []);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
+
+	if (!block.show) return <></>;
+
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
