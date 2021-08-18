@@ -5,8 +5,7 @@ import { useEditor } from '../../hooks/useEditor';
 import { useEventListener } from '../../hooks/useEvents';
 import { BasicBlock } from '../../types/basicBlock';
 import { useRefsLatest } from '../../../../hooks/useRefLatest';
-import { getCaretIndex } from '../../helpers/getCaretIndex';
-import { useBlockMenu } from '../../hooks/useBlockMenu';
+import { getCaretGlobalPosition, getCaretIndex } from '../../helpers/caretOperators';
 import { selectBlockNeighborsProps } from '../../redux/editor';
 import { useAppSelector } from '../../../../redux/hooks';
 import { usePageContext, useReferences } from '../../hooks/useReferences';
@@ -42,18 +41,14 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	const contentEditable = useRef<HTMLElement>(null);
 
-	const { open } = useBlockMenu();
-
-	const { addBlockAfterRef, deleteBlockRef, previousRef, openRef, updateBlockTypeRef, isEditingRef, valueRef } =
-		useRefsLatest({
-			previous,
-			addBlockAfter,
-			updateBlockType,
-			deleteBlock,
-			value,
-			isEditing,
-			open,
-		});
+	const { addBlockAfterRef, deleteBlockRef, previousRef, isEditingRef, valueRef } = useRefsLatest({
+		previous,
+		addBlockAfter,
+		updateBlockType,
+		deleteBlock,
+		value,
+		isEditing,
+	});
 
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
@@ -65,13 +60,13 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	useEventListener(id, (event) => event.eventName === 'focus' && contentEditable?.current?.focus(), []);
 
+	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
 	const onKeyDownHandler: KeyboardEventHandler = (e) => {
 		if (e.key === CMD_KEY) {
 			if (!contentEditable.current) return;
-			openRef.current(contentEditable.current).then((v) => {
-				if (!v) return;
-				updateBlockTypeRef.current(id, v);
-			});
+			const position = getCaretGlobalPosition();
+			console.log({ position });
+			if (position) inspectorProps.open(position.left, position.top, ['Turn into']);
 		}
 		if (e.key === 'Enter' && !e.shiftKey) {
 			if (!contentEditable.current) return;
@@ -104,8 +99,6 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 	const html = useReferences(isEditing ? '' : realValue);
 
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
-
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
 
 	if (!block.show) return <></>;
 

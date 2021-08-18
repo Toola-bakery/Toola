@@ -36,7 +36,7 @@ type UseEditorResponse = {
 	deleteBlock: (blockId: string) => void;
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
-	updateBlockType: (blockId: string, type: Blocks['type'] | ({ type: Blocks['type'] } & BlockProps)) => void;
+	updateBlockType: (blockId: string, type: Blocks['type'] | ({ type: Blocks['type'] } & Partial<BlockProps>)) => void;
 	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean) => void;
 	immerBlockProps: <Block extends BlockProps = BlockProps, D = Draft<Block & BasicBlock>>(
 		blockId: string,

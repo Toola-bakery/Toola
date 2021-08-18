@@ -40,7 +40,7 @@ export function useFunctionExecutor(listener: (event: FunctionExecutorAction) =>
 			const preloadState = watchList?.reduce<{ [key: string]: unknown }>((state, item) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				state[watchListKeyGetter(item[0], item[1])] = blocksRef.current[item[0]][item[1]];
+				state[watchListKeyGetter(item[0], item[1])] = blocksRef.current?.[item[0]]?.[item[1]];
 				return state;
 			}, {});
 
