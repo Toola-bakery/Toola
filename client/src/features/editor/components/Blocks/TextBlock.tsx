@@ -27,7 +27,7 @@ const textBlockStyleTag = {
 
 export type TextBlockProps = { type: 'text'; style?: TextBlockStyles; value: string };
 
-export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX.Element {
+export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	const { id, value: realValue = '', style } = block;
 	const [value, setValue] = useState(realValue);
 	const {
@@ -65,7 +65,6 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 		if (e.key === CMD_KEY) {
 			if (!contentEditable.current) return;
 			const position = getCaretGlobalPosition();
-			console.log({ position });
 			if (position) inspectorProps.open(position.left, position.top, ['Turn into']);
 		}
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -100,7 +99,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }): JSX
 
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
-	if (!block.show) return <></>;
+	if (!block.show) return null;
 
 	return (
 		<>

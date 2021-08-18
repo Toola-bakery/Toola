@@ -4,7 +4,7 @@ export type EventStorage = {
 	[channel: string]: EventChannelStorage;
 };
 export type EventListeners = {
-	[channel: string]: ((event: Event) => void)[];
+	[channel: string]: ((event: Event) => void | Promise<void>)[];
 };
 
 export type EventChannelStorage = Event[];
@@ -43,7 +43,10 @@ export function useEvents(): UseEventsResponse {
 		if (!eventListeners[channel]?.length && event.waitListener) {
 			if (events[channel]) events[channel].push(event);
 			else events[channel] = [event];
-		} else eventListeners[channel]?.map((listener) => listener(event));
+		} else {
+			const promises = eventListeners[channel]?.map((listener) => listener(event)) || [];
+			return Promise.all(promises);
+		}
 	}, []);
 
 	return useMemo<UseEventsResponse>(

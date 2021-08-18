@@ -2,7 +2,8 @@ import { produceWithPatches } from 'immer';
 import { Draft } from 'immer/dist/types/types-external';
 import { useCallback } from 'react';
 import { store } from '../../../redux';
-import { useEvents } from './useEvents';
+import { DeleteBlockEvent } from './useDeleteBlockHook';
+import { useEvents, Event } from './useEvents';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import {
 	addBlocks as addBlocksAction,
@@ -155,8 +156,12 @@ export function useEditor(): UseEditorResponse {
 	);
 
 	const deleteBlock = useCallback<UseEditorResponse['deleteBlock']>(
-		(blockId) => dispatch(deleteBlockAction({ id: blockId, pageId })),
-		[dispatch, pageId],
+		async (blockId) => {
+			const deleteEvent: DeleteBlockEvent & Event = { blockId, pageId, action: 'delete' };
+			await send('deleteBlock', deleteEvent);
+			dispatch(deleteBlockAction({ id: blockId, pageId }));
+		},
+		[dispatch, pageId, send],
 	);
 
 	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
