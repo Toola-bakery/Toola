@@ -14,7 +14,7 @@ type QueryProperty = {
 export function useQueryConstructor(properties: QueryProperties, initialValue: any = {}) {
 	const [value, valueResult] = useImmer<{ [key: string]: any }>(initialValue);
 
-	const { evaluate } = useReferenceEvaluator({});
+	const { evaluate, setOnUpdate } = useReferenceEvaluator();
 
 	const menu = properties.map<MenuItemProps>((queryProperty) => {
 		const { label, id, type } = queryProperty;
@@ -62,5 +62,5 @@ export function useQueryConstructor(properties: QueryProperties, initialValue: a
 		[evaluate, properties, value],
 	);
 
-	return { value, result, menu, component: <QueryInspector menu={menu} /> };
+	return { value, result, menu, setOnUpdate, component: <QueryInspector menu={menu} /> };
 }

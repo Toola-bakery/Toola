@@ -47,13 +47,17 @@ export function useWatchList({
 	const addToWatchList = useCallback(
 		(blockId: string, property: string) => {
 			const key = watchListKeyGetter(blockId, property);
-			setWatchListObj((wl) => {
-				const newObj = { ...wl, [key]: [blockId, property] as [string, string] };
-				if (!(key in wl)) onListChanged?.(Object.values(newObj));
-				return newObj;
-			});
+			if (!(key in watchListObj))
+				setWatchListObj((wl) => {
+					if (!(key in wl)) {
+						const newObj = { ...wl, [key]: [blockId, property] as [string, string] };
+						onListChanged?.(Object.values(newObj));
+						return newObj;
+					}
+					return wl;
+				});
 		},
-		[onListChanged],
+		[onListChanged, watchListObj],
 	);
 
 	const previousBlocks = usePrevious(blocks);

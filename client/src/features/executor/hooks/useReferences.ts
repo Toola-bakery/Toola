@@ -2,7 +2,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import { PageContext } from '../../editor/components/Page';
 import { useBlock } from '../../editor/hooks/useBlock';
 import { useEditor } from '../../editor/hooks/useEditor';
-import { useWatchList } from './useWatchList';
+import { useWatchList, WatchListProps } from './useWatchList';
 
 export function usePageContext() {
 	return useContext(PageContext);
@@ -10,14 +10,19 @@ export function usePageContext() {
 
 export function useReferenceEvaluator({
 	syncWithBlockProps,
-	watchReferences,
+	watchReferences = true,
+	watchListProps = {},
 }: {
 	syncWithBlockProps?: boolean;
 	watchReferences?: boolean;
+	watchListProps?: WatchListProps;
 } = {}) {
 	const { blocks, globals } = usePageContext();
 
-	const { watchList, isLoading, addToWatchList } = useWatchList({ syncWithBlockProps });
+	const { watchList, isLoading, addToWatchList, setOnUpdate } = useWatchList({
+		syncWithBlockProps,
+		...watchListProps,
+	});
 
 	const blockProxy = useMemo(
 		() =>
@@ -58,7 +63,7 @@ export function useReferenceEvaluator({
 		[blockProxy, blocks, globals, watchReferences],
 	);
 
-	return { evaluate, watchList, isLoading };
+	return { evaluate, watchList, isLoading, setOnUpdate };
 }
 export function useReferences<T extends string | string[]>(_sourceCode: T): T {
 	const { evaluate } = useReferenceEvaluator();

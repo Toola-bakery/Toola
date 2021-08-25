@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
+import { useNextRenderHook } from '../../../../../hooks/useNextRenderHook';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { useQueryConstructor } from '../../../../inspector/hooks/useQueryConstructor';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
@@ -39,6 +40,7 @@ export function QueryBlock({ block }: QueryBlockComponentProps) {
 		component,
 		value,
 		result: qResult,
+		setOnUpdate,
 	} = useQueryConstructor(
 		[
 			{ type: 'string', label: 'Database Id', id: 'id' },
@@ -89,6 +91,12 @@ async function main () {
 		value: code,
 		onTrigger,
 	});
+
+	const { callNextTime } = useNextRenderHook(trigger);
+
+	useEffect(() => {
+		setOnUpdate(() => callNextTime);
+	}, [callNextTime, setOnUpdate]);
 
 	useDeclareBlockMethods<QueryBlockMethods>(id, { trigger }, [trigger]);
 
