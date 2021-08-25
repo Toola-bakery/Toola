@@ -1,7 +1,7 @@
 import { ColumnTypes, TableBlockProps, TableBlockType } from '../components/Blocks/TableBlock/TableBlock';
-import { MenuItemProps } from '../components/Inspector/BlockInspector';
+import { MenuItemProps } from '../../inspector/components/InspectorItem';
 import { BasicBlock } from '../types/basicBlock';
-import { useBlockInspectorState } from './useBlockInspectorState';
+import { useBlockInspectorState } from '../../inspector/hooks/useBlockInspectorState';
 import { useEditor } from './useEditor';
 
 export function useTableInspector(block: BasicBlock & TableBlockType) {

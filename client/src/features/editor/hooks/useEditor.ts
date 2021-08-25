@@ -19,7 +19,7 @@ import {
 	patchBlockPropsAction,
 } from '../redux/editor';
 import { BasicBlock } from '../types/basicBlock';
-import { usePageContext } from './useReferences';
+import { usePageContext } from '../../executor/hooks/useReferences';
 import { BlockCreators } from '../helpers/BlockCreators';
 import { BlockProps, Blocks } from '../types/blocks';
 

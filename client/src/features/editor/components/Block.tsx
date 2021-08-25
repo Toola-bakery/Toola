@@ -1,8 +1,9 @@
 import React from 'react';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import { useDrag } from 'react-dnd';
-import { usePageContext } from '../hooks/useReferences';
+import { usePageContext } from '../../executor/hooks/useReferences';
 import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
+import { QueryBlock, QueryBlockType } from './Blocks/QueryBlock/QueryBlock';
 import { SubPageBlock, SubPageBlockType } from './Blocks/SubPageBlock';
 import { TextBlock, TextBlockType } from './Blocks/TextBlock';
 import { BasicBlock } from '../types/basicBlock';
@@ -21,6 +22,7 @@ export const BlockContext = React.createContext<BlockContextType>(null);
 function BlockSelector({ block }: { block: BasicBlock & Blocks }) {
 	if (block.type === 'text') return <TextBlock block={block as BasicBlock & TextBlockType} />;
 	if (block.type === 'code') return <CodeBlock block={block as BasicBlock & CodeBlockType} />;
+	if (block.type === 'query') return <QueryBlock block={block as BasicBlock & QueryBlockType} />;
 	if (block.type === 'JSONView') return <JSONViewBlock block={block as BasicBlock & JSONViewBlockType} />;
 	if (block.type === 'table') return <TableBlock block={block as BasicBlock & TableBlockType} />;
 	if (block.type === 'image') return <ImageBlock block={block as BasicBlock & ImageBlockType} />;
@@ -62,7 +64,6 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 						flexDirection: 'row',
 						opacity,
 						width: '100%',
-						overflow: 'hidden',
 						transform: 'translate3d(0, 0, 0)',
 					}}
 				>

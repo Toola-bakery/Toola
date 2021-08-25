@@ -8,9 +8,9 @@ import { useRefsLatest } from '../../../../hooks/useRefLatest';
 import { getCaretGlobalPosition, getCaretIndex } from '../../helpers/caretOperators';
 import { selectBlockNeighborsProps } from '../../redux/editor';
 import { useAppSelector } from '../../../../redux/hooks';
-import { usePageContext, useReferences } from '../../hooks/useReferences';
-import { BlockInspector } from '../Inspector/BlockInspector';
-import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
+import { usePageContext, useReferences } from '../../../executor/hooks/useReferences';
+import { BlockInspector } from '../../../inspector/components/BlockInspector';
+import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
 
 const CMD_KEY = '/';
 

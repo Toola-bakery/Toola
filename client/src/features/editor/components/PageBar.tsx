@@ -7,7 +7,7 @@ import { decode } from 'html-entities';
 import { useCallback } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { useEditor } from '../hooks/useEditor';
-import { usePageContext } from '../hooks/useReferences';
+import { usePageContext } from '../../executor/hooks/useReferences';
 
 export function PageBar() {
 	const {

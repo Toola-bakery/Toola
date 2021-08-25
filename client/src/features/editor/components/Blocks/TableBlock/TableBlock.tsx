@@ -9,19 +9,16 @@ import {
 	TableRow,
 } from '@material-ui/core';
 import JSONTree from 'react-json-tree';
-import { Column, useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
+import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
-import { usePrevious } from '../../../../../hooks/usePrevious';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { useTableBlockColumnsAndData } from '../../../hooks/useTableBlockColumnsAndData';
 import { useTableColumnResizing } from '../../../hooks/useTableColumnResizing';
 import { useTableInspector } from '../../../hooks/useTableInspector';
 import { BasicBlock } from '../../../types/basicBlock';
-import { useReferenceEvaluator } from '../../../hooks/useReferences';
-import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
-import { BlockInspector, MenuItemProps } from '../../Inspector/BlockInspector';
+import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useEditor } from '../../../hooks/useEditor';
 import { ColumnDnD } from './ColumnDnD';
 import { TableStyles } from './TableStyles';

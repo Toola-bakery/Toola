@@ -1,11 +1,10 @@
 import Button from '@material-ui/core/Button';
 import React from 'react';
-import JSONTree from 'react-json-tree';
 import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
-import { BlockInspector } from '../Inspector/BlockInspector';
-import { useReferenceEvaluator, useReferences } from '../../hooks/useReferences';
-import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
+import { BlockInspector } from '../../../inspector/components/BlockInspector';
+import { useReferenceEvaluator, useReferences } from '../../../executor/hooks/useReferences';
+import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
 
 export type ButtonBlockType = ButtonBlockProps;
 export type ButtonBlockProps = {

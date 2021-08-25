@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { BlockCreators } from '../helpers/BlockCreators';
 import { useEditor } from '../hooks/useEditor';
-import { usePageContext } from '../hooks/useReferences';
+import { usePageContext } from '../../executor/hooks/useReferences';
 
 export type CreateBlockAtTheEndProps = {
 	parentId: string;

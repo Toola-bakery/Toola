@@ -6,10 +6,10 @@ import { useQuery } from 'react-query';
 import { Config } from '../../../../config';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageNavigator } from '../../hooks/usePageNavigator';
-import { useReferenceEvaluator, useReferences } from '../../hooks/useReferences';
+import { useReferenceEvaluator, useReferences } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
-import { BlockInspector } from '../Inspector/BlockInspector';
-import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
+import { BlockInspector } from '../../../inspector/components/BlockInspector';
+import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
 import { PageBlockProps } from '../Page';
 
 export type SubPageBlockType = SubPageBlockProps;

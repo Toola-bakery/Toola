@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Block } from '../../Block';
 import { BasicBlock } from '../../../types/basicBlock';
-import { usePageContext } from '../../../hooks/useReferences';
+import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { DropTarget } from './DropTarget';
 import { useEditor } from '../../../hooks/useEditor';
 import { ColumnBlock, ColumnBlockType } from './ColumnBlock';

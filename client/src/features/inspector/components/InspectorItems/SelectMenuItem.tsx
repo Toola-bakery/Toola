@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, ListItem, Select } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
-import { BasicItemProps } from '../BlockInspector';
+import { BasicItemProps } from '../InspectorItem';
 
 export type SelectMenuItemProps = BasicItemProps & {
 	type: 'select';

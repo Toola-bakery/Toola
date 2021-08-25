@@ -29,31 +29,36 @@ export function executeFunction({
 		});
 
 		let mentionedOnce = false;
+		let madeFullResponse = false;
 		let response = '';
 
 		function catchData(data: Buffer) {
 			const stringData = data.toString('utf-8');
-			if (stringData.includes(id)) {
-				const batch = stringData.split(id);
-				console.log({ stringData, l: batch.length });
-
+			if (!madeFullResponse && (stringData.includes(id) || mentionedOnce)) {
 				if (!mentionedOnce) {
+					const batch = stringData.split(id);
 					if (batch[0]) output(Buffer.from(batch[0]));
 					response += batch[1];
 					if (batch.length === 3) {
+						madeFullResponse = true;
 						resolve(JSON.parse(response).result);
-						console.log({ response });
 						if (batch[2]) output(Buffer.from(batch[2]));
 					}
 					mentionedOnce = true;
 				} else {
-					response += batch[0];
-					resolve(JSON.parse(response).result);
-					console.log({ response });
-					if (batch[1]) output(Buffer.from(batch[0]));
+					response += stringData;
+					const batch = response.split(id);
+
+					if (batch.length >= 2) {
+						// eslint-disable-next-line prefer-destructuring
+						response = batch[0];
+						madeFullResponse = true;
+						resolve(JSON.parse(response).result);
+					}
+
+					if (batch[1]) output(Buffer.from(batch[1]));
 				}
-			} else if (mentionedOnce) response += stringData;
-			else output(data);
+			} else output(data);
 		}
 
 		node.stdout.on('data', catchData);

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
-import { BlockInspector } from '../Inspector/BlockInspector';
-import { useReferences } from '../../hooks/useReferences';
-import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
+import { BlockInspector } from '../../../inspector/components/BlockInspector';
+import { useReferences } from '../../../executor/hooks/useReferences';
+import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
 
 export type ImageBlockType = ImageBlockProps;
 export type ImageBlockProps = {

@@ -26,7 +26,6 @@ export type PageCallEvent = {
 export function useStateToWS(pageId: string, blockMethods: { [p: string]: BlockMethods }) {
 	const { sendWS } = useWS();
 	const blocksState = useAppSelector((state) => selectBlocksState(state, pageId));
-	const { send } = useEvents();
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
 		(event) => {

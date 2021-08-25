@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectBlockState } from '../redux/editor';
 import { useEditor } from './useEditor';
-import { usePageContext } from './useReferences';
+import { usePageContext } from '../../executor/hooks/useReferences';
 
 export function useBlockStateDefault<T>(
 	initialState: (() => Partial<T>) | Partial<T>,

@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { TableBlockType, TableColumnsProp } from '../components/Blocks/TableBlock/TableBlock';
 import { BasicBlock } from '../types/basicBlock';
 import { useEditor } from './useEditor';
-import { useReferenceEvaluator } from './useReferences';
+import { useReferenceEvaluator } from '../../executor/hooks/useReferences';
 
 export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType) {
 	const { columns, value, id, pageId } = block;

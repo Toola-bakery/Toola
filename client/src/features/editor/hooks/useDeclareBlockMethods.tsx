@@ -1,6 +1,6 @@
 import { DependencyList, useEffect, useMemo } from 'react';
 import { BlockMethods } from '../types/blocks';
-import { usePageContext } from './useReferences';
+import { usePageContext } from '../../executor/hooks/useReferences';
 
 export function useDeclareBlockMethods<T extends BlockMethods = BlockMethods>(
 	blockId: string,

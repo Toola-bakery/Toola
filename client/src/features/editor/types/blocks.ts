@@ -1,6 +1,12 @@
 import { ButtonBlockProps, ButtonBlockType } from '../components/Blocks/ButtonBlock';
 import { ColumnBlockProps, ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { ImageBlockProps, ImageBlockType } from '../components/Blocks/ImageBlock';
+import {
+	QueryBlockMethods,
+	QueryBlockProps,
+	QueryBlockState,
+	QueryBlockType,
+} from '../components/Blocks/QueryBlock/QueryBlock';
 import { SubPageBlockProps, SubPageBlockType } from '../components/Blocks/SubPageBlock';
 import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock';
 import {
@@ -24,6 +30,7 @@ export type Blocks =
 	| ImageBlockType
 	| LayoutBlocks
 	| SubPageBlockType
+	| QueryBlockType
 	| ButtonBlockType;
 
 export type LayoutBlocks = PageBlockType | ColumnBlockType | RowBlockType;
@@ -33,6 +40,7 @@ export type BlockProps =
 	| TextBlockProps
 	| TableBlockProps
 	| CodeBlockProps
+	| QueryBlockProps
 	| JSONViewBlockProps
 	| ImageBlockProps
 	| PageBlockProps
@@ -46,6 +54,7 @@ export type BlockPropsAndState =
 	| TextBlockProps
 	| (TableBlockProps & TableBlockState)
 	| (CodeBlockProps & CodeBlockState)
+	| (QueryBlockProps & QueryBlockState)
 	| JSONViewBlockProps
 	| ImageBlockProps
 	| (PageBlockProps & PageBlockState)
@@ -54,5 +63,5 @@ export type BlockPropsAndState =
 	| ColumnBlockProps
 	| ButtonBlockProps;
 
-export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | PageBlockState;
-export type BlockMethods = CodeBlockMethods | InputBlockMethods;
+export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | QueryBlockState | PageBlockState;
+export type BlockMethods = QueryBlockMethods | CodeBlockMethods | InputBlockMethods;

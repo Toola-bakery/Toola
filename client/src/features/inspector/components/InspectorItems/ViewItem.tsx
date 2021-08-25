@@ -1,7 +1,7 @@
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import { BasicItemProps } from '../BlockInspector';
+import { BasicItemProps } from '../InspectorItem';
 
 export type ViewMenuItemProps = BasicItemProps & {
 	type: 'view';

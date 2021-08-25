@@ -1,10 +1,10 @@
 import TextField from '@material-ui/core/TextField';
 import React, { useCallback } from 'react';
 import { useDeclareBlockMethods } from '../../hooks/useDeclareBlockMethods';
-import { useReferenceEvaluator } from '../../hooks/useReferences';
+import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
-import { BlockInspector } from '../Inspector/BlockInspector';
-import { useBlockInspectorState } from '../../hooks/useBlockInspectorState';
+import { BlockInspector } from '../../../inspector/components/BlockInspector';
+import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
 import { useEditor } from '../../hooks/useEditor';
 import { useOnMountedEffect } from '../../../../hooks/useOnMounted';
 

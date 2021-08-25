@@ -17,6 +17,7 @@ export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: BlockProps) => 
 	column: (anyBlock) => copyProps({ type: 'column', blocks: [] }, anyBlock),
 	row: (anyBlock) => copyProps({ type: 'row', blocks: [] }, anyBlock),
 	code: (anyBlock) => copyProps({ type: 'code', language: 'javascript', value: '', manualControl: false }, anyBlock),
+	query: (anyBlock) => copyProps({ type: 'query', values: {}, manualControl: false }, anyBlock),
 	JSONView: (anyBlock) => copyProps({ type: 'JSONView', value: '' }, anyBlock),
 	table: (anyBlock) => copyProps({ type: 'table', value: '', manualPagination: false, connectedPage: '' }, anyBlock),
 	text: (anyBlock) => copyProps({ type: 'text', value: '' }, anyBlock),

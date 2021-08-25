@@ -4,7 +4,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { HeaderGroup, HeaderPropGetter, TableHeaderProps } from 'react-table';
 import { useElementSize } from '../../../../../hooks/useElementSize';
 import { useEditor } from '../../../hooks/useEditor';
-import { usePageContext } from '../../../hooks/useReferences';
+import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { TableBlockProps } from './TableBlock';
 
 type Item = { id: string; tableId: string; width: number };

@@ -1,17 +1,20 @@
-import React, { useRef, MutableRefObject, useCallback, useState, useEffect } from 'react';
+import Monaco from 'monaco-editor';
+import React, { useRef, MutableRefObject, useCallback, useState, useEffect, useMemo } from 'react';
 import Button from '@material-ui/core/Button';
+import Editor, { OnChange, Monaco as MonacoType } from '@monaco-editor/react';
+
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
-import { usePageContext } from '../../../hooks/useReferences';
+import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { SateGetEvent } from '../../../hooks/useStateToWS';
-import { useWatchList, WatchList } from '../../../hooks/useWatchList';
+import { useWatchList, WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
-import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
-import { Editor } from './Editor';
-import { useBlockInspectorState } from '../../../hooks/useBlockInspectorState';
-import { BlockInspector } from '../../Inspector/BlockInspector';
+import { FunctionExecutorAction, useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
+import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
+import { BlockInspector } from '../../../../inspector/components/BlockInspector';
+import { liblib } from './test';
 
 export type CodeBlockType = CodeBlockProps & CodeBlockState & CodeBlockMethods;
 export type CodeBlockProps = {
@@ -34,9 +37,19 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, value, language, logs = [], result, manualControl, pageId, watchList: watchListProp } = block;
+	const { id, value, logs = [], result, manualControl, watchList: watchListProp } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
-	const editorRef = useRef() as MutableRefObject<Copenhagen.Editor>;
+	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+
+	const { blocks } = usePageContext();
+
+	const blocksType = useMemo(
+		() =>
+			Object.keys(blocks)
+				.map((v) => `'${v}'`)
+				.join(' | '),
+		[blocks],
+	);
 
 	const [showLogs, setShowLogs] = useState(false);
 
@@ -46,7 +59,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	useEventListener(id, (event) => event.eventName === 'focus' && editorRef.current?.focus(), []);
 
-	const listener = useCallback<Parameters<typeof useFunctionExecutor>[0]>(
+	const listener = useCallback<(data: FunctionExecutorAction) => void>(
 		(data) => {
 			if (data.result) updateBlockState({ id, result: data.result, loading: false });
 			else updateBlockState({ id, logs: [...logs, data.data] });
@@ -54,45 +67,36 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		[id, logs, updateBlockState],
 	);
 
-	const { addToWatchList, watchList, setOnUpdate } = useWatchList({
-		initialList: watchListProp,
-		syncWithBlockProps: true,
-	});
-
-	const { runCode, UUID } = useFunctionExecutor(listener);
-
-	const trigger = useCallback(() => {
+	const onTrigger = useCallback(() => {
 		updateBlockState({ id, logs: [], loading: true });
-		runCode(value, watchList);
-	}, [id, runCode, updateBlockState, value, watchList]);
+	}, [id, updateBlockState]);
 
-	useEffect(() => {
-		setOnUpdate(() => trigger);
-	}, [setOnUpdate, trigger]);
+	const { trigger } = useFunctionExecutor({
+		listener,
+		value,
+		watchListProp,
+		onTrigger,
+	});
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
 
-	useEventListener<SateGetEvent>(
-		`ws/page.getState`,
-		(event) => {
-			const { blockId, reqId, property } = event;
-			if (UUID === reqId) addToWatchList(blockId, property);
+	const onEditorMount = useCallback(
+		(editor?: Monaco.editor.IStandaloneCodeEditor) => {
+			if (!manualControl) trigger();
+
+			if (!editor) {
+				editorRef.current = null;
+				return;
+			}
+			// monaco?.languages.t
+			editorRef.current = editor;
 		},
-		[UUID],
+		[editorRef, manualControl, trigger],
 	);
-
-	const onEditorReady = useCallback(() => {
-		if (!manualControl) trigger();
-
-		if (!editorRef.current) return;
-
-		editorRef.current.on('change', (_, v) => {
-			updateBlockProps({ id, value: v });
-		});
-	}, [editorRef, id, manualControl, trigger, updateBlockProps]);
+	const onEditorChange = useCallback<OnChange>((v) => updateBlockProps({ id, value: v }), [id, updateBlockProps]);
 
 	useOnMountedEffect(() => {
-		if (!block.show) onEditorReady();
+		if (!block.show) onEditorMount();
 	});
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState([
@@ -111,12 +115,50 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				<Editor
-					id={`${id}${pageId}`}
-					onEditorReady={onEditorReady}
-					value={value}
-					language={language}
-					editorRef={editorRef}
-					disabled={!editing}
+					height="50vh"
+					wrapperClassName=""
+					onMount={onEditorMount}
+					defaultValue={value}
+					onChange={onEditorChange}
+					beforeMount={(monaco) => {
+						monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+							...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
+							allowSyntheticDefaultImports: false,
+							target: monaco.languages.typescript.ScriptTarget.ES5,
+							module: monaco.languages.typescript.ModuleKind.CommonJS,
+							moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+							skipDefaultLibCheck: true,
+							allowJs: true,
+							typeRoots: ['./types'],
+							allowNonTsExtensions: true,
+						});
+						monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({ noSuggestionDiagnostics: true });
+						const libSource = `declare module 'axios' { ${liblib} }`;
+						const libUri = 'ts:axios/index.d.ts';
+						monaco.languages.typescript.javascriptDefaults.addExtraLib(libSource, libUri);
+						monaco.languages.typescript.javascriptDefaults.addExtraLib(
+							[
+								'declare var require: {',
+								'toUrl(path: string): string;',
+								'(moduleName: string): any;',
+								'(dependencies: string[], callback: (...args: any[]) => any, errorback?: (err: any) => void): any;',
+								'config(data: any): any;',
+								'onError: Function;',
+								'};',
+							].join('\n'),
+							'ts:require.d.ts',
+						);
+						monaco.languages.typescript.javascriptDefaults.addExtraLib(
+							[
+								'declare module "page-state" {',
+								`export function callMethod(blockId: ${blocksType}, method: any, callArgs?: any[]): Promise<any>;`,
+								`export function getProperty(blockId: ${blocksType}, property: any): Promise<any>;`,
+								'};',
+							].join('\n'),
+							'ts:page-state',
+						);
+					}}
+					language="javascript"
 				/>
 				<Button sx={{ marginRight: 1 }} variant="contained" color="primary" onClick={() => setShowLogs((v) => !v)}>
 					{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}

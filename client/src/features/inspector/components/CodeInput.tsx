@@ -1,10 +1,10 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import TextField from '@material-ui/core/TextField';
-import { usePageContext } from '../../hooks/useReferences';
-import { useCaretPosition } from '../../hooks/useCaretPosition';
+import { usePageContext } from '../../executor/hooks/useReferences';
+import { useCaretPosition } from '../../editor/hooks/useCaretPosition';
 
 const GO_DEEPER_TYPES = ['object', 'array'];
 
@@ -50,31 +50,34 @@ export function CodeHints({ hints, select }: { select: (value: string | null) =>
 export function CodeInput({
 	onChange,
 	value = '',
+	type = 'string',
 	label,
 }: {
 	label: string;
 	value: string;
+	type?: 'object' | 'string';
 	onChange: (v: string) => void;
 }) {
 	const ref = useRef<HTMLDivElement>(null);
 	const context = usePageContext();
+	const [isFocused, setFocused] = useState(false);
 
 	const { start, ref: inputRef, updateCaret } = useCaretPosition();
 
 	const { isReference, currentWord } = useMemo(() => {
 		const closestSpaceIndex = value.lastIndexOf(' ', start - 1) + 1;
 		let word = value.slice(closestSpaceIndex, start);
-		const isRef = word.startsWith('${');
-		if (isRef) word = word.slice(2);
+		const isRef = word.length > 0 && (word.startsWith('${') || type === 'object');
+		if (isRef) word = word.startsWith('${') ? word.slice(2) : word;
 		return { isReference: isRef, currentWord: word };
-	}, [start, value]);
+	}, [start, type, value]);
 
 	const suggestions = useMemo(() => getSuggestionKeys(context), [context]);
 
 	const filteredSuggestions = useMemo(() => {
-		if (!isReference) return [];
+		if (!isReference || !isFocused) return [];
 		return suggestions.filter((v) => v.value.startsWith(currentWord));
-	}, [isReference, suggestions, currentWord]);
+	}, [isFocused, isReference, suggestions, currentWord]);
 
 	return (
 		<div style={{ width: '100%', height: 50 }} ref={ref}>
@@ -86,6 +89,8 @@ export function CodeInput({
 				variant="outlined"
 				value={value}
 				autoComplete="off"
+				onBlur={() => setFocused(false)}
+				onFocus={() => setFocused(true)}
 				onChange={(e) => {
 					onChange(e.target.value);
 					updateCaret();

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useOnMountedEffect } from '../../../hooks/useOnMounted';
 import { usePrevious } from '../../../hooks/usePrevious';
-import { useBlock } from './useBlock';
-import { useEditor } from './useEditor';
+import { useBlock } from '../../editor/hooks/useBlock';
+import { useEditor } from '../../editor/hooks/useEditor';
 import { usePageContext } from './useReferences';
 
 export type WatchListObj = { [key: string]: [string, string] };

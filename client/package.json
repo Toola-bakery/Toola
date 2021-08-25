@@ -7,6 +7,7 @@
 		"@material-ui/icons": "^5.0.0-beta.0",
 		"@material-ui/lab": "next",
 		"@material-ui/styled-engine-sc": "next",
+		"@monaco-editor/react": "^4.2.2",
 		"@reduxjs/toolkit": "^1.6.0",
 		"@testing-library/jest-dom": "latest",
 		"@testing-library/react": "latest",
@@ -20,6 +21,7 @@
 		"immutability-helper": "^3.1.1",
 		"just-debounce": "^1.1.0",
 		"ky": "^0.28.5",
+		"monaco-editor": "^0.27.0",
 		"re-reselect": "^4.0.0",
 		"react": "latest",
 		"react-contenteditable": "^3.3.5",
@@ -35,6 +37,7 @@
 		"redux-persist": "^6.0.0",
 		"reselect": "^4.0.0",
 		"styled-components": "latest",
+		"use-immer": "^0.6.0",
 		"uuid": "^8.3.2"
 	},
 	"scripts": {

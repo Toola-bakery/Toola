@@ -1,7 +1,8 @@
 import { ListItem } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import { BasicItemProps, BlockInspectorProps, MenuItemProps } from '../BlockInspector';
+import { BlockInspectorProps } from '../BlockInspector';
+import { MenuItemProps, BasicItemProps } from '../InspectorItem';
 
 export type NestedMenuItemProps = BasicItemProps & {
 	type: 'nested';

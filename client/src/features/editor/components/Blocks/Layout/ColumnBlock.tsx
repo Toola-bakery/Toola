@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Block } from '../../Block';
 import { BasicBlock } from '../../../types/basicBlock';
-import { usePageContext } from '../../../hooks/useReferences';
+import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { useEditor } from '../../../hooks/useEditor';
 import { RowBlock, RowBlockType } from './RowBlock';
 import { DropTarget } from './DropTarget';

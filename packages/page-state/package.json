@@ -10,6 +10,7 @@
 		"url": "YOUR WEBSITE"
 	},
 	"exports": "./index.js",
+	"typings": "./index.d.ts",
 	"engines": {
 		"node": ">=12"
 	},

@@ -1,11 +1,9 @@
-import MenuItem from '@material-ui/core/MenuItem';
 import React, { useCallback, useState } from 'react';
-import { TableBlockProps } from '../components/Blocks/TableBlock/TableBlock';
-import { MenuItemProps } from '../components/Inspector/BlockInspector';
-import { BlockProps, Blocks } from '../types/blocks';
-import { useBlock } from './useBlock';
-import { useEditor } from './useEditor';
-import { usePageContext } from './useReferences';
+import { MenuItemProps } from '../components/InspectorItem';
+import { BlockProps, Blocks } from '../../editor/types/blocks';
+import { useBlock } from '../../editor/hooks/useBlock';
+import { useEditor } from '../../editor/hooks/useEditor';
+import { usePageContext } from '../../executor/hooks/useReferences';
 
 const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Partial<BlockProps>)][] = [
 	['Text', 'text'],
@@ -13,6 +11,7 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 	['Heading 2', { type: 'text', style: 'heading2' }],
 	['Heading 3', { type: 'text', style: 'heading3' }],
 	['Code', 'code'],
+	['Query', 'query'],
 	['Page', 'subpage'],
 	['JSON viewer', 'JSONView'],
 	['Table', 'table'],

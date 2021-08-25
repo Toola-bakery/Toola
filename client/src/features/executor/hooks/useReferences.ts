@@ -1,14 +1,20 @@
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { PageContext } from '../components/Page';
-import { useBlock } from './useBlock';
-import { useEditor } from './useEditor';
+import { PageContext } from '../../editor/components/Page';
+import { useBlock } from '../../editor/hooks/useBlock';
+import { useEditor } from '../../editor/hooks/useEditor';
 import { useWatchList } from './useWatchList';
 
 export function usePageContext() {
 	return useContext(PageContext);
 }
 
-export function useReferenceEvaluator(syncWithBlockProps?: boolean) {
+export function useReferenceEvaluator({
+	syncWithBlockProps,
+	watchReferences,
+}: {
+	syncWithBlockProps?: boolean;
+	watchReferences?: boolean;
+} = {}) {
 	const { blocks, globals } = usePageContext();
 
 	const { watchList, isLoading, addToWatchList } = useWatchList({ syncWithBlockProps });
@@ -40,16 +46,16 @@ export function useReferenceEvaluator(syncWithBlockProps?: boolean) {
 					// RETURN EXACT VALUE IF ONLY ONE REFERENCE
 					// eslint-disable-next-line @typescript-eslint/no-implied-eval
 					const evalFunction = Function(...['blocks', 'globals', 'current'], `return ${sourceCode.slice(2, -1)}`);
-					return evalFunction(blockProxy, globals, current);
+					return evalFunction(watchReferences ? blockProxy : blocks, globals, current);
 				}
 				// eslint-disable-next-line @typescript-eslint/no-implied-eval
 				const evalFunction = Function(...['blocks', 'globals', 'current'], `return \`${sourceCode}\``);
-				return evalFunction(blockProxy, globals, current);
+				return evalFunction(watchReferences ? blockProxy : blocks, globals, current);
 			} catch (e) {
 				return e.message;
 			}
 		},
-		[blockProxy, globals],
+		[blockProxy, blocks, globals, watchReferences],
 	);
 
 	return { evaluate, watchList, isLoading };
