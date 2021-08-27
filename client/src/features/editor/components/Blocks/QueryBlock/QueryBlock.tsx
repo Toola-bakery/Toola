@@ -1,5 +1,5 @@
+import { Button, Card } from '@blueprintjs/core';
 import React, { useCallback, useEffect, useState } from 'react';
-import Button from '@material-ui/core/Button';
 import { useNextRenderHook } from '../../../../../hooks/useNextRenderHook';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { useQueryConstructor } from '../../../../inspector/hooks/useQueryConstructor';
@@ -31,7 +31,7 @@ export type QueryBlockComponentProps = {
 };
 
 export function QueryBlock({ block }: QueryBlockComponentProps) {
-	const { id, logs = [], result, manualControl, values } = block;
+	const { id, logs = [], result, manualControl, values, loading } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 
 	const [showLogs, setShowLogs] = useState(false);
@@ -116,14 +116,12 @@ async function main () {
 	if (!block.show) return null;
 
 	return (
-		<>
+		<Card>
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				{component}
-				<Button sx={{ marginRight: 1 }} variant="contained" color="primary" onClick={() => setShowLogs((v) => !v)}>
-					{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}
-				</Button>
-				<Button variant="contained" color="primary" onClick={() => trigger()}>
+				<Button onClick={() => setShowLogs((v) => !v)}>{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}</Button>
+				<Button loading={loading} onClick={() => trigger()}>
 					Run CODE
 				</Button>
 				{showLogs ? (
@@ -136,6 +134,6 @@ async function main () {
 					</pre>
 				) : null}
 			</div>
-		</>
+		</Card>
 	);
 }

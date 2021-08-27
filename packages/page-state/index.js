@@ -1,12 +1,14 @@
 const WebSocket = require("ws");
 const { v4 } = require("uuid");
 
+const ALLOWED_TOP_LEVEL_KEYS = ["blocks", "globals"];
+
 const preloadState = JSON.parse(process.env.preloadState);
 
-const watchListKeyGetter = (p1, p2) => `["${p1}"]["${p2}"]`;
+const watchListKeyGetter = (keys) => keys.map((p1) => `["${p1}"]`).join("");
 
-function getPreloadedState(p1, p2) {
-  const key = watchListKeyGetter(p1, p2);
+function getPreloadedState(keys) {
+  const key = watchListKeyGetter(keys);
   const value = preloadState[key];
   if (typeof value !== "undefined") {
     delete preloadState[key];
@@ -50,17 +52,17 @@ function sendToUser(message, awaitResp) {
   return awaitResp ? awaitMessageResponse(messageId) : true;
 }
 
-async function getProperty(blockId, property) {
+async function getProperty(...keys) {
   await isWsReadyPromise;
-  const value = getPreloadedState(blockId, property);
+  const value = getPreloadedState(
+    ALLOWED_TOP_LEVEL_KEYS.includes(keys[0]) ? keys : ["blocks", ...keys]
+  );
   if (typeof value !== "undefined") return value;
 
   const resp = await sendToUser(
     {
       action: "page.getState",
-      pageId: "Databases",
-      blockId,
-      property,
+      keys,
     },
     true
   );
@@ -73,7 +75,6 @@ async function callMethod(blockId, method, callArgs = []) {
   const resp = await sendToUser(
     {
       action: "page.call",
-      pageId: "Databases",
       blockId,
       method,
       callArgs,

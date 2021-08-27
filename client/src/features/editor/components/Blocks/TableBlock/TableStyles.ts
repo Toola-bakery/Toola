@@ -4,11 +4,36 @@ export const TableStyles = styled.div`
 	.table {
 		min-height: 100px;
 
-		.tr {
+		thead th {
+			background: white;
+		}
+
+		tr {
 			max-height: 250px;
 			overflow-y: hidden;
-			.td {
-				padding: 5px;
+		}
+
+		td {
+			padding: 5px;
+		}
+
+		th,
+		td {
+			position: relative;
+			word-wrap: break-word;
+
+			.resizer {
+				right: 0;
+				width: 3px;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				z-index: 1;
+				touch-action: none;
+
+				&.isResizing {
+					background: red;
+				}
 			}
 		}
 
@@ -24,26 +49,6 @@ export const TableStyles = styled.div`
 			background: red;
 			z-index: 1;
 			touch-action: none;
-		}
-
-		th,
-		td {
-			word-wrap: break-word;
-
-			.resizer {
-				right: 0;
-				background: rgba(0, 0, 0, 0.2);
-				width: 1px;
-				height: 100%;
-				position: absolute;
-				top: 0;
-				z-index: 1;
-				touch-action: none;
-
-				&.isResizing {
-					background: red;
-				}
-			}
 		}
 	}
 `;

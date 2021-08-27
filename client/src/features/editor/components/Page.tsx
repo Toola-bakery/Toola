@@ -6,6 +6,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { usePageContext } from '../../executor/hooks/useReferences';
 import { useBlocks } from '../hooks/useBlocks';
 import { useBlockStateDefault } from '../hooks/useBlockStateDefault';
 import { useStateToWS } from '../hooks/useStateToWS';
@@ -33,12 +34,13 @@ export type PageContextType = {
 	globals: { pageId: string };
 	page: BasicBlock & PageBlockType;
 	pageId: string;
-} & Omit<ReturnType<typeof useBlocks>, 'blocksMethods'>;
+} & ReturnType<typeof useBlocks>;
 
 export const PageContext = React.createContext<PageContextType>({
 	blocks: {},
 	deleteBlockMethods: () => {},
 	setBlockMethods: () => {},
+	blocksMethods: {},
 	globals: { pageId: '' },
 	pageId: '',
 	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
@@ -48,17 +50,20 @@ const putPage = debounce((pageId, blocksProps) => {
 	return ky.post(`${Config.domain}/pages/post`, { json: { id: pageId, value: blocksProps } });
 }, 300);
 
+function WSHandler() {
+	useStateToWS();
+	return null;
+}
+
 export function Page(): JSX.Element {
 	const dispatch = useAppDispatch();
 	const { pageId } = useParams<{ pageId: string }>();
 	const { state: pageParams } = useLocation();
-
 	const [editing, setEditing] = useLocalStorage('editing', true);
 	useBlockStateDefault<PageBlockState>({ editing }, 'page', pageId);
 	const [fetching, setFetching] = useState(true);
 
-	const { blocks, blocksMethods, deleteBlockMethods, setBlockMethods } = useBlocks(pageId, editing);
-	useStateToWS(pageId, blocksMethods);
+	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods } = useBlocks(pageId, editing);
 
 	const hiddenBlocks = useMemo(() => {
 		const blockKeys = Object.keys(blocks);
@@ -91,14 +96,24 @@ export function Page(): JSX.Element {
 	}, [fetching, blocksProps, pageId]);
 
 	const value = useMemo<PageContextType>(
-		() => ({ blocks, pageId, globals: { pageId, pageParams }, page, deleteBlockMethods, setBlockMethods }),
-		[blocks, pageId, pageParams, page, deleteBlockMethods, setBlockMethods],
+		() => ({
+			blocks,
+			pageId,
+			globals: { pageId, pageParams },
+			page,
+			deleteBlockMethods,
+			setBlockMethods,
+			blocksMethods,
+		}),
+		[blocks, blocksMethods, pageId, pageParams, page, deleteBlockMethods, setBlockMethods],
 	);
 	const { width } = useWindowSize({ width: 1000 });
 
 	return (
 		<DndProvider backend={HTML5Backend}>
 			<PageContext.Provider value={value}>
+				<WSHandler />
+
 				<div style={{ width: width - 240 - 10, overflowX: 'clip' }}>
 					{page ? (
 						<>

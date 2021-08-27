@@ -1,7 +1,6 @@
-import TableCell, { TableCellProps } from '@material-ui/core/TableCell';
-import { MouseEventHandler, PropsWithChildren, useRef } from 'react';
+import { MouseEventHandler, PropsWithChildren, TdHTMLAttributes, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { HeaderGroup, HeaderPropGetter, TableHeaderProps } from 'react-table';
+import { HeaderGroup } from 'react-table';
 import { useElementSize } from '../../../../../hooks/useElementSize';
 import { useEditor } from '../../../hooks/useEditor';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
@@ -15,14 +14,16 @@ export function ColumnDnD({
 	tableId,
 	onClick,
 	...tableCell
-}: PropsWithChildren<{ column: HeaderGroup; tableId: string; onClick: MouseEventHandler } & TableCellProps>) {
+}: PropsWithChildren<
+	{ column: HeaderGroup; tableId: string; onClick: MouseEventHandler } & TdHTMLAttributes<HTMLTableHeaderCellElement>
+>) {
 	const {
 		page: { editing },
 	} = usePageContext();
 
 	const { immerBlockProps } = useEditor();
 
-	const colRef = useRef<HTMLDivElement>(null);
+	const colRef = useRef<HTMLTableHeaderCellElement>(null);
 	const { width, height } = useElementSize(colRef);
 
 	const [{ opacity, isDrag }, dragRef] = useDrag(
@@ -80,7 +81,7 @@ export function ColumnDnD({
 	if (isDrag) return null;
 
 	return (
-		<TableCell ref={colRef} {...tableCell} {...headerProps}>
+		<th {...tableCell} {...headerProps} ref={colRef}>
 			<div style={{ display: 'flex' }}>
 				{draggingItem && draggingItem.id !== column.id && !isDrag ? (
 					<div
@@ -99,10 +100,20 @@ export function ColumnDnD({
 					style={{ width: parseInt(String(headerProps.style?.width), 10) - dragWidth }}
 					onClick={onClick}
 				>
-					<div style={{ margin: column.id === 'add' ? 0 : 16 }}>{column.render('Header')}</div>
+					<div
+						style={{
+							marginTop: 16,
+							marginBottom: 16,
+							marginLeft: column.id === 'add' ? 0 : 16,
+							marginRight: column.id === 'add' ? 0 : 16,
+							textAlign: column.id === 'add' ? 'center' : 'left',
+						}}
+					>
+						{column.render('Header')}
+					</div>
 				</div>
 				<div {...column.getResizerProps()} className={`resizer ${column.isResizing ? 'isResizing' : ''}`} />
 			</div>
-		</TableCell>
+		</th>
 	);
 }

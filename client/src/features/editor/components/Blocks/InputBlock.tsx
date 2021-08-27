@@ -1,5 +1,7 @@
+import { FormGroup, InputGroup } from '@blueprintjs/core';
 import TextField from '@material-ui/core/TextField';
 import React, { useCallback } from 'react';
+import { TextInput } from '../../../ui/components/TextInput';
 import { useDeclareBlockMethods } from '../../hooks/useDeclareBlockMethods';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
@@ -55,16 +57,16 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 
 	if (!block.show) return <></>;
 
+	// TODO "helperText" Helper text with details...
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
-				<TextField
-					id="outlined-basic"
-					sx={{ width: '100%' }}
-					label={label || id}
-					variant="outlined"
+				<TextInput
+					label={label}
+					fill
 					value={value}
+					inline
 					autoComplete="off"
 					onChange={(e) => {
 						setValue(e.target.value);

@@ -1,19 +1,11 @@
-import {
-	Paper,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TablePagination,
-	TableRow,
-} from '@material-ui/core';
+import { Card, HTMLTable } from '@blueprintjs/core';
+import { TablePagination } from '@material-ui/core';
 import JSONTree from 'react-json-tree';
 import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
-import { usePageNavigator } from '../../../hooks/usePageNavigator';
+import { usePageNavigator } from '../../../../../hooks/usePageNavigator';
 import { useTableBlockColumnsAndData } from '../../../hooks/useTableBlockColumnsAndData';
 import { useTableColumnResizing } from '../../../hooks/useTableColumnResizing';
 import { useTableInspector } from '../../../hooks/useTableInspector';
@@ -104,17 +96,18 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		<>
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
-				<Paper>
-					<TableContainer sx={{ maxHeight: 500 }}>
-						<Table
+				<Card style={{ padding: 0, zIndex: 1000 }}>
+					<div style={{ overflow: 'scroll', maxHeight: 500 }}>
+						<HTMLTable
+							bordered
+							striped
 							{...getTableProps()}
-							stickyHeader
 							onContextMenu={(e) => onContextMenu(e, ['global'])}
 							className="table"
 						>
-							<TableHead style={{ position: 'sticky', top: 0 }}>
+							<thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
 								{headerGroups.map((headerGroup) => (
-									<TableRow {...headerGroup.getHeaderGroupProps()} className="tr">
+									<tr {...headerGroup.getHeaderGroupProps()} className="tr">
 										{headerGroup.headers.map((column) => {
 											return (
 												<ColumnDnD
@@ -127,14 +120,14 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 												/>
 											);
 										})}
-									</TableRow>
+									</tr>
 								))}
-							</TableHead>
-							<TableBody {...getTableBodyProps()} className="tbody">
+							</thead>
+							<tbody {...getTableBodyProps()} className="tbody">
 								{page.map((row) => {
 									prepareRow(row);
 									return (
-										<TableRow
+										<tr
 											{...row.getRowProps({
 												style: { backgroundColor: row.isSelected ? 'rgba(127, 180, 235, 0.3)' : undefined },
 											})}
@@ -157,7 +150,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 													: JSON.stringify(cell.value);
 
 												return (
-													<TableCell className="td" {...cell.getCellProps()} title={cellValue}>
+													<td className="td" {...cell.getCellProps()} title={cellValue}>
 														{(() => {
 															// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 															// @ts-ignore
@@ -170,15 +163,15 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 															if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
 															return cellValue;
 														})()}
-													</TableCell>
+													</td>
 												);
 											})}
-										</TableRow>
+										</tr>
 									);
 								})}
-							</TableBody>
-						</Table>
-					</TableContainer>
+							</tbody>
+						</HTMLTable>
+					</div>
 					<TablePagination
 						rowsPerPageOptions={[1, 5, 10, 25]}
 						component="div"
@@ -190,7 +183,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 						}}
 						onRowsPerPageChange={(event) => setPageSize(+event.target.value)}
 					/>
-				</Paper>
+				</Card>
 			</TableStyles>
 		</>
 	);

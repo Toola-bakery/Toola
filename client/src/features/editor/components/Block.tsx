@@ -64,7 +64,7 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 						flexDirection: 'row',
 						opacity,
 						width: '100%',
-						transform: 'translate3d(0, 0, 0)',
+						// transform: 'translate3d(0, 0, 0)',
 					}}
 				>
 					<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>

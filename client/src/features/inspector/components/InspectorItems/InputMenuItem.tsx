@@ -1,7 +1,8 @@
-import { ListItem } from '@material-ui/core';
+import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
 import { BasicItemProps } from '../InspectorItem';
 import { CodeInput } from '../CodeInput';
+import { MenuItemWithInput } from '../MenuItemWithInput';
 
 export type InputMenuItemProps = BasicItemProps & {
 	type: 'input';
@@ -10,10 +11,18 @@ export type InputMenuItemProps = BasicItemProps & {
 	onChange: (v: string) => void;
 };
 
-export function InputMenuItem({ item }: { item: InputMenuItemProps }) {
+export function InputMenuItem({
+	item,
+	Wrapper = MenuItem,
+}: {
+	item: InputMenuItemProps;
+	Wrapper?: typeof React.Component | React.FC<any>;
+}) {
 	return (
-		<ListItem>
-			<CodeInput label={item.label} value={item.value} type={item.codeType} onChange={item.onChange} />
-		</ListItem>
+		<Wrapper
+			shouldDismissPopover={false}
+			icon={item.icon}
+			text={<CodeInput label={item.label} value={item.value} type={item.codeType} onChange={item.onChange} />}
+		/>
 	);
 }

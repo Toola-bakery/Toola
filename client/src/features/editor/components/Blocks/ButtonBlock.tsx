@@ -1,4 +1,4 @@
-import Button from '@material-ui/core/Button';
+import { Button } from '@blueprintjs/core';
 import React from 'react';
 import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
@@ -41,15 +41,12 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
 				<Button
-					variant="contained"
-					color="primary"
-					sx={{ width: '100%' }}
+					fill
 					onClick={() => {
 						evaluate(value);
 					}}
-				>
-					{nameRef}
-				</Button>
+					text={nameRef}
+				/>
 			</div>
 		</>
 	);

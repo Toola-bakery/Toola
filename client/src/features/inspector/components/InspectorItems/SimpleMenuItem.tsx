@@ -1,5 +1,4 @@
-import { ListItem } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
+import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
 import { BasicItemProps } from '../InspectorItem';
 
@@ -9,16 +8,24 @@ export type SimpleMenuItemProps = BasicItemProps & {
 	closeAfterCall?: boolean;
 };
 
-export function SimpleMenuItem({ item, close }: { item: SimpleMenuItemProps; close?: () => void }) {
+export function SimpleMenuItem({
+	item,
+	close,
+	Wrapper = MenuItem,
+}: {
+	item: SimpleMenuItemProps;
+	close?: () => void;
+	Wrapper?: typeof React.Component | React.FC<any>;
+}) {
 	return (
-		<ListItem
-			button
+		<Wrapper
+			shouldDismissPopover={false}
+			icon={item.icon}
 			onClick={() => {
 				item.call();
 				if (item.closeAfterCall && close) close();
 			}}
-		>
-			<Typography variant="inherit">{item.label}</Typography>
-		</ListItem>
+			text={item.label}
+		/>
 	);
 }

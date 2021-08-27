@@ -31,7 +31,7 @@ export function useReferenceEvaluator({
 					if (typeof target1[key1] === 'object')
 						return new Proxy(target1[key1], {
 							get: (target2, key2: string) => {
-								if (key2 in target2) addToWatchList(key1, key2);
+								if (key2 in target2) addToWatchList(['blocks', key1, key2]);
 								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 								// @ts-ignore
 								return target2[key2];

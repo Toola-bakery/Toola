@@ -1,13 +1,10 @@
-import { useAppSelector } from '../../../redux/hooks';
+import { usePageContext } from '../../executor/hooks/useReferences';
+import { evalGet } from '../../executor/hooks/useWatchList';
 import { useWS } from '../../ws/hooks/useWS';
-import { selectBlocksState } from '../redux/editor';
-import { BlockMethods } from '../types/blocks';
 import { useEventListener, useEvents } from './useEvents';
 
 export type SateGetEvent = {
-	property: string;
-	blockId: string;
-	pageId: string;
+	keys: string[];
 	redirectedFrom: string;
 	reqId: string;
 	messageId: string;
@@ -23,25 +20,29 @@ export type PageCallEvent = {
 	messageId: string;
 };
 
-export function useStateToWS(pageId: string, blockMethods: { [p: string]: BlockMethods }) {
+export function useStateToWS() {
 	const { sendWS } = useWS();
-	const blocksState = useAppSelector((state) => selectBlocksState(state, pageId));
+	const { blocks, globals, pageId } = usePageContext();
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
 		(event) => {
-			const { property, pageId: pageIdReq, blockId, redirectedFrom, messageId } = event;
-			if (property && pageId && blockId && redirectedFrom) {
+			const { keys, redirectedFrom, messageId } = event;
+			const topLevelObject = { blocks, globals };
+
+			if (pageId && redirectedFrom) {
+				const value = evalGet(topLevelObject, keys);
+
+				console.log({ event, keys, value });
+
 				sendWS({
 					action: 'state.getResponse',
 					destinationId: redirectedFrom,
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					value: blocksState?.[blockId]?.[property],
+					value,
 					messageId,
 				});
 			}
 		},
-		[blocksState],
+		[blocks, globals, pageId, sendWS],
 	);
 
 	useEventListener<PageCallEvent>(
@@ -49,7 +50,6 @@ export function useStateToWS(pageId: string, blockMethods: { [p: string]: BlockM
 		(event) => {
 			const { method, pageId: pageIdReq, callArgs = [], blockId, redirectedFrom, messageId } = event;
 			if (method && pageId && blockId && redirectedFrom) {
-				console.log(event);
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
 				const resp = blockMethods?.[blockId]?.[method]?.(...callArgs);
@@ -61,6 +61,6 @@ export function useStateToWS(pageId: string, blockMethods: { [p: string]: BlockM
 				});
 			}
 		},
-		[blocksState],
+		[],
 	);
 }

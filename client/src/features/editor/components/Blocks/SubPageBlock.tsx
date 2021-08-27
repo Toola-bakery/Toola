@@ -1,12 +1,12 @@
-import Button from '@material-ui/core/Button';
+import { Button } from '@blueprintjs/core';
 import DescriptionIcon from '@material-ui/icons/Description';
 import ky from 'ky';
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Config } from '../../../../config';
 import { useEditor } from '../../hooks/useEditor';
-import { usePageNavigator } from '../../hooks/usePageNavigator';
-import { useReferenceEvaluator, useReferences } from '../../../executor/hooks/useReferences';
+import { usePageNavigator } from '../../../../hooks/usePageNavigator';
+import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
@@ -73,10 +73,10 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 					onClick={() => {
 						if (page && page.pageId) navigate(page.pageId, evaluate(state));
 					}}
-					startIcon={<DescriptionIcon />}
-				>
-					{page?.title}
-				</Button>
+					icon="document"
+					minimal
+					text={page?.title}
+				/>
 			</div>
 		</>
 	);

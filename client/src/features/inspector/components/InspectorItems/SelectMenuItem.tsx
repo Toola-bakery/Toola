@@ -1,6 +1,6 @@
-import { FormControl, InputLabel, ListItem, Select } from '@material-ui/core';
-import MenuItem from '@material-ui/core/MenuItem';
+import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
+import { SimpleSelect } from '../../../ui/components/SimpleSelect';
 import { BasicItemProps } from '../InspectorItem';
 
 export type SelectMenuItemProps = BasicItemProps & {
@@ -10,22 +10,33 @@ export type SelectMenuItemProps = BasicItemProps & {
 	onChange: (v: string) => void;
 };
 
-export function SelectMenuItem({ item }: { item: SelectMenuItemProps }) {
+export function SelectMenuItem({
+	item,
+	Wrapper = MenuItem,
+}: {
+	item: SelectMenuItemProps;
+	Wrapper?: typeof React.Component | React.FC<any>;
+}) {
 	return (
-		<ListItem>
-			<FormControl variant="outlined" sx={{ width: '100%' }}>
-				<InputLabel>{item.label}</InputLabel>
-				<Select value={item.value} onChange={(v) => item.onChange(v.target.value)}>
-					{item.options.map((option) => (
-						<MenuItem
-							key={typeof option === 'string' ? option : option.value}
-							value={typeof option === 'string' ? option : option.value}
-						>
-							{typeof option === 'string' ? option : option.name}
-						</MenuItem>
-					))}
-				</Select>
-			</FormControl>
-		</ListItem>
+		<Wrapper
+			shouldDismissPopover={false}
+			icon={item.icon}
+			text={
+				<SimpleSelect
+					options={item.options.map((option) =>
+						typeof option === 'string'
+							? option
+							: {
+									label: option.name,
+									value: option.value,
+							  },
+					)}
+					label={item.label}
+					fill
+					value={item.value}
+					onChange={(v) => item.onChange(v.target.value)}
+				/>
+			}
+		/>
 	);
 }

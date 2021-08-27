@@ -3,4 +3,4 @@ export function callMethod(
   method: any,
   callArgs?: any[]
 ): Promise<any>;
-export function getProperty(blockId: any, property: any): Promise<any>;
+export function getProperty(...keys: string[]): Promise<any>;

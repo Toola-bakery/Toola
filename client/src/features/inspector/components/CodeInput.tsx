@@ -5,6 +5,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import TextField from '@material-ui/core/TextField';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { useCaretPosition } from '../../editor/hooks/useCaretPosition';
+import { TextInput } from '../../ui/components/TextInput';
 
 const GO_DEEPER_TYPES = ['object', 'array'];
 
@@ -80,13 +81,10 @@ export function CodeInput({
 	}, [isFocused, isReference, suggestions, currentWord]);
 
 	return (
-		<div style={{ width: '100%', height: 50 }} ref={ref}>
-			<TextField
-				sx={{ width: '100%' }}
-				id="outlined-basic"
+		<div ref={ref}>
+			<TextInput
 				label={label}
 				inputRef={inputRef}
-				variant="outlined"
 				value={value}
 				autoComplete="off"
 				onBlur={() => setFocused(false)}
@@ -96,7 +94,6 @@ export function CodeInput({
 					updateCaret();
 				}}
 			/>
-			<CodeHints select={(v) => console.log(v)} hints={filteredSuggestions} />
 		</div>
 	);
 }

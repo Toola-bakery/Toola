@@ -1,8 +1,7 @@
-import { ListItem, Switch } from '@material-ui/core';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Typography from '@material-ui/core/Typography';
+import { MenuItem, Switch } from '@blueprintjs/core';
 import React from 'react';
 import { BasicItemProps } from '../InspectorItem';
+import { MenuItemWithInput } from '../MenuItemWithInput';
 
 export type SwitchMenuItemProps = BasicItemProps & {
 	type: 'switch';
@@ -10,19 +9,29 @@ export type SwitchMenuItemProps = BasicItemProps & {
 	onChange: (nextValue: boolean) => void;
 };
 
-export function SwitchMenuItem({ item }: { item: SwitchMenuItemProps }) {
+export function SwitchMenuItem({
+	item,
+	Wrapper = MenuItem,
+}: {
+	item: SwitchMenuItemProps;
+	Wrapper?: typeof React.Component | React.FC<any>;
+}) {
 	return (
-		<ListItem
-			button
+		<Wrapper
+			shouldDismissPopover={false}
+			icon={item.icon}
 			onClick={() => {
 				item.onChange(!item.value);
 			}}
-		>
-			<Typography variant="inherit">{item.label}</Typography>
-
-			<ListItemSecondaryAction>
-				<Switch checked={item.value} />
-			</ListItemSecondaryAction>
-		</ListItem>
+			text={item.label}
+			labelElement={
+				<Switch
+					checked={item.value}
+					onChange={() => {
+						item.onChange(!item.value);
+					}}
+				/>
+			}
+		/>
 	);
 }

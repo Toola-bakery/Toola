@@ -5,10 +5,13 @@ import { useBlock } from '../../editor/hooks/useBlock';
 import { useEditor } from '../../editor/hooks/useEditor';
 import { usePageContext } from './useReferences';
 
-export type WatchListObj = { [key: string]: [string, string] };
-export type WatchList = [string, string][];
+export type WatchListObj = { [key: string]: string[] };
+export type WatchList = string[][];
 
-export const watchListKeyGetter = (p1: string, p2: string) => `["${p1}"]["${p2}"]`;
+export const populateKeys = (keys: string[]) =>
+	keys[0] === 'globals' || keys[0] === 'blocks' ? keys : ['blocks', ...keys];
+
+export const watchListKeyGetter = (keys: string[]) => keys.map((p1) => `["${p1}"]`).join('');
 
 export type WatchListProps = {
 	initialList?: WatchList;
@@ -19,18 +22,25 @@ export type WatchListProps = {
 	syncWithBlockProps?: boolean;
 };
 
+export function evalGet(anyTopLevel: { globals: any; blocks: any }, keys: string[]) {
+	return populateKeys(keys).reduce<any>((acc, key) => {
+		if (typeof acc === 'object' && key in acc) return acc[key];
+		return undefined;
+	}, anyTopLevel);
+}
+
 export function useWatchList({
 	initialList,
 	onListChanged,
 	onUpdate: onUpdateInitial,
 	syncWithBlockProps,
 }: WatchListProps = {}) {
-	const { blocks, pageId } = usePageContext();
+	const { blocks, pageId, globals } = usePageContext();
 	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() => ({}));
 	const [onUpdate, setOnUpdate] = useState<(() => void) | undefined>(onUpdateInitial);
 	useOnMountedEffect(() => {
 		if (initialList)
-			setWatchListObj(initialList.reduce((acc, v) => ({ ...acc, [watchListKeyGetter(v[0], v[1])]: v }), {}));
+			setWatchListObj(initialList.reduce((acc, v) => ({ ...acc, [watchListKeyGetter([v[0], v[1]])]: v }), {}));
 	});
 
 	const watchList = useMemo(() => Object.values(watchListObj), [watchListObj]);
@@ -45,12 +55,13 @@ export function useWatchList({
 	}, [id, syncWithBlockProps, updateBlockProps, watchList]);
 
 	const addToWatchList = useCallback(
-		(blockId: string, property: string) => {
-			const key = watchListKeyGetter(blockId, property);
+		(_keys: string[]) => {
+			const keys = populateKeys(_keys);
+			const key = watchListKeyGetter(keys);
 			if (!(key in watchListObj))
 				setWatchListObj((wl) => {
 					if (!(key in wl)) {
-						const newObj = { ...wl, [key]: [blockId, property] as [string, string] };
+						const newObj = { ...wl, [key]: keys };
 						onListChanged?.(Object.values(newObj));
 						return newObj;
 					}
@@ -60,32 +71,36 @@ export function useWatchList({
 		[onListChanged, watchListObj],
 	);
 
-	const previousBlocks = usePrevious(blocks);
-	const previousPageId = usePrevious(pageId);
+	const topLevel = useMemo(() => ({ blocks, globals, pageId }), [blocks, globals, pageId]);
+	const previousTopLevel = usePrevious(topLevel);
 
 	const [isLoading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (previousPageId !== pageId || !previousBlocks || previousBlocks === blocks) return;
+		if (
+			!previousTopLevel ||
+			!previousTopLevel.blocks ||
+			previousTopLevel.pageId !== pageId ||
+			(previousTopLevel.blocks === blocks && previousTopLevel.globals === globals)
+		)
+			return;
 		let isUpdated = false;
 		let newIsLoading = false;
 
-		watchList.forEach(([blockId, property]) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const newValue = blocks?.[blockId]?.[property];
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const oldValue = previousBlocks?.[blockId]?.[property];
+		watchList.forEach((_keys) => {
+			const keys = populateKeys(_keys);
+
+			const newValue = evalGet(topLevel, keys);
+			const oldValue = evalGet(previousTopLevel, keys);
 
 			isUpdated = isUpdated || newValue !== oldValue;
 
-			newIsLoading = (blocks[blockId] as any)?.loading || newIsLoading;
+			newIsLoading = newIsLoading || (keys[0] === 'blocks' && (blocks[keys[1]] as any)?.loading);
 		}, false);
 
 		setLoading(newIsLoading);
 		if (isUpdated) onUpdate?.();
-	}, [blocks, onUpdate, pageId, previousBlocks, previousPageId, watchList]);
+	}, [blocks, globals, onUpdate, pageId, previousTopLevel, topLevel, watchList]);
 
 	return { watchList, addToWatchList, isLoading, setOnUpdate };
 }

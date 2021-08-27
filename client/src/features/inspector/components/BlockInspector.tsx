@@ -1,6 +1,6 @@
-import React from 'react';
-import Popover from '@material-ui/core/Popover';
-import List from '@material-ui/core/List';
+import { Classes, Menu, Popover, PopoverTargetProps } from '@blueprintjs/core';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import { InspectorItem, MenuItemProps } from './InspectorItem';
 import { NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
 import { ViewMenuItemProps } from './InspectorItems/ViewItem';
@@ -20,27 +20,52 @@ export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInsp
 		return nextItem?.next;
 	}, menu);
 
-	if (!isOpen || !state) return null;
+	const el = useMemo(() => document.createElement('div'), []);
 
+	useEffect(() => {
+		document.body.append(el);
+		return () => el.remove();
+	});
+	const renderTarget = useCallback(
+		(props: PopoverTargetProps) =>
+			isOpen ? (
+				<>
+					{ReactDOM.createPortal(
+						<div
+							{...props}
+							className={Classes.CONTEXT_MENU_POPOVER_TARGET}
+							style={{ position: 'fixed', top: isOpen[1], left: isOpen[0] }}
+						/>,
+						el,
+					)}
+				</>
+			) : (
+				<></>
+			),
+		[el, isOpen],
+	);
+
+	if (!isOpen || !state) return null;
 	return (
-		<>
-			<Popover
-				anchorReference="anchorPosition"
-				anchorPosition={isOpen ? { top: isOpen[1], left: isOpen[0] } : undefined}
-				open={!!isOpen}
-				onClose={() => close()}
-				sx={{ '& .MuiPaper-root': { width: 290 } }}
-			>
-				{Array.isArray(state) ? (
-					<List>
+		<Popover
+			positioningStrategy="fixed"
+			content={
+				Array.isArray(state) ? (
+					<Menu>
 						{state.map((item) => (
 							<InspectorItem key={item.label} close={close} item={item} setPath={setPath} />
 						))}
-					</List>
+					</Menu>
 				) : (
-					state({})
-				)}
-			</Popover>
-		</>
+					state({}) || <></>
+				)
+			}
+			minimal
+			key={`${isOpen[0]}x${isOpen[1]}`}
+			renderTarget={renderTarget}
+			isOpen={!!isOpen}
+			placement="right-start"
+			onClose={() => close()}
+		/>
 	);
 }

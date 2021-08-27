@@ -1,13 +1,13 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
-import { useRefLatest } from '../../../hooks/useRefLatest';
+import { useRefLatest, useRefsLatest } from '../../../hooks/useRefLatest';
 import { useAppSelector } from '../../../redux/hooks';
 import { useBlock } from '../../editor/hooks/useBlock';
 import { useBlocks } from '../../editor/hooks/useBlocks';
 import { useEventListener } from '../../editor/hooks/useEvents';
 import { usePageContext } from './useReferences';
 import { SateGetEvent } from '../../editor/hooks/useStateToWS';
-import { useWatchList, WatchList, watchListKeyGetter, WatchListProps } from './useWatchList';
+import { evalGet, useWatchList, WatchList, watchListKeyGetter, WatchListProps } from './useWatchList';
 import { selectBlocksState } from '../../editor/redux/editor';
 import { useWS } from '../../ws/hooks/useWS';
 
@@ -15,7 +15,7 @@ export type FunctionExecutorAction = {
 	id: string;
 	result: unknown;
 	data: string;
-	eventName: 'function.end' | 'function.output' | 'function.start';
+	action: 'function.end' | 'function.output' | 'function.start';
 };
 
 export type FunctionExecutor = {
@@ -29,32 +29,31 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 	const { sendWS } = useWS();
 
 	const [UUID, setUUID] = useState(v4());
-	const [lastEvent, setLastEvent] = useState<FunctionExecutorAction['eventName']>();
+	const [lastEvent, setLastEvent] = useState<FunctionExecutorAction['action']>();
 
 	const { addToWatchList, watchList, setOnUpdate } = useWatchList({
 		initialList: watchListProp,
 		syncWithBlockProps: true,
 	});
 
-	const { blocks } = usePageContext();
+	const { blocks, globals } = usePageContext();
 
 	useEventListener<FunctionExecutorAction>(
 		`ws/${UUID}`,
 		(event) => {
 			listener(event);
-			setLastEvent(event.eventName);
+			setLastEvent(event.action);
 		},
 		[listener],
 	);
 
-	const blocksRef = useRefLatest(blocks);
+	const { blocksRef, globalsRef } = useRefsLatest({ blocks, globals });
 
 	const runCode = useCallback(
 		(code: string) => {
-			const preloadState = watchList?.reduce<{ [key: string]: unknown }>((state, item) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				state[watchListKeyGetter(item[0], item[1])] = blocksRef.current?.[item[0]]?.[item[1]];
+			const preloadState = watchList?.reduce<{ [key: string]: unknown }>((state, keys) => {
+				const topLevel = { globals: globalsRef.current, blocks: blocksRef.current };
+				state[watchListKeyGetter(keys)] = evalGet(topLevel, keys);
 				return state;
 			}, {});
 
@@ -70,7 +69,7 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 			});
 			return newUUID;
 		},
-		[blocksRef, sendWS, watchList],
+		[blocksRef, globalsRef, sendWS, watchList],
 	);
 
 	const trigger = useCallback(async () => {
@@ -81,8 +80,8 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
 		(event) => {
-			const { blockId, reqId, property } = event;
-			if (UUID === reqId) addToWatchList(blockId, property);
+			const { keys, reqId } = event;
+			if (UUID === reqId) addToWatchList(keys);
 		},
 		[UUID],
 	);

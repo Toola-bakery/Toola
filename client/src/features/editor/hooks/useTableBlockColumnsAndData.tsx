@@ -50,13 +50,14 @@ export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType) 
 			type: col.type,
 			id: col.id,
 		}));
+		const addCellWidth = 35;
 		cols.push({
 			id: 'add',
 			Header: '+',
 			accessor: () => '',
-			maxWidth: 20,
-			minWidth: 20,
-			width: 20,
+			maxWidth: addCellWidth,
+			minWidth: addCellWidth,
+			width: addCellWidth,
 			// type: ColumnTypes.text,
 		});
 		return cols;

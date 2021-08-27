@@ -58,6 +58,7 @@ export function useBlockInspectorState(
 		{
 			type: 'nested',
 			label: 'Display',
+			icon: 'eye-open',
 			next: [
 				{
 					label: 'Hide',
@@ -74,6 +75,7 @@ export function useBlockInspectorState(
 		{
 			type: 'nested',
 			label: 'Turn into',
+			icon: 'rotate-document',
 			next: TurnIntoBlocks.map((blockType) => ({
 				label: blockType[0],
 				type: 'item',
@@ -82,6 +84,7 @@ export function useBlockInspectorState(
 		},
 		{
 			type: 'item',
+			icon: 'trash',
 			label: 'Delete',
 			closeAfterCall: true,
 			call: () => deleteBlock(id),

@@ -1,4 +1,4 @@
-import { ListItem } from '@material-ui/core';
+import { MenuItem } from '@blueprintjs/core';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import { BlockInspectorProps } from '../BlockInspector';
@@ -12,18 +12,20 @@ export type NestedMenuItemProps = BasicItemProps & {
 export function NestedMenuItem({
 	item,
 	setPath,
+	Wrapper = MenuItem,
 }: {
 	item: NestedMenuItemProps;
 	setPath: BlockInspectorProps['setPath'];
+	Wrapper?: typeof React.Component | React.FC<any>;
 }) {
 	return (
-		<ListItem
-			button
+		<Wrapper
+			shouldDismissPopover={false}
+			icon={item.icon}
 			onClick={() => {
 				setPath((path) => [...path, item.label]);
 			}}
-		>
-			<Typography variant="inherit">{item.label}</Typography>
-		</ListItem>
+			text={item.label}
+		/>
 	);
 }

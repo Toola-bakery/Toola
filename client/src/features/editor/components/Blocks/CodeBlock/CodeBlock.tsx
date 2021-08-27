@@ -1,6 +1,6 @@
+import { Button } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
 import React, { useRef, MutableRefObject, useCallback, useState, useEffect, useMemo } from 'react';
-import Button from '@material-ui/core/Button';
 import Editor, { OnChange, Monaco as MonacoType } from '@monaco-editor/react';
 
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
@@ -8,13 +8,12 @@ import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
-import { SateGetEvent } from '../../../hooks/useStateToWS';
-import { useWatchList, WatchList } from '../../../../executor/hooks/useWatchList';
+import { WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
 import { FunctionExecutorAction, useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { liblib } from './test';
+import { setupMonaco } from './setupMonaco';
 
 export type CodeBlockType = CodeBlockProps & CodeBlockState & CodeBlockMethods;
 export type CodeBlockProps = {
@@ -37,7 +36,7 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, value, logs = [], result, manualControl, watchList: watchListProp } = block;
+	const { id, value, logs = [], result, manualControl, watchList: watchListProp, loading } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
@@ -61,7 +60,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const listener = useCallback<(data: FunctionExecutorAction) => void>(
 		(data) => {
-			if (data.result) updateBlockState({ id, result: data.result, loading: false });
+			if (data.action === 'function.end') updateBlockState({ id, result: data.result, loading: false });
 			else updateBlockState({ id, logs: [...logs, data.data] });
 		},
 		[id, logs, updateBlockState],
@@ -121,33 +120,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 					defaultValue={value}
 					onChange={onEditorChange}
 					beforeMount={(monaco) => {
-						monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-							...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
-							allowSyntheticDefaultImports: false,
-							target: monaco.languages.typescript.ScriptTarget.ES5,
-							module: monaco.languages.typescript.ModuleKind.CommonJS,
-							moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-							skipDefaultLibCheck: true,
-							allowJs: true,
-							typeRoots: ['./types'],
-							allowNonTsExtensions: true,
-						});
-						monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({ noSuggestionDiagnostics: true });
-						const libSource = `declare module 'axios' { ${liblib} }`;
-						const libUri = 'ts:axios/index.d.ts';
-						monaco.languages.typescript.javascriptDefaults.addExtraLib(libSource, libUri);
-						monaco.languages.typescript.javascriptDefaults.addExtraLib(
-							[
-								'declare var require: {',
-								'toUrl(path: string): string;',
-								'(moduleName: string): any;',
-								'(dependencies: string[], callback: (...args: any[]) => any, errorback?: (err: any) => void): any;',
-								'config(data: any): any;',
-								'onError: Function;',
-								'};',
-							].join('\n'),
-							'ts:require.d.ts',
-						);
+						setupMonaco(monaco);
 						monaco.languages.typescript.javascriptDefaults.addExtraLib(
 							[
 								'declare module "page-state" {',
@@ -160,16 +133,13 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 					}}
 					language="javascript"
 				/>
-				<Button sx={{ marginRight: 1 }} variant="contained" color="primary" onClick={() => setShowLogs((v) => !v)}>
-					{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}
-				</Button>
-				<Button variant="contained" color="primary" onClick={() => trigger()}>
-					Run CODE
-				</Button>
+				<Button onClick={() => setShowLogs((v) => !v)} text={showLogs ? 'HIDE LOGS' : 'SHOW LOGS'} />
+				<Button loading={loading} onClick={() => trigger()} text="Run CODE" />
+
 				{showLogs ? (
 					<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
 						{logs.join('')}
-						{JSON.stringify(result)}
+						{JSON.stringify(result, null, '\t')}
 					</pre>
 				) : null}
 			</div>
