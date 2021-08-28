@@ -13,9 +13,11 @@ export type SelectMenuItemProps = BasicItemProps & {
 export function SelectMenuItem({
 	item,
 	Wrapper = MenuItem,
+	inline,
 }: {
 	item: SelectMenuItemProps;
 	Wrapper?: typeof React.Component | React.FC<any>;
+	inline?: boolean;
 }) {
 	return (
 		<Wrapper
@@ -23,6 +25,7 @@ export function SelectMenuItem({
 			icon={item.icon}
 			text={
 				<SimpleSelect
+					inline={inline}
 					options={item.options.map((option) =>
 						typeof option === 'string'
 							? option

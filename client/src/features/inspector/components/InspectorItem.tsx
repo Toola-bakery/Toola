@@ -26,17 +26,19 @@ export function InspectorItem({
 	close,
 	setPath,
 	Wrapper,
+	inline,
 }: {
 	item: MenuItemProps;
 	close?: () => void;
 	setPath?: BlockInspectorProps['setPath'];
 	Wrapper?: typeof React.Component | React.FC<any>;
+	inline?: boolean;
 }) {
 	if (item.type === 'item') return <SimpleMenuItem Wrapper={Wrapper} item={item} close={close} />;
-	if (item.type === 'switch') return <SwitchMenuItem Wrapper={Wrapper} item={item} />;
+	if (item.type === 'switch') return <SwitchMenuItem inline={inline} Wrapper={Wrapper} item={item} />;
 	if (item.type === 'nested' && setPath) return <NestedMenuItem Wrapper={Wrapper} setPath={setPath} item={item} />;
 	if (item.type === 'view') return <ViewMenuItem item={item} />;
-	if (item.type === 'input') return <InputMenuItem Wrapper={Wrapper} item={item} />;
-	if (item.type === 'select') return <SelectMenuItem Wrapper={Wrapper} item={item} />;
+	if (item.type === 'input') return <InputMenuItem inline={inline} Wrapper={Wrapper} item={item} />;
+	if (item.type === 'select') return <SelectMenuItem inline={inline} Wrapper={Wrapper} item={item} />;
 	return <></>;
 }

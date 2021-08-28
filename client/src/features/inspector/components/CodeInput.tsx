@@ -1,3 +1,4 @@
+import { TextArea } from '@blueprintjs/core';
 import { useMemo, useRef, useState } from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -53,11 +54,15 @@ export function CodeInput({
 	value = '',
 	type = 'string',
 	label,
+	inline,
+	multiline,
 }: {
 	label: string;
 	value: string;
 	type?: 'object' | 'string';
 	onChange: (v: string) => void;
+	inline?: boolean;
+	multiline?: boolean;
 }) {
 	const ref = useRef<HTMLDivElement>(null);
 	const context = usePageContext();
@@ -83,9 +88,12 @@ export function CodeInput({
 	return (
 		<div ref={ref}>
 			<TextInput
+				inline={inline}
 				label={label}
 				inputRef={inputRef}
 				value={value}
+				multiline={multiline}
+				fill
 				autoComplete="off"
 				onBlur={() => setFocused(false)}
 				onFocus={() => setFocused(true)}

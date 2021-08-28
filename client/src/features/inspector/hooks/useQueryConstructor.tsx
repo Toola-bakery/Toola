@@ -23,6 +23,7 @@ export function useQueryConstructor(properties: QueryProperties, initialValue: a
 				type: 'input',
 				label,
 				value: value[id],
+				multiline: type === 'object',
 				codeType: type === 'object' ? 'object' : 'string',
 				onChange(v) {
 					valueResult((draft) => {

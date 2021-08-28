@@ -12,7 +12,7 @@ export function QueryInspector({ menu }: QueryInspectorProps) {
 	return (
 		<>
 			{Array.isArray(menu)
-				? menu.map((item) => <InspectorItem Wrapper={Wrapper} key={item.label} item={item} />)
+				? menu.map((item) => <InspectorItem inline Wrapper={Wrapper} key={item.label} item={item} />)
 				: null}
 		</>
 	);

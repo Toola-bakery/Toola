@@ -40,7 +40,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	const { updateBlockProps, updateBlockState } = useEditor();
 	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
-	const { blocks } = usePageContext();
+	const { blocks, globals } = usePageContext();
 
 	const blocksType = useMemo(
 		() =>
@@ -48,6 +48,14 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 				.map((v) => `'${v}'`)
 				.join(' | '),
 		[blocks],
+	);
+
+	const globalsType = useMemo(
+		() =>
+			Object.keys(globals)
+				.map((v) => `'${v}'`)
+				.join(' | '),
+		[globals],
 	);
 
 	const [showLogs, setShowLogs] = useState(false);
@@ -125,7 +133,10 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 							[
 								'declare module "page-state" {',
 								`export function callMethod(blockId: ${blocksType}, method: any, callArgs?: any[]): Promise<any>;`,
-								`export function getProperty(blockId: ${blocksType}, property: any): Promise<any>;`,
+								`export function getProperty(topLevel: "globals", key1: ${globalsType}, key2: string): Promise<any>;`,
+								`export function getProperty(blockId: ${blocksType}, property: string): Promise<any>;`,
+								`export function getGlobals(key1: ${globalsType}, key2: string): Promise<any>;`,
+								`export function getProperty(topLevel: "blocks", blockId: ${blocksType}, property: string): Promise<any>;`,
 								'};',
 							].join('\n'),
 							'ts:page-state',

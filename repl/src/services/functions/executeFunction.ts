@@ -34,7 +34,6 @@ export function executeFunction({
 
 		function catchData(data: Buffer) {
 			const stringData = data.toString('utf-8');
-			console.log({ stringData });
 			if (!madeFullResponse && (stringData.includes(id) || mentionedOnce)) {
 				if (!mentionedOnce) {
 					const batch = stringData.split(id);
@@ -42,7 +41,6 @@ export function executeFunction({
 					response += batch[1];
 					if (batch.length === 3) {
 						madeFullResponse = true;
-						console.log(JSON.parse(response)?.result);
 						resolve(JSON.parse(response)?.result);
 						if (batch[2]) output(Buffer.from(batch[2]));
 					}

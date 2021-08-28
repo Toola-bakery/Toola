@@ -12,12 +12,15 @@ export type SwitchMenuItemProps = BasicItemProps & {
 export function SwitchMenuItem({
 	item,
 	Wrapper = MenuItem,
+	inline,
 }: {
 	item: SwitchMenuItemProps;
 	Wrapper?: typeof React.Component | React.FC<any>;
+	inline?: boolean;
 }) {
 	return (
 		<Wrapper
+			inline={inline}
 			shouldDismissPopover={false}
 			icon={item.icon}
 			onClick={() => {
