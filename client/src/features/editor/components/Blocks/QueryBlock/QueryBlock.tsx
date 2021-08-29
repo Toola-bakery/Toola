@@ -1,9 +1,9 @@
-import { Button, Card } from '@blueprintjs/core';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Card, Pre } from '@blueprintjs/core';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import safeStringify from 'json-stringify-safe';
 import { useNextRenderHook } from '../../../../../hooks/useNextRenderHook';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
-import { useDatabaseAction } from '../../../../inspector/api/api';
+import { Database, useDatabaseAction } from '../../../../inspector/api/api';
 import { useQueryConstructor } from '../../../../inspector/hooks/useQueryConstructor';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
@@ -42,15 +42,18 @@ export function QueryBlock({ block }: QueryBlockComponentProps) {
 
 	const [databaseId, setDatabaseId] = useState<string>();
 
-	const { component, value: databaseValues } = useQueryConstructor(
+	const { component, value: databaseValues } = useQueryConstructor<{ database?: Database; action?: string }>(
 		[
-			{ type: 'database', label: 'Database', id: 'id' },
+			{ type: 'database', label: 'Database', id: 'database' },
 			{ type: 'queryAction', label: 'Action type', id: 'action', databaseId },
 		],
 		values.databaseValues,
 	);
 
-	const { data: databaseAction } = useDatabaseAction(databaseValues.id, databaseValues.action);
+	const databaseAction = useMemo(
+		() => databaseValues.database?.actions?.find((action) => action.name === databaseValues.action),
+		[databaseValues.database, databaseValues.action],
+	);
 
 	const {
 		component: component2,
@@ -60,7 +63,7 @@ export function QueryBlock({ block }: QueryBlockComponentProps) {
 	} = useQueryConstructor(databaseAction?.fields || [], values.actionValues);
 
 	useEffect(() => {
-		if (databaseId !== databaseValues.id) setDatabaseId(databaseValues.id);
+		if (databaseId !== databaseValues.database?._id) setDatabaseId(databaseValues.database?._id);
 	}, [databaseValues, updateBlockProps, databaseId]);
 
 	useEffect(() => {
@@ -71,20 +74,20 @@ export function QueryBlock({ block }: QueryBlockComponentProps) {
 		page: { editing },
 	} = usePageContext();
 
-	const code = `const axios = require('axios');
-const { getProperty } = require('page-state');
+	const code = `const SDK = require('page-state');
 
 async function main () {
-  const resp = await axios.post('http://localhost:8080/mongo/find', ${JSON.stringify(
-		{ ...qResult, ...databaseValues },
-		null,
-		'\t',
-	)}).catch(e=>console.log(e.response.data));
-  return resp.data;
+  const resp = await SDK
+  	.${databaseValues.database?.type}("${databaseValues.database?._id}")
+  	.${databaseValues.action}(${JSON.stringify(qResult, null, '\t')});
+  return resp;
 }`;
+
+	const disabled = !databaseValues.database?._id || !databaseValues?.action;
 
 	const { trigger, result, loading, logs } = useFunctionExecutor({
 		value: code,
+		disabled,
 	});
 
 	useBlockSetState<CodeBlockState>('result', result);
@@ -121,17 +124,17 @@ async function main () {
 				{component}
 				{component2}
 				<Button onClick={() => setShowLogs((v) => !v)}>{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}</Button>
-				<Button loading={loading} onClick={() => trigger()}>
+				<Button disabled={disabled} loading={loading} onClick={() => trigger()}>
 					Run CODE
 				</Button>
 				{showLogs ? (
-					<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
+					<Pre style={{ wordBreak: 'break-word', overflow: 'scroll', maxHeight: 500 }}>
 						{code}
 						{'\n'}
 						{logs.join('')}
 						{'\n'}
 						{safeStringify(result)}
-					</pre>
+					</Pre>
 				) : null}
 			</div>
 		</Card>

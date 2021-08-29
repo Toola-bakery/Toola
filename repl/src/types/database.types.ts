@@ -1,7 +1,7 @@
 export type DatabaseSchema = MongoDatabaseSchema;
 export type MongoDatabaseSchema = {
 	_id: string;
-	type: 'mongodb';
+	type: 'mongo';
 	name: string;
 	host: string;
 	port?: string;
@@ -12,4 +12,7 @@ export type MongoDatabaseSchema = {
 	ssl: boolean;
 	CA?: string;
 	clientKeyAndCert?: string;
+	cache?: {
+		collections?: string[];
+	};
 };

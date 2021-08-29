@@ -5,6 +5,13 @@ import { mongoDB } from '../../utils/mongo';
 
 const databaseCollection = mongoDB.collection<DatabaseSchema>('databases');
 
+function convertActionsToArray(actions: any) {
+	return Object.keys(actions).map(name => ({
+		name,
+		fields: Object.keys(actions[name]).map(id => ({ id, ...actions[name][id] })),
+	}));
+}
+
 export const DatabasesService: ServiceSchema<
 	'databases',
 	{
@@ -68,7 +75,14 @@ export const DatabasesService: ServiceSchema<
 		},
 		getAll: {
 			async handler(ctx) {
-				return databaseCollection.find().toArray();
+				const databases = await databaseCollection.find().toArray();
+				const result = await ctx.mcall(
+					databases.map(db => ({
+						action: `${db.type}Manager.queryBuilder`,
+						params: { id: db._id, database: db },
+					})),
+				);
+				return databases.map((db, index) => ({ ...db, actions: convertActionsToArray(result[index]) }));
 			},
 		},
 	},

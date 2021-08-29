@@ -6,15 +6,18 @@ import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type DatabaseMenuItemProps = BasicItemProps & {
 	type: 'database';
-	value: string;
-	onChange: (v: string) => void;
+	value?: Database;
+	onChange: (v: Database) => void;
 };
 
 const DatabaseSelect = Select.ofType<Database>();
 
 export function DatabaseMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<DatabaseMenuItemProps>) {
 	const { data } = useDatabases();
-	const selectedDatabase = useMemo(() => data?.find((database) => database._id === item.value), [item.value, data]);
+	const selectedDatabase = useMemo(
+		() => data?.find((database) => database._id === item.value?._id),
+		[item.value, data],
+	);
 
 	return (
 		<Wrapper
@@ -27,7 +30,7 @@ export function DatabaseMenuItem({ item, Wrapper = MenuItem, inline }: Inspector
 						itemPredicate={(query, database) => database.name.toLowerCase().includes(query.toLowerCase())}
 						noResults={<MenuItem disabled text="No results." />}
 						itemRenderer={(database, { handleClick }) => <MenuItem onClick={handleClick} text={database.name} />}
-						onItemSelect={(a) => item.onChange(a._id)}
+						onItemSelect={(a) => item.onChange(a)}
 					>
 						<Button fill text={selectedDatabase?.name || 'Выберите базу данных'} rightIcon="double-caret-vertical" />
 					</DatabaseSelect>

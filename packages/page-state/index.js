@@ -12,7 +12,7 @@ const genericModuleProxy = (module, databaseId) =>
       get: (target2, action) => {
         return (options) => {
           const response = axios
-            .post(`http://localhost:8080/${module}/${action}`, {
+            .post(`http://localhost:8080/${module}Proxy/${action}`, {
               ...options,
               id: databaseId,
             })

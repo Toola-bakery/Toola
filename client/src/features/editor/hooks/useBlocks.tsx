@@ -15,7 +15,10 @@ export function useBlocks(pageId: string, editing: boolean) {
 	const [blocksMethods, setMethods] = useState<{ [blockId: string]: BlockMethods }>({});
 
 	useEffect(() => {
-		setMethods({});
+		return () => {
+			setBlockState({});
+			setMethods({});
+		};
 	}, [pageId]);
 
 	const setBlockMethods = useCallback<(blockId: string, methods: BlockMethods) => void>((blockId, methods) => {

@@ -11,7 +11,7 @@ import { useEditor } from '../../../hooks/useEditor';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
-import { FunctionExecutorAction, useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
+import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { setupMonaco } from './setupMonaco';

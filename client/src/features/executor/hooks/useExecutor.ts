@@ -20,9 +20,10 @@ export type FunctionExecutor = {
 	watchListProp?: WatchList;
 	onTrigger?: () => void | Promise<void>;
 	value: string;
+	disabled?: boolean;
 };
 
-export function useFunctionExecutor({ watchListProp, listener, onTrigger, value }: FunctionExecutor) {
+export function useFunctionExecutor({ watchListProp, listener, onTrigger, value, disabled = false }: FunctionExecutor) {
 	const { sendWS } = useWS();
 
 	const [UUID, setUUID] = useState(v4());
@@ -56,6 +57,8 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 
 	const runCode = useCallback(
 		(code: string) => {
+			if (disabled) return;
+
 			setLoading(true);
 			setLogs([]);
 			const preloadState = watchList?.reduce<{ [key: string]: unknown }>((state, keys) => {
@@ -76,13 +79,14 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 			});
 			return newUUID;
 		},
-		[blocksRef, globalsRef, sendWS, watchList],
+		[blocksRef, disabled, globalsRef, sendWS, watchList],
 	);
 
 	const trigger = useCallback(async () => {
+		if (disabled) return;
 		await onTrigger?.();
 		runCode(value);
-	}, [onTrigger, runCode, value]);
+	}, [disabled, onTrigger, runCode, value]);
 
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,

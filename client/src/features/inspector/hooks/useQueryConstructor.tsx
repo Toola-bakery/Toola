@@ -12,7 +12,7 @@ export type QueryProperty = {
 	databaseId?: string;
 };
 
-export function useQueryConstructor(properties: QueryProperties, initialValue: any = {}) {
+export function useQueryConstructor<T = any>(properties: QueryProperties, initialValue: any = {}) {
 	const [values, valueResult] = useImmer<{ [key: string]: any }>(initialValue);
 
 	const { evaluate, setOnUpdate } = useReferenceEvaluator();
@@ -60,23 +60,20 @@ export function useQueryConstructor(properties: QueryProperties, initialValue: a
 
 	const result = useMemo(
 		() =>
-			properties.reduce<{ [key: string]: any }>((state, item) => {
-				const { id, type } = item;
-				if (typeof values[id] === 'undefined') return state;
+			Object.keys(values).reduce<{ [key: string]: any }>((state, valueKey) => {
+				const value = values[valueKey];
+				if (typeof values[valueKey] === 'undefined') return state;
 
-				if (type === 'object') {
-					state[id] = evaluate(`\${ ${values[id]} }`);
-				} else {
-					state[id] = evaluate(values[id]);
-				}
-				if (type === 'number') {
-					state[id] = parseInt(state[id], 10);
-				}
+				state[valueKey] = typeof value === 'string' ? evaluate(value) : value;
+
+				// if (type === 'number') {
+				// 	state[id] = parseInt(state[id], 10);
+				// }
 
 				return state;
 			}, {}),
-		[evaluate, properties, values],
+		[evaluate, values],
 	);
 
-	return { value: values, result, menu, setOnUpdate, component: <QueryInspector menu={menu} /> };
+	return { value: values as T, result, menu, setOnUpdate, component: <QueryInspector menu={menu} /> };
 }

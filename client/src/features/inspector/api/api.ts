@@ -18,8 +18,7 @@ export function useDatabases() {
 	const { data, ...rest } = useQuery<Database[]>('/databases/getAll');
 
 	const newData: Database[] =
-		data?.map((db) => ({
-			...db,
+		data?.map((db: Omit<Database, 'actions'> & { actions?: Database['actions'] }) => ({
 			actions: [
 				{
 					name: 'find',
@@ -33,6 +32,7 @@ export function useDatabases() {
 					],
 				},
 			],
+			...db,
 		})) || [];
 
 	return {
