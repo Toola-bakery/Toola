@@ -43,6 +43,8 @@ export const PageContext = React.createContext<PageContextType>({
 	blocksMethods: {},
 	globals: { pageId: '' },
 	pageId: '',
+	setBlockState: () => {},
+	blocksState: {},
 	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
 });
 
@@ -63,7 +65,10 @@ export function Page(): JSX.Element {
 	useBlockStateDefault<PageBlockState>({ editing }, 'page', pageId);
 	const [fetching, setFetching] = useState(true);
 
-	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods } = useBlocks(pageId, editing);
+	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState } = useBlocks(
+		pageId,
+		editing,
+	);
 
 	const hiddenBlocks = useMemo(() => {
 		const blockKeys = Object.keys(blocks);
@@ -103,10 +108,13 @@ export function Page(): JSX.Element {
 			page,
 			deleteBlockMethods,
 			setBlockMethods,
+			blocksState,
+			setBlockState,
 			blocksMethods,
 		}),
-		[blocks, blocksMethods, pageId, pageParams, page, deleteBlockMethods, setBlockMethods],
+		[blocks, pageId, pageParams, page, deleteBlockMethods, setBlockMethods, blocksState, setBlockState, blocksMethods],
 	);
+
 	const { width } = useWindowSize({ width: 1000 });
 
 	return (

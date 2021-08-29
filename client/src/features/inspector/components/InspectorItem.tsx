@@ -1,8 +1,10 @@
 import { IconName } from '@blueprintjs/core';
 import React from 'react';
 import { BlockInspectorProps } from './BlockInspector';
+import { DatabaseMenuItem, DatabaseMenuItemProps } from './InspectorItems/DatabaseMenuItem';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
+import { QueryActionMenuItem, QueryActionMenuItemProps } from './InspectorItems/QueryActionMenuItem';
 import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
 import { SimpleMenuItem, SimpleMenuItemProps } from './InspectorItems/SimpleMenuItem';
 import { SwitchMenuItem, SwitchMenuItemProps } from './InspectorItems/SwitchMenuItem';
@@ -19,26 +21,28 @@ export type MenuItemProps =
 	| ViewMenuItemProps
 	| InputMenuItemProps
 	| SelectMenuItemProps
+	| DatabaseMenuItemProps
+	| QueryActionMenuItemProps
 	| SwitchMenuItemProps;
 
-export function InspectorItem({
-	item,
-	close,
-	setPath,
-	Wrapper,
-	inline,
-}: {
-	item: MenuItemProps;
+export type InspectorItemProps<Item = MenuItemProps> = {
+	item: Item;
 	close?: () => void;
 	setPath?: BlockInspectorProps['setPath'];
 	Wrapper?: typeof React.Component | React.FC<any>;
 	inline?: boolean;
-}) {
-	if (item.type === 'item') return <SimpleMenuItem Wrapper={Wrapper} item={item} close={close} />;
-	if (item.type === 'switch') return <SwitchMenuItem inline={inline} Wrapper={Wrapper} item={item} />;
-	if (item.type === 'nested' && setPath) return <NestedMenuItem Wrapper={Wrapper} setPath={setPath} item={item} />;
-	if (item.type === 'view') return <ViewMenuItem item={item} />;
-	if (item.type === 'input') return <InputMenuItem inline={inline} Wrapper={Wrapper} item={item} />;
-	if (item.type === 'select') return <SelectMenuItem inline={inline} Wrapper={Wrapper} item={item} />;
-	return <></>;
+};
+
+export function InspectorItem(props: InspectorItemProps) {
+	const { item } = props;
+	if (item.type === 'item') return <SimpleMenuItem {...(props as InspectorItemProps<SimpleMenuItemProps>)} />;
+	if (item.type === 'switch') return <SwitchMenuItem {...(props as InspectorItemProps<SwitchMenuItemProps>)} />;
+	if (item.type === 'nested') return <NestedMenuItem {...(props as InspectorItemProps<NestedMenuItemProps>)} />;
+	if (item.type === 'view') return <ViewMenuItem {...(props as InspectorItemProps<ViewMenuItemProps>)} />;
+	if (item.type === 'input') return <InputMenuItem {...(props as InspectorItemProps<InputMenuItemProps>)} />;
+	if (item.type === 'database') return <DatabaseMenuItem {...(props as InspectorItemProps<DatabaseMenuItemProps>)} />;
+	if (item.type === 'select') return <SelectMenuItem {...(props as InspectorItemProps<SelectMenuItemProps>)} />;
+	if (item.type === 'queryAction')
+		return <QueryActionMenuItem {...(props as InspectorItemProps<QueryActionMenuItemProps>)} />;
+	return null;
 }

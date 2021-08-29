@@ -1,6 +1,6 @@
 import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
-import { BasicItemProps } from '../InspectorItem';
+import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type SimpleMenuItemProps = BasicItemProps & {
 	type: undefined | 'item';
@@ -8,15 +8,7 @@ export type SimpleMenuItemProps = BasicItemProps & {
 	closeAfterCall?: boolean;
 };
 
-export function SimpleMenuItem({
-	item,
-	close,
-	Wrapper = MenuItem,
-}: {
-	item: SimpleMenuItemProps;
-	close?: () => void;
-	Wrapper?: typeof React.Component | React.FC<any>;
-}) {
+export function SimpleMenuItem({ item, close, Wrapper = MenuItem }: InspectorItemProps<SimpleMenuItemProps>) {
 	return (
 		<Wrapper
 			shouldDismissPopover={false}

@@ -105,7 +105,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 							onContextMenu={(e) => onContextMenu(e, ['global'])}
 							className="table"
 						>
-							<thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
+							<thead style={{ position: 'sticky', top: 0, zIndex: 3 }}>
 								{headerGroups.map((headerGroup) => (
 									<tr {...headerGroup.getHeaderGroupProps()} className="tr">
 										{headerGroup.headers.map((column) => {

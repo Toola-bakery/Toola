@@ -8,7 +8,7 @@ import { BlockProps, BlockPropsAndState, Blocks, BlockStates, LayoutBlocks } fro
 
 type PageState = {
 	blocksProperties: { [id: string]: BlockProps & BasicBlock };
-	blocksState: { [id: string]: BlockStates };
+	// blocksState: { [id: string]: BlockStates };
 };
 
 interface EditorState {
@@ -34,7 +34,11 @@ function getBlockHelper(state: EditorState, pageId: string, blockId: string): Ba
 }
 
 function getPageHelper(state: EditorState, pageId: string): PageState {
-	if (!state.pages[pageId]) state.pages[pageId] = { blocksState: {}, blocksProperties: {} };
+	if (!state.pages[pageId])
+		state.pages[pageId] = {
+			// blocksState: {},
+			blocksProperties: {},
+		};
 	return state.pages[pageId];
 }
 
@@ -44,7 +48,7 @@ function deleteBlockHelper(state: EditorState, pageId: string, blockId: string) 
 	deleteChildFromParentHelper(state, pageId, blockId);
 
 	delete state.pages[pageId].blocksProperties[blockId];
-	delete state.pages[pageId].blocksState[blockId];
+	// delete state.pages[pageId].blocksState[blockId];
 }
 
 function deleteChildFromParentHelper(state: EditorState, pageId: string, blockId: string) {
@@ -134,15 +138,15 @@ export const editorSlice = createSlice({
 			});
 		},
 
-		updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
-			const { blocksState } = getPageHelper(state, action.payload.pageId);
-
-			blocksState[action.payload.id] = update(blocksState[action.payload.id] || {}, {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				$merge: action.payload,
-			});
-		},
+		// updateBlockState: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
+		// 	const { blocksState } = getPageHelper(state, action.payload.pageId);
+		//
+		// 	blocksState[action.payload.id] = update(blocksState[action.payload.id] || {}, {
+		// 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// 		// @ts-ignore
+		// 		$merge: action.payload,
+		// 	});
+		// },
 
 		deleteBlock: (state, action: PayloadAction<Partial<Blocks> & Pick<BasicBlock, 'id' | 'pageId'>>) => {
 			const { id: blockId, pageId } = action.payload;
@@ -165,7 +169,7 @@ export const {
 	deleteChildFromParent,
 	updateBlockProps,
 	setPage,
-	updateBlockState,
+	// updateBlockState,
 	addChildInsteadOf,
 	addBlocks,
 	deleteBlock,
@@ -176,29 +180,29 @@ export const {
 
 export const selectBlocksProps = (state: RootState, pageId: string) =>
 	state.editor.pages?.[pageId]?.blocksProperties || {};
-export const selectBlocksState = (state: RootState, pageId: string) => state.editor.pages?.[pageId]?.blocksState || {};
+// export const selectBlocksState = (state: RootState, pageId: string) => state.editor.pages?.[pageId]?.blocksState || {};
 
 export const selectBlockProps = (state: RootState, pageId: string, blockId: string) =>
 	selectBlocksProps(state, pageId)[blockId];
-export const selectBlockState = (state: RootState, pageId: string, blockId: string) =>
-	selectBlocksState(state, pageId)[blockId];
+// export const selectBlockState = (state: RootState, pageId: string, blockId: string) =>
+// 	selectBlocksState(state, pageId)[blockId];
 
 export const selectBlockParentProps = (state: RootState, pageId: string, blockId: string) => {
 	const parent = selectBlockProps(state, pageId, blockId)?.parentId;
 	if (parent) return selectBlockProps(state, pageId, parent) as LayoutBlocks;
 };
 
-export const selectBlockStateWithProps = createCachedSelector(
-	(state) => state,
-	selectBlockProps,
-	selectBlockState,
-	(state, blockProps, blockState) => {
-		return {
-			...blockProps,
-			...blockState,
-		};
-	},
-)((_, blockId) => blockId);
+// export const selectBlockStateWithProps = createCachedSelector(
+// 	(state) => state,
+// 	selectBlockProps,
+// 	selectBlockState,
+// 	(state, blockProps, blockState) => {
+// 		return {
+// 			...blockProps,
+// 			...blockState,
+// 		};
+// 	},
+// )((_, blockId) => blockId);
 
 export const selectBlockNeighborsProps = createCachedSelector(
 	(state) => state,

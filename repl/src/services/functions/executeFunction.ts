@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import { parse, stringify } from 'flatted';
 
 type ExecuteFunctionOptions = {
 	code: string;
@@ -18,11 +19,14 @@ export function executeFunction({
 	return new Promise((resolve, reject) => {
 		const id = Math.random().toString();
 		const callFunctionWithArgs = callArgs
-			? `(async ()=>${mainFunctionName}(${callArgs.map(v => JSON.stringify(v)).join(', ')}))()
-			.then(result=>process.stdout.write("${id}"+JSON.stringify({result})+"${id}"))`
+			? `
+			const {stringify:_stringify} = require("flatted");
+			(async ()=>${mainFunctionName}(${callArgs.map(v => JSON.stringify(v)).join(', ')}))()
+			.then(result=>process.stdout.write("${id}"+_stringify(result)+"${id}"))`
 			: '';
 
-		const source = `"${code.replace(/(["$`])/g, '\\$1')}; ${callFunctionWithArgs}"`;
+		const source = `"${code.replace(/(["$`])/g, '\\$1')}; ${callFunctionWithArgs.replace(/(["$`])/g, '\\$1')}"`;
+
 		const node = spawn('node', ['-e', source], {
 			shell: true,
 			env,
@@ -41,7 +45,7 @@ export function executeFunction({
 					response += batch[1];
 					if (batch.length === 3) {
 						madeFullResponse = true;
-						resolve(JSON.parse(response)?.result);
+						resolve(response);
 						if (batch[2]) output(Buffer.from(batch[2]));
 					}
 					mentionedOnce = true;
@@ -53,7 +57,7 @@ export function executeFunction({
 						// eslint-disable-next-line prefer-destructuring
 						response = batch[0];
 						madeFullResponse = true;
-						resolve(JSON.parse(response).result);
+						resolve(response);
 					}
 
 					if (batch[1]) output(Buffer.from(batch[1]));

@@ -39,6 +39,7 @@ module.exports = {
 		'react/require-default-props': 'off',
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'import/prefer-default-export': 'off',
+		'no-underscore-dangle': 'off',
 		'import/no-cycle': 'off',
 		'@typescript-eslint/no-explicit-any': 'off',
 		'spaced-comment': 'off',

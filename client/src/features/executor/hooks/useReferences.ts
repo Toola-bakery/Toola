@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { PageContext } from '../../editor/components/Page';
 import { useBlock } from '../../editor/hooks/useBlock';
 import { useEditor } from '../../editor/hooks/useEditor';
@@ -24,14 +24,21 @@ export function useReferenceEvaluator({
 		...watchListProps,
 	});
 
-	const blockProxy = useMemo(
-		() =>
-			new Proxy(blocks, {
+	const watchId = useRef<number | null>(0);
+
+	const updateId = useCallback(() => {
+		watchId.current = (watchId.current || 0) + 1;
+	}, [watchId]);
+
+	const evaluate = useCallback(
+		(sourceCode: string, current?: unknown) => {
+			const myWatchId = watchId.current;
+			const blockProxy = new Proxy(blocks, {
 				get: (target1, key1: string) => {
 					if (typeof target1[key1] === 'object')
 						return new Proxy(target1[key1], {
 							get: (target2, key2: string) => {
-								if (key2 in target2) addToWatchList(['blocks', key1, key2]);
+								if (myWatchId === watchId.current && key2 in target2) addToWatchList(['blocks', key1, key2]);
 								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 								// @ts-ignore
 								return target2[key2];
@@ -39,19 +46,21 @@ export function useReferenceEvaluator({
 						});
 					return target1[key1];
 				},
-			}),
-		[addToWatchList, blocks],
-	);
+			});
 
-	const evaluate = useCallback(
-		(sourceCode: string, current?: unknown) => {
 			if (!sourceCode.includes('${') || !sourceCode.includes('}')) return sourceCode;
 			try {
 				if (sourceCode.startsWith('${') && sourceCode.endsWith('}') && sourceCode.indexOf('${', 1) === -1) {
 					// RETURN EXACT VALUE IF ONLY ONE REFERENCE
 					// eslint-disable-next-line @typescript-eslint/no-implied-eval
-					const evalFunction = Function(...['blocks', 'globals', 'current'], `return ${sourceCode.slice(2, -1)}`);
-					return evalFunction(watchReferences ? blockProxy : blocks, globals, current);
+					const evalFunction = Function(
+						...['blocks', 'globals', 'current', 'updateId'],
+						`
+						const evalResult = ${sourceCode.slice(2, -1)};
+						updateId();
+					return evalResult`,
+					);
+					return evalFunction(watchReferences ? blockProxy : blocks, globals, current, updateId);
 				}
 				// eslint-disable-next-line @typescript-eslint/no-implied-eval
 				const evalFunction = Function(...['blocks', 'globals', 'current'], `return \`${sourceCode}\``);
@@ -60,7 +69,7 @@ export function useReferenceEvaluator({
 				return e.message;
 			}
 		},
-		[blockProxy, blocks, globals, watchReferences],
+		[addToWatchList, blocks, globals, updateId, watchReferences],
 	);
 
 	return { evaluate, watchList, isLoading, setOnUpdate };

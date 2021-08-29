@@ -24,7 +24,7 @@ export const MongoService: ServiceSchema<
 		findOne: {
 			id: string;
 			collection: string;
-			filter: any;
+			filter?: any;
 			project?: any;
 			sort?: any;
 			skip?: number;
@@ -32,7 +32,7 @@ export const MongoService: ServiceSchema<
 		find: {
 			id: string;
 			collection: string;
-			filter: any;
+			filter?: any;
 			project?: any;
 			sort?: any;
 			limit?: number;
@@ -47,7 +47,7 @@ export const MongoService: ServiceSchema<
 			params: {
 				id: { type: 'uuid', version: 4 },
 				collection: 'string',
-				filter: { type: 'object', default: {} },
+				filter: { type: 'object', optional: true, default: {} },
 				project: { type: 'object', optional: true },
 				sort: { type: 'object', optional: true },
 				skip: { type: 'number', optional: true },
@@ -65,7 +65,7 @@ export const MongoService: ServiceSchema<
 			params: {
 				id: { type: 'uuid', version: 4 },
 				collection: 'string',
-				filter: { type: 'object', default: {} },
+				filter: { type: 'object', optional: true, default: {} },
 				project: { type: 'object', optional: true },
 				sort: { type: 'object', optional: true },
 				limit: { type: 'number', optional: true, default: 100 },

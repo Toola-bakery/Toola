@@ -107,7 +107,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 			<ContentEditable
 				disabled={!editing}
 				onContextMenu={onContextMenu}
-				className="Block"
+				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
 				onFocus={() => {
 					if (!isEditingRef.current) setEditing(true);
 				}}

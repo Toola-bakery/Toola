@@ -1,6 +1,6 @@
 import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
-import { BasicItemProps } from '../InspectorItem';
+import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 import { CodeInput } from '../CodeInput';
 
 export type InputMenuItemProps = BasicItemProps & {
@@ -11,15 +11,7 @@ export type InputMenuItemProps = BasicItemProps & {
 	multiline?: boolean;
 };
 
-export function InputMenuItem({
-	item,
-	Wrapper = MenuItem,
-	inline,
-}: {
-	item: InputMenuItemProps;
-	Wrapper?: typeof React.Component | React.FC<any>;
-	inline?: boolean;
-}) {
+export function InputMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<InputMenuItemProps>) {
 	return (
 		<Wrapper
 			shouldDismissPopover={false}

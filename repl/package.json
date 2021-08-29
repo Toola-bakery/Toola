@@ -19,6 +19,7 @@
 		"fastify": "^3.19.1",
 		"fastify-cors": "^6.0.2",
 		"fastify-mongodb": "^4.0.0",
+		"flatted": "^3.2.2",
 		"moleculer": "^0.14.16",
 		"moleculer-web": "^0.10.0",
 		"mongodb": "^4.0.1",

@@ -1,12 +1,13 @@
 import { Button } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
-import React, { useRef, MutableRefObject, useCallback, useState, useEffect, useMemo } from 'react';
-import Editor, { OnChange, Monaco as MonacoType } from '@monaco-editor/react';
-
+import { stringify, parse } from 'flatted';
+import React, { useRef, useCallback, useState, useMemo } from 'react';
+import Editor, { OnChange } from '@monaco-editor/react';
+import safeStringify from 'json-stringify-safe';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
+import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
-import { useEventListener } from '../../../hooks/useEvents';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -36,8 +37,8 @@ export type CodeBlockComponentProps = {
 };
 
 export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
-	const { id, value, logs = [], result, manualControl, watchList: watchListProp, loading } = block;
-	const { updateBlockProps, updateBlockState } = useEditor();
+	const { id, value, manualControl, watchList: watchListProp } = block;
+	const { updateBlockProps } = useEditor();
 	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
 	const { blocks, globals } = usePageContext();
@@ -64,26 +65,14 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		page: { editing },
 	} = usePageContext();
 
-	useEventListener(id, (event) => event.eventName === 'focus' && editorRef.current?.focus(), []);
-
-	const listener = useCallback<(data: FunctionExecutorAction) => void>(
-		(data) => {
-			if (data.action === 'function.end') updateBlockState({ id, result: data.result, loading: false });
-			else updateBlockState({ id, logs: [...logs, data.data] });
-		},
-		[id, logs, updateBlockState],
-	);
-
-	const onTrigger = useCallback(() => {
-		updateBlockState({ id, logs: [], loading: true });
-	}, [id, updateBlockState]);
-
-	const { trigger } = useFunctionExecutor({
-		listener,
+	const { trigger, loading, logs, result } = useFunctionExecutor({
 		value,
 		watchListProp,
-		onTrigger,
 	});
+
+	useBlockSetState<CodeBlockState>('result', result);
+	useBlockSetState<CodeBlockState>('logs', logs);
+	useBlockSetState<CodeBlockState>('loading', loading);
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
 
@@ -120,7 +109,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
-			<div onContextMenu={onContextMenu}>
+			<div>
 				<Editor
 					height="50vh"
 					wrapperClassName=""
@@ -132,11 +121,29 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 						monaco.languages.typescript.javascriptDefaults.addExtraLib(
 							[
 								'declare module "page-state" {',
-								`export function callMethod(blockId: ${blocksType}, method: any, callArgs?: any[]): Promise<any>;`,
-								`export function getProperty(topLevel: "globals", key1: ${globalsType}, key2: string): Promise<any>;`,
-								`export function getProperty(blockId: ${blocksType}, property: string): Promise<any>;`,
-								`export function getGlobals(key1: ${globalsType}, key2: string): Promise<any>;`,
-								`export function getProperty(topLevel: "blocks", blockId: ${blocksType}, property: string): Promise<any>;`,
+								`export function mongo(databaseId: string): {
+  find<T = any>(options: {
+    collection: string;
+    filter?: any;
+    project?: any;
+    sort?: any;
+    limit?: number;
+    skip?: number;
+  }): T[];
+
+  findOne<T = any>(options: {
+    collection: string;
+    filter?: any;
+    project?: any;
+    sort?: any;
+    skip?: number;
+  }): T;
+};
+
+export const pageState: {
+  callMethod(blockId: any, method: any, callArgs?: any[]): Promise<any>;
+  getProperty(...keys: string[]): Promise<any>;
+};`,
 								'};',
 							].join('\n'),
 							'ts:page-state',
@@ -150,7 +157,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 				{showLogs ? (
 					<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
 						{logs.join('')}
-						{JSON.stringify(result, null, '\t')}
+						{safeStringify(result, null, '\t')}
 					</pre>
 				) : null}
 			</div>

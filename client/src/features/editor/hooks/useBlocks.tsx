@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMap } from '../../../hooks/useMap';
 import { useAppSelector } from '../../../redux/hooks';
-import { selectBlocksProps, selectBlocksState } from '../redux/editor';
+import { selectBlocksProps } from '../redux/editor';
 import { BasicBlock } from '../types/basicBlock';
 import { BlockMethods, BlockProps, Blocks, BlockStates } from '../types/blocks';
 
@@ -9,7 +9,7 @@ export function useBlocks(pageId: string, editing: boolean) {
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
 
-	const blocksState = useAppSelector((state) => selectBlocksState(state, pageId));
+	const [blocksState, setBlockState] = useState<{ [id: string]: BlockStates }>({});
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 
 	const [blocksMethods, setMethods] = useState<{ [blockId: string]: BlockMethods }>({});
@@ -63,5 +63,5 @@ export function useBlocks(pageId: string, editing: boolean) {
 		return response;
 	}, [blockParticles, blocksMethods, blocksProps, blocksState, editing, joinedBlock]);
 
-	return { deleteBlockMethods, setBlockMethods, blocks, blocksMethods };
+	return { deleteBlockMethods, setBlockMethods, blocks, blocksMethods, blocksState, setBlockState };
 }

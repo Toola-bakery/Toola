@@ -1,6 +1,6 @@
 import { MenuItem, Switch } from '@blueprintjs/core';
 import React from 'react';
-import { BasicItemProps } from '../InspectorItem';
+import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 import { MenuItemWithInput } from '../MenuItemWithInput';
 
 export type SwitchMenuItemProps = BasicItemProps & {
@@ -9,15 +9,7 @@ export type SwitchMenuItemProps = BasicItemProps & {
 	onChange: (nextValue: boolean) => void;
 };
 
-export function SwitchMenuItem({
-	item,
-	Wrapper = MenuItem,
-	inline,
-}: {
-	item: SwitchMenuItemProps;
-	Wrapper?: typeof React.Component | React.FC<any>;
-	inline?: boolean;
-}) {
+export function SwitchMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<SwitchMenuItemProps>) {
 	return (
 		<Wrapper
 			inline={inline}

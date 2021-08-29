@@ -1,14 +1,11 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { parse } from 'flatted';
+import { useCallback, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
-import { useRefLatest, useRefsLatest } from '../../../hooks/useRefLatest';
-import { useAppSelector } from '../../../redux/hooks';
-import { useBlock } from '../../editor/hooks/useBlock';
-import { useBlocks } from '../../editor/hooks/useBlocks';
+import { useRefsLatest } from '../../../hooks/useRefLatest';
 import { useEventListener } from '../../editor/hooks/useEvents';
 import { usePageContext } from './useReferences';
 import { SateGetEvent } from '../../editor/hooks/useStateToWS';
-import { evalGet, useWatchList, WatchList, watchListKeyGetter, WatchListProps } from './useWatchList';
-import { selectBlocksState } from '../../editor/redux/editor';
+import { evalGet, useWatchList, WatchList, watchListKeyGetter } from './useWatchList';
 import { useWS } from '../../ws/hooks/useWS';
 
 export type FunctionExecutorAction = {
@@ -19,7 +16,7 @@ export type FunctionExecutorAction = {
 };
 
 export type FunctionExecutor = {
-	listener: (event: FunctionExecutorAction) => void;
+	listener?: (event: FunctionExecutorAction) => void;
 	watchListProp?: WatchList;
 	onTrigger?: () => void | Promise<void>;
 	value: string;
@@ -29,6 +26,9 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 	const { sendWS } = useWS();
 
 	const [UUID, setUUID] = useState(v4());
+	const [result, setResult] = useState<unknown>();
+	const [logs, setLogs] = useState<string[]>([]);
+	const [loading, setLoading] = useState<boolean>(false);
 	const [lastEvent, setLastEvent] = useState<FunctionExecutorAction['action']>();
 
 	const { addToWatchList, watchList, setOnUpdate } = useWatchList({
@@ -41,7 +41,12 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 	useEventListener<FunctionExecutorAction>(
 		`ws/${UUID}`,
 		(event) => {
-			listener(event);
+			if (event.action === 'function.end') {
+				setResult(parse(event.result as string));
+				setLoading(false);
+			} else setLogs((oldLogs) => [...oldLogs, event.data]);
+
+			listener?.(event);
 			setLastEvent(event.action);
 		},
 		[listener],
@@ -51,6 +56,8 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 
 	const runCode = useCallback(
 		(code: string) => {
+			setLoading(true);
+			setLogs([]);
 			const preloadState = watchList?.reduce<{ [key: string]: unknown }>((state, keys) => {
 				const topLevel = { globals: globalsRef.current, blocks: blocksRef.current };
 				state[watchListKeyGetter(keys)] = evalGet(topLevel, keys);
@@ -90,5 +97,5 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value 
 		setOnUpdate(() => trigger);
 	}, [setOnUpdate, trigger]);
 
-	return { runCode, lastEvent, UUID, trigger };
+	return { runCode, lastEvent, UUID, trigger, loading, result, logs };
 }

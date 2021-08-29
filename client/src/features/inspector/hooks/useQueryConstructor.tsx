@@ -4,42 +4,57 @@ import { useReferenceEvaluator } from '../../executor/hooks/useReferences';
 import { MenuItemProps } from '../components/InspectorItem';
 import { QueryInspector } from '../components/QueryInspector';
 
-type QueryProperties = QueryProperty[];
-type QueryProperty = {
+export type QueryProperties = QueryProperty[];
+export type QueryProperty = {
 	id: string;
 	label: string;
-	type: 'string' | 'code' | 'number' | 'object' | 'switch';
+	type: 'queryAction' | 'database' | 'string' | 'code' | 'number' | 'object' | 'switch';
+	databaseId?: string;
 };
 
 export function useQueryConstructor(properties: QueryProperties, initialValue: any = {}) {
-	const [value, valueResult] = useImmer<{ [key: string]: any }>(initialValue);
+	const [values, valueResult] = useImmer<{ [key: string]: any }>(initialValue);
 
 	const { evaluate, setOnUpdate } = useReferenceEvaluator();
 
 	const menu = properties.map<MenuItemProps>((queryProperty) => {
-		const { label, id, type } = queryProperty;
+		const { label, id, type, databaseId } = queryProperty;
+		const onChange = (v: unknown) =>
+			valueResult((draft) => {
+				draft[id] = v;
+			});
+
+		const value = values[id];
+
 		if (type === 'string' || type === 'code' || type === 'object' || type === 'number')
 			return {
 				type: 'input',
 				label,
-				value: value[id],
+				value,
 				multiline: type === 'object',
 				codeType: type === 'object' ? 'object' : 'string',
-				onChange(v) {
-					valueResult((draft) => {
-						draft[id] = v;
-					});
-				},
+				onChange,
+			};
+		if (type === 'database')
+			return {
+				type: 'database',
+				label,
+				value,
+				onChange,
+			};
+		if (type === 'queryAction')
+			return {
+				type: 'queryAction',
+				label,
+				databaseId,
+				value,
+				onChange,
 			};
 		return {
 			type: 'switch',
 			label,
-			value: value[id],
-			onChange(v) {
-				valueResult((draft) => {
-					draft[id] = v;
-				});
-			},
+			value,
+			onChange,
 		};
 	});
 
@@ -47,12 +62,12 @@ export function useQueryConstructor(properties: QueryProperties, initialValue: a
 		() =>
 			properties.reduce<{ [key: string]: any }>((state, item) => {
 				const { id, type } = item;
-				if (typeof value[id] === 'undefined') return state;
+				if (typeof values[id] === 'undefined') return state;
 
 				if (type === 'object') {
-					state[id] = evaluate(`\${ ${value[id]} }`);
+					state[id] = evaluate(`\${ ${values[id]} }`);
 				} else {
-					state[id] = evaluate(value[id]);
+					state[id] = evaluate(values[id]);
 				}
 				if (type === 'number') {
 					state[id] = parseInt(state[id], 10);
@@ -60,8 +75,8 @@ export function useQueryConstructor(properties: QueryProperties, initialValue: a
 
 				return state;
 			}, {}),
-		[evaluate, properties, value],
+		[evaluate, properties, values],
 	);
 
-	return { value, result, menu, setOnUpdate, component: <QueryInspector menu={menu} /> };
+	return { value: values, result, menu, setOnUpdate, component: <QueryInspector menu={menu} /> };
 }

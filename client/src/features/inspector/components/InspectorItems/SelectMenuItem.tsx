@@ -1,7 +1,7 @@
 import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
 import { SimpleSelect } from '../../../ui/components/SimpleSelect';
-import { BasicItemProps } from '../InspectorItem';
+import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type SelectMenuItemProps = BasicItemProps & {
 	type: 'select';
@@ -10,15 +10,7 @@ export type SelectMenuItemProps = BasicItemProps & {
 	onChange: (v: string) => void;
 };
 
-export function SelectMenuItem({
-	item,
-	Wrapper = MenuItem,
-	inline,
-}: {
-	item: SelectMenuItemProps;
-	Wrapper?: typeof React.Component | React.FC<any>;
-	inline?: boolean;
-}) {
+export function SelectMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<SelectMenuItemProps>) {
 	return (
 		<Wrapper
 			shouldDismissPopover={false}

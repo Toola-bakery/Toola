@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import {
 	addBlocks as addBlocksAction,
 	updateBlockProps as updateBlockPropsAction,
-	updateBlockState as updateBlockStateAction,
 	deleteBlock as deleteBlockAction,
 	addChildInsteadOf as addChildInsteadOfAction,
 	deleteChildFromParent as deleteChildFromParentAction,
@@ -53,9 +52,12 @@ const getBlocks = (pageId: string) => selectBlocksProps(store.getState(), pageId
 
 export function useEditor(): UseEditorResponse {
 	const { send } = useEvents();
+
 	const {
 		globals: { pageId },
+		setBlockState,
 	} = usePageContext();
+
 	const dispatch = useAppDispatch();
 
 	const addChild = useCallback<UseEditorResponse['addChild']>(
@@ -93,10 +95,13 @@ export function useEditor(): UseEditorResponse {
 
 	const updateBlockState = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
-			dispatch(updateBlockStateAction({ pageId, ...block }));
+			setBlockState((state) => {
+				return { ...state, [block.id]: { ...state[block.id], ...block } };
+			});
+
 			if (focus) send(block.id, { action: 'focus', waitListener: true });
 		},
-		[dispatch, pageId, send],
+		[send, setBlockState],
 	);
 
 	const updateParentId = useCallback<UseEditorResponse['updateParentId']>(
