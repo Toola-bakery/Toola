@@ -70,9 +70,7 @@ export function QueryBlock({ block }: QueryBlockComponentProps) {
 		updateBlockProps({ id, values: { databaseValues, actionValues } });
 	}, [id, databaseValues, actionValues, updateBlockProps]);
 
-	const {
-		page: { editing },
-	} = usePageContext();
+	const { editing } = usePageContext();
 
 	const code = `const SDK = require('page-state');
 

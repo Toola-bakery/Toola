@@ -30,9 +30,7 @@ export type TextBlockProps = { type: 'text'; style?: TextBlockStyles; value: str
 export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	const { id, value: realValue = '', style } = block;
 	const [value, setValue] = useState(realValue);
-	const {
-		page: { editing },
-	} = usePageContext();
+	const { editing } = usePageContext();
 
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
 	const [isEditing, setEditing] = useState(false);

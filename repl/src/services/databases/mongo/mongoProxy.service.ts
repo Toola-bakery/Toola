@@ -20,8 +20,8 @@ export const MongoProxyService: ServiceSchema<'mongoProxy', MongoActions> = {
 				collection: 'string',
 				filter: { type: 'object', optional: true, default: {} },
 				project: { type: 'object', optional: true },
-				sort: { type: 'object', optional: true },
-				skip: { type: 'number', optional: true },
+				sort: { type: 'object', convert: true, optional: true },
+				skip: { type: 'number', convert: true, optional: true },
 			},
 			async handler(ctx) {
 				const { id, collection, project, filter, skip, sort } = ctx.params;
@@ -35,12 +35,12 @@ export const MongoProxyService: ServiceSchema<'mongoProxy', MongoActions> = {
 		find: {
 			params: {
 				id: { type: 'uuid', version: 4 },
-				collection: 'string',
+				collection: { type: 'string', min: 1 },
 				filter: { type: 'object', optional: true, default: {} },
 				project: { type: 'object', optional: true },
 				sort: { type: 'object', optional: true },
-				limit: { type: 'number', optional: true, default: 100 },
-				skip: { type: 'number', optional: true },
+				limit: { type: 'number', convert: true, optional: true, default: 100 },
+				skip: { type: 'number', convert: true, optional: true },
 			},
 			async handler(ctx) {
 				const { id, collection, project, filter, limit, skip, sort } = ctx.params;

@@ -1,7 +1,5 @@
 import { MenuItem } from '@blueprintjs/core';
-import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import { BlockInspectorProps } from '../BlockInspector';
 import { MenuItemProps, BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type NestedMenuItemProps = BasicItemProps & {

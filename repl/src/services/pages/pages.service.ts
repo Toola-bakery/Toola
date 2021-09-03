@@ -55,7 +55,7 @@ export const PagesService: ServiceSchema<
 		post: {
 			params: {
 				id: { type: 'string' },
-				value: { type: 'object' },
+				value: { type: 'object', minProps: 1 },
 			},
 			async handler(ctx) {
 				const { id, value } = ctx.params;

@@ -9,7 +9,7 @@ export type CreateBlockAtTheEndProps = {
 
 export function CreateBlockAtTheEnd({ parentId }: CreateBlockAtTheEndProps): JSX.Element {
 	const { addBlockIn } = useEditor();
-	const { page: { editing } = {} } = usePageContext();
+	const { editing } = usePageContext();
 
 	const handler = useCallback(() => {
 		addBlockIn(parentId, BlockCreators.text());

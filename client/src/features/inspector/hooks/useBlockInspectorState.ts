@@ -14,6 +14,7 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 	['Query', 'query'],
 	['Page', 'subpage'],
 	['JSON viewer', 'JSONView'],
+	['KeyValue viewer', 'keyValue'],
 	['Table', 'table'],
 	['Image', 'image'],
 	['Input', 'input'],
@@ -23,9 +24,7 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 export function useBlockInspectorState(
 	menuConfig: ((defaultMenu: MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],
 ) {
-	const {
-		page: { editing },
-	} = usePageContext();
+	const { editing } = usePageContext();
 
 	const { id, display } = useBlock();
 	const { deleteBlock, immerBlockProps, updateBlockType } = useEditor();

@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 export const AppStyles = styled.div`
+	height: 100%;
+
 	.bp4-form-content {
 		flex: 1;
 	}

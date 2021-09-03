@@ -1,5 +1,3 @@
-import { FormGroup, InputGroup } from '@blueprintjs/core';
-import TextField from '@material-ui/core/TextField';
 import React, { useCallback } from 'react';
 import { TextInput } from '../../../ui/components/TextInput';
 import { useDeclareBlockMethods } from '../../hooks/useDeclareBlockMethods';

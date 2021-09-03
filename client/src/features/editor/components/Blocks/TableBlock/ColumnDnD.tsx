@@ -17,9 +17,7 @@ export function ColumnDnD({
 }: PropsWithChildren<
 	{ column: HeaderGroup; tableId: string; onClick: MouseEventHandler } & TdHTMLAttributes<HTMLTableHeaderCellElement>
 >) {
-	const {
-		page: { editing },
-	} = usePageContext();
+	const { editing } = usePageContext();
 
 	const { immerBlockProps } = useEditor();
 

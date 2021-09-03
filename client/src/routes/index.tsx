@@ -4,13 +4,11 @@ import EditorRoute from './EditorRoute';
 export function AppRouters() {
 	return (
 		<Router>
-			<div>
-				<Switch>
-					<Route path="/:pageId">
-						<EditorRoute />
-					</Route>
-				</Switch>
-			</div>
+			<Switch>
+				<Route path="/:pageId">
+					<EditorRoute />
+				</Route>
+			</Switch>
 		</Router>
 	);
 }

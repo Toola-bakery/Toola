@@ -1,8 +1,9 @@
+import { Icon } from '@blueprintjs/core';
 import React from 'react';
-import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import { useDrag } from 'react-dnd';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
+import { KeyValueBlock, KeyValueBlockType } from './Blocks/KeyValueBlock';
 import { QueryBlock, QueryBlockType } from './Blocks/QueryBlock/QueryBlock';
 import { SubPageBlock, SubPageBlockType } from './Blocks/SubPageBlock';
 import { TextBlock, TextBlockType } from './Blocks/TextBlock';
@@ -24,18 +25,17 @@ function BlockSelector({ block }: { block: BasicBlock & Blocks }) {
 	if (block.type === 'code') return <CodeBlock block={block as BasicBlock & CodeBlockType} />;
 	if (block.type === 'query') return <QueryBlock block={block as BasicBlock & QueryBlockType} />;
 	if (block.type === 'JSONView') return <JSONViewBlock block={block as BasicBlock & JSONViewBlockType} />;
+	if (block.type === 'keyValue') return <KeyValueBlock block={block as BasicBlock & KeyValueBlockType} />;
 	if (block.type === 'table') return <TableBlock block={block as BasicBlock & TableBlockType} />;
 	if (block.type === 'image') return <ImageBlock block={block as BasicBlock & ImageBlockType} />;
 	if (block.type === 'input') return <InputBlock block={block as BasicBlock & InputBlockType} />;
 	if (block.type === 'button') return <ButtonBlock block={block as BasicBlock & ButtonBlockType} />;
 	if (block.type === 'subpage') return <SubPageBlock block={block as BasicBlock & SubPageBlockType} />;
-	return <></>;
+	return null;
 }
 
 export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
-	const {
-		page: { editing },
-	} = usePageContext();
+	const { editing } = usePageContext();
 
 	const [{ opacity }, dragRef, dragPreview] = useDrag(
 		() => ({
@@ -68,7 +68,7 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 					}}
 				>
 					<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
-						<DragIndicatorIcon />
+						<Icon icon="drag-handle-vertical" />
 					</div>
 					<div style={{ width: 'calc(100% - 25px)' }}>
 						<BlockSelector block={block} />

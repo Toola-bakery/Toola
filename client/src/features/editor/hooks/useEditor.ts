@@ -197,7 +197,7 @@ export function useEditor(): UseEditorResponse {
 			const [{ id: newId }] = addBlocks([
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				{ ...newBlock, ...(typeOrBlock === 'string' ? {} : typeOrBlock), pageId, parentId, type },
+				{ ...newBlock, ...(typeof typeOrBlock === 'string' ? {} : typeOrBlock), pageId, parentId, type },
 			]);
 
 			if (parentId) addChildInsteadOf(blockId, newId);

@@ -61,9 +61,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 
 	const [showLogs, setShowLogs] = useState(false);
 
-	const {
-		page: { editing },
-	} = usePageContext();
+	const { editing } = usePageContext();
 
 	const { trigger, loading, logs, result } = useFunctionExecutor({
 		value,

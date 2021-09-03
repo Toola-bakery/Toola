@@ -1,10 +1,13 @@
+import { Button, NonIdealState } from '@blueprintjs/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import ky from 'ky';
 import debounce from 'just-debounce';
+import { useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { useBlocks } from '../hooks/useBlocks';
@@ -20,20 +23,19 @@ import { Blocks } from '../types/blocks';
 import { PageBar } from './PageBar';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 
-export type PageBlockType = PageBlockProps & PageBlockState;
+export type PageBlockType = PageBlockProps;
 export type PageBlockProps = {
 	type: 'page';
 	title: string;
 	blocks: string[];
-};
-export type PageBlockState = {
-	editing: boolean;
 };
 
 export type PageContextType = {
 	globals: { pageId: string };
 	page: BasicBlock & PageBlockType;
 	pageId: string;
+	editing: boolean;
+	setEditing: (value: boolean) => void;
 } & ReturnType<typeof useBlocks>;
 
 export const PageContext = React.createContext<PageContextType>({
@@ -45,7 +47,10 @@ export const PageContext = React.createContext<PageContextType>({
 	pageId: '',
 	setBlockState: () => {},
 	blocksState: {},
-	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', blocks: [], editing: false },
+	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', blocks: [] },
+	editing: true,
+	setEditing: () => {},
+	blocksProps: {},
 });
 
 const putPage = debounce((pageId, blocksProps) => {
@@ -57,48 +62,57 @@ function WSHandler() {
 	return null;
 }
 
+declare global {
+	interface Window {
+		blocks: { [p: string]: BasicBlock & Blocks };
+	}
+}
 export function Page(): JSX.Element {
 	const dispatch = useAppDispatch();
 	const { pageId } = useParams<{ pageId: string }>();
 	const { state: pageParams } = useLocation();
 	const [editing, setEditing] = useLocalStorage('editing', true);
-	useBlockStateDefault<PageBlockState>({ editing }, 'page', pageId);
-	const [fetching, setFetching] = useState(true);
 
-	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState } = useBlocks(
-		pageId,
-		editing,
-	);
+	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState, blocksProps } =
+		useBlocks(pageId, editing);
+
+	useEffect(() => {
+		window.blocks = blocks;
+	}, [blocks]);
 
 	const hiddenBlocks = useMemo(() => {
-		const blockKeys = Object.keys(blocks);
+		const blockValues = Object.values(blocks);
 		const response: (BasicBlock & Blocks)[] = [];
-		blockKeys.forEach((key) => {
-			if (!blocks[key].show) response.push(blocks[key]);
+		blockValues.forEach((block) => {
+			if (!block.show) response.push(block);
 		});
 		return response;
 	}, [blocks]);
 
-	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 	const page = blocks?.page as BasicBlock & PageBlockType;
 
-	useEffect(() => {
-		if (typeof page?.editing !== 'undefined' && editing !== page?.editing) setEditing(page?.editing);
-	}, [editing, page, setEditing]);
+	const { data, error, isLoading, isError, isSuccess } = useQuery(
+		['pages/get', pageId],
+		async () => {
+			return ky
+				.get(`${Config.domain}/pages/get`, { searchParams: { id: pageId } })
+				.json<{ value: { [key: string]: BasicBlock & Blocks } }>();
+		},
+		{
+			retry: false,
+			refetchOnWindowFocus: false,
+		},
+	);
 
 	useEffect(() => {
-		ky.get(`${Config.domain}/pages/get`, { searchParams: { id: pageId } })
-			.json<{ value: { [key: string]: BasicBlock & Blocks } }>()
-			.then((v) => {
-				dispatch(setPage({ blocks: v.value, pageId }));
-				setFetching(false);
-			});
-	}, [dispatch, pageId]);
+		if (isSuccess && data) dispatch(setPage({ blocks: data.value, pageId }));
+	}, [data, dispatch, isSuccess, pageId]);
 
 	useEffect(() => {
-		if (fetching) return;
-		putPage(pageId, blocksProps);
-	}, [fetching, blocksProps, pageId]);
+		if (isSuccess) putPage(pageId, blocksProps);
+	}, [isSuccess, blocksProps, pageId]);
+
+	const { navigate } = usePageNavigator();
 
 	const value = useMemo<PageContextType>(
 		() => ({
@@ -111,8 +125,24 @@ export function Page(): JSX.Element {
 			blocksState,
 			setBlockState,
 			blocksMethods,
+			editing,
+			setEditing,
+			blocksProps,
 		}),
-		[blocks, pageId, pageParams, page, deleteBlockMethods, setBlockMethods, blocksState, setBlockState, blocksMethods],
+		[
+			blocks,
+			editing,
+			setEditing,
+			pageId,
+			pageParams,
+			page,
+			deleteBlockMethods,
+			setBlockMethods,
+			blocksState,
+			setBlockState,
+			blocksMethods,
+			blocksProps,
+		],
 	);
 
 	const { width } = useWindowSize({ width: 1000 });
@@ -122,8 +152,15 @@ export function Page(): JSX.Element {
 			<PageContext.Provider value={value}>
 				<WSHandler />
 
-				<div style={{ width: width - 240 - 10, overflowX: 'clip' }}>
-					{page ? (
+				<div style={{ width: width - 240, overflowX: 'clip', height: '100%' }}>
+					{isError ? (
+						<NonIdealState
+							icon="search"
+							title="Page not found"
+							action={<Button text="Back home" onClick={() => navigate('')} />}
+						/>
+					) : null}
+					{page && !error ? (
 						<>
 							<PageBar />
 							<ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} />

@@ -1,4 +1,5 @@
 import { ButtonBlockProps, ButtonBlockType } from '../components/Blocks/ButtonBlock';
+import { KeyValueBlockProps, KeyValueBlockType } from '../components/Blocks/KeyValueBlock';
 import { ColumnBlockProps, ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { ImageBlockProps, ImageBlockType } from '../components/Blocks/ImageBlock';
 import {
@@ -16,7 +17,7 @@ import {
 	CodeBlockType,
 } from '../components/Blocks/CodeBlock/CodeBlock';
 import { JSONViewBlockProps, JSONViewBlockType } from '../components/Blocks/JSONViewBlock';
-import { PageBlockProps, PageBlockState, PageBlockType } from '../components/Page';
+import { PageBlockProps, PageBlockType } from '../components/Page';
 import { RowBlockProps, RowBlockType } from '../components/Blocks/Layout/RowBlock';
 import { TableBlockProps, TableBlockState, TableBlockType } from '../components/Blocks/TableBlock/TableBlock';
 import { InputBlockMethods, InputBlockProps, InputBlockState, InputBlockType } from '../components/Blocks/InputBlock';
@@ -27,6 +28,7 @@ export type Blocks =
 	| TableBlockType
 	| CodeBlockType
 	| JSONViewBlockType
+	| KeyValueBlockType
 	| ImageBlockType
 	| LayoutBlocks
 	| SubPageBlockType
@@ -42,6 +44,7 @@ export type BlockProps =
 	| CodeBlockProps
 	| QueryBlockProps
 	| JSONViewBlockProps
+	| KeyValueBlockProps
 	| ImageBlockProps
 	| PageBlockProps
 	| RowBlockProps
@@ -57,11 +60,11 @@ export type BlockPropsAndState =
 	| (QueryBlockProps & QueryBlockState)
 	| JSONViewBlockProps
 	| ImageBlockProps
-	| (PageBlockProps & PageBlockState)
+	| PageBlockProps
 	| RowBlockProps
 	| SubPageBlockProps
 	| ColumnBlockProps
 	| ButtonBlockProps;
 
-export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | QueryBlockState | PageBlockState;
+export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | QueryBlockState;
 export type BlockMethods = QueryBlockMethods | CodeBlockMethods | InputBlockMethods;

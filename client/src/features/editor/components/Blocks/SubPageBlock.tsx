@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import DescriptionIcon from '@material-ui/icons/Description';
 import ky from 'ky';
 import * as React from 'react';
 import { useQuery } from 'react-query';
