@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { QueryProperty } from '../hooks/useQueryConstructor';
+import { useProjects } from '../../user/hooks/useProjects';
+import { QueryProperty } from './useQueryConstructor';
 
 export type Database = {
 	_id: string;
@@ -15,7 +16,8 @@ export type DatabaseAction = {
 };
 
 export function useDatabases() {
-	const { data, ...rest } = useQuery<Database[]>('/databases/getAll');
+	const { currentProjectId } = useProjects();
+	const { data, ...rest } = useQuery<Database[]>(['/databases/getAll', { projectId: currentProjectId }]);
 
 	const newData: Database[] =
 		data?.map((db: Omit<Database, 'actions'> & { actions?: Database['actions'] }) => ({

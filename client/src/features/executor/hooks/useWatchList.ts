@@ -30,18 +30,16 @@ export function evalGet(anyTopLevel: { globals: any; blocks: any }, keys: string
 }
 
 export function useWatchList({
-	initialList,
+	initialList = [],
 	onListChanged,
 	onUpdate: onUpdateInitial,
 	syncWithBlockProps,
 }: WatchListProps = {}) {
 	const { blocks, pageId, globals } = usePageContext();
-	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() => ({}));
+	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() =>
+		initialList.reduce((acc, v) => ({ ...acc, [watchListKeyGetter(v)]: v }), {}),
+	);
 	const [onUpdate, setOnUpdate] = useState<(() => void) | undefined>(onUpdateInitial);
-	useOnMountedEffect(() => {
-		if (initialList)
-			setWatchListObj(initialList.reduce((acc, v) => ({ ...acc, [watchListKeyGetter([v[0], v[1]])]: v }), {}));
-	});
 
 	const watchList = useMemo(() => Object.values(watchListObj), [watchListObj]);
 

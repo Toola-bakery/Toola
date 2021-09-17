@@ -6,16 +6,12 @@ import { useEditor } from '../hooks/useEditor';
 import { usePageContext } from '../../executor/hooks/useReferences';
 
 export function PageBar() {
-	const {
-		editing,
-		setEditing,
-		page: { id, title },
-	} = usePageContext();
+	const { editing, setEditing, page: { id, title } = {} } = usePageContext();
 
 	const { updateBlockProps } = useEditor();
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
-			updateBlockProps({ id, title: decode(e.currentTarget.textContent) });
+			if (id) updateBlockProps({ id, title: decode(e.currentTarget.textContent) });
 		},
 		[id, updateBlockProps],
 	);
@@ -26,30 +22,35 @@ export function PageBar() {
 				top: 0,
 				backgroundColor: 'rgb(240 240 240)',
 				zIndex: 20,
+				height: 65,
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center',
+				flexDirection: 'row',
+				paddingLeft: 20,
+				paddingRight: 20,
 			}}
 		>
-			<div style={{ flexDirection: 'row', display: 'flex', padding: 20 }}>
-				<div style={{ flexGrow: 1 }}>
-					<H3 style={{ fontWeight: 400, margin: 0 }}>
-						<ContentEditable
-							disabled={!editing}
-							html={title}
-							tagName="span"
-							style={{ margin: 0, marginBottom: 10 }}
-							onChange={onChangeHandler}
-						/>
-					</H3>
-				</div>
-				<div style={{ flexShrink: 1 }}>
-					<Switch
-						style={{ margin: 0 }}
-						label="Editing"
-						alignIndicator="right"
-						large
-						checked={editing}
-						onChange={() => setEditing(!editing)}
+			<div style={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+				<H3 style={{ fontWeight: 400, margin: 0 }}>
+					<ContentEditable
+						disabled={!editing || !id}
+						html={title || ''}
+						tagName="span"
+						style={{ margin: 0, marginBottom: 10 }}
+						onChange={onChangeHandler}
 					/>
-				</div>
+				</H3>
+			</div>
+			<div style={{ flexShrink: 1 }}>
+				<Switch
+					style={{ margin: 0 }}
+					label="Editing"
+					alignIndicator="right"
+					large
+					checked={editing}
+					onChange={() => setEditing(!editing)}
+				/>
 			</div>
 		</div>
 	);

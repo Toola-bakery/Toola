@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import safeStringify from 'json-stringify-safe';
 import { useNextRenderHook } from '../../../../../hooks/useNextRenderHook';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
-import { Database, useDatabaseAction } from '../../../../inspector/api/api';
+import { Database, useDatabaseAction } from '../../../../inspector/hooks/useDatabases';
 import { useQueryConstructor } from '../../../../inspector/hooks/useQueryConstructor';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';

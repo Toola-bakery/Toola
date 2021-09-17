@@ -1,5 +1,5 @@
 import { ServiceSchema } from 'moleculer';
-import { ActionsDeclarations } from '../services';
+import { ObjectId } from 'mongodb';
 import { executeFunction } from './executeFunction';
 
 export const FunctionsService: ServiceSchema<
@@ -9,7 +9,7 @@ export const FunctionsService: ServiceSchema<
 			code: string;
 			callArgs?: unknown[];
 			reqId: string;
-			meta: { wsId: string };
+			meta: { wsId: string; userId: string | ObjectId; projectId: string | ObjectId };
 			preloadState: { [key: string]: unknown };
 		};
 	}
@@ -18,6 +18,7 @@ export const FunctionsService: ServiceSchema<
 	settings: {},
 	actions: {
 		run: {
+			visibility: 'public',
 			params: {
 				code: { type: 'string' },
 				callArgs: { type: 'array', optional: true },
@@ -26,29 +27,32 @@ export const FunctionsService: ServiceSchema<
 			},
 			async handler(ctx) {
 				const { code, callArgs, reqId, preloadState } = ctx.params;
-				const { wsId } = ctx.meta;
+				const { wsId, userId, projectId } = ctx.meta;
+
 				if (!wsId) throw new Error('Set websocket id');
 
-				this.broker.broadcast('ws.send', { message: { action: 'function.start', id: reqId }, id: wsId });
+				const { token } = await ctx.call('auth.createCustomToken', { data: { projectId } });
+
+				await ctx.broadcast('ws.send', { message: { action: 'function.start', id: reqId }, id: wsId });
 
 				executeFunction({
 					code,
 					output: data =>
-						this.broker.broadcast('ws.send', {
+						ctx.broadcast('ws.send', {
 							id: wsId,
 							message: { action: 'function.output', id: reqId, data: data.toString('utf-8') },
 						}),
 					callArgs,
-					env: { wsId, reqId, preloadState: JSON.stringify(preloadState) },
+					env: { wsId, token, projectId: projectId.toString(), reqId, preloadState: JSON.stringify(preloadState) },
 				})
 					.then(result =>
-						this.broker.broadcast('ws.send', {
+						ctx.broadcast('ws.send', {
 							id: wsId,
 							message: { action: 'function.end', result, id: reqId },
 						}),
 					)
 					.catch(error =>
-						this.broker.broadcast('ws.send', {
+						ctx.broadcast('ws.send', {
 							id: wsId,
 							message: { action: 'function.end', result: 'error', id: reqId },
 						}),

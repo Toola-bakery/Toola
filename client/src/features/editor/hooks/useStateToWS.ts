@@ -32,8 +32,6 @@ export function useStateToWS() {
 			if (pageId && redirectedFrom) {
 				const value = evalGet(topLevelObject, keys);
 
-				console.log({ event, keys, value });
-
 				sendWS({
 					action: 'state.getResponse',
 					destinationId: redirectedFrom,

@@ -1,33 +1,32 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-// import { persistStore, persistReducer, createTransform } from 'redux-persist';
-import { stringify, parse } from 'flatted';
-// import storage from 'redux-persist/lib/storage';
-
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { editorReducer } from '../features/editor/redux/editor';
+import { projectsSlice } from '../features/user/redux/projects';
+import { userSlice } from '../features/user/redux/user';
+import { immerSlice } from './immerSlice';
 
 const rootReducer = combineReducers({
 	editor: editorReducer,
+	user: userSlice.reducer,
+	projects: projectsSlice.reducer,
+	immer: immerSlice.reducer,
 });
 
-// export const transformCircular = createTransform(
-// 	(inboundState, key) => stringify(inboundState),
-// 	(outboundState, key) => parse(outboundState),
-// );
-
-// const persistedReducer = persistReducer(
-// 	{
-// 		key: 'root',
-// 		storage,
-// 		blacklist: ['editor'],
-// 	},
-// 	rootReducer,
-// );
+const persistedReducer = persistReducer(
+	{
+		key: 'root',
+		storage,
+		blacklist: ['editor'],
+	},
+	rootReducer,
+);
 
 export const store = configureStore({
-	reducer: rootReducer,
+	reducer: persistedReducer,
 });
 
-// export const persistor = persistStore(store);
+export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

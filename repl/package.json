@@ -19,7 +19,9 @@
 		"fastify": "^3.19.1",
 		"fastify-cors": "^6.0.2",
 		"fastify-mongodb": "^4.0.0",
+		"firebase-admin": "^9.11.1",
 		"flatted": "^3.2.2",
+		"jose": "^3.17.0",
 		"moleculer": "^0.14.16",
 		"moleculer-web": "^0.10.0",
 		"mongodb": "^4.0.1",
@@ -57,5 +59,12 @@
 	},
 	"husky": {
 		"hooks": {}
+	},
+	"prettier": {
+		"printWidth": 120,
+		"trailingComma": "all",
+		"singleQuote": true,
+		"useTabs": true,
+		"arrowParens": "avoid"
 	}
 }

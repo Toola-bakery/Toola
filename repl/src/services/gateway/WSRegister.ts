@@ -19,18 +19,20 @@ const connectionsDb = mongoDB.collection<ConnectionSchema>(
 connectionsDb.createIndex({ nodeID: 1 });
 connectionsDb.createIndex({ userId: 1 });
 
+export type WSClient = {
+	id: string;
+	socket: WebSockets;
+	initialized: boolean;
+	meta?: { [key: string]: unknown };
+	heartbeat?: Heartbeat;
+};
+
 export class WSRegister {
-	clients: {
-		[id: string]: {
-			socket: WebSockets;
-			initialized: boolean;
-			heartbeat?: Heartbeat;
-		};
-	} = {};
+	clients: { [id: string]: WSClient } = {};
 
-	readonly onMessage: (id: string, data: any) => void;
+	readonly onMessage: (client: WSClient, data: any) => void;
 
-	readonly authorization: (token: string) => Record<string, unknown> | Promise<Record<string, unknown>>;
+	readonly authorization: (message: unknown) => unknown | Promise<unknown>;
 
 	readonly heartbeatInterval;
 
@@ -45,11 +47,11 @@ export class WSRegister {
 		nodeID,
 		authorization,
 	}: {
-		onMessage: (id: string, data: any) => void;
+		onMessage: WSRegister['onMessage'];
 		interval: number;
 		timeout: number;
 		nodeID: string;
-		authorization?: (token: string) => Record<string, unknown> | Promise<Record<string, unknown>>;
+		authorization?: WSRegister['authorization'];
 	}) {
 		this.heartbeatTimeout = timeout;
 		this.heartbeatInterval = interval;
@@ -60,7 +62,7 @@ export class WSRegister {
 
 	onConnection(socket: WebSockets) {
 		const id = uuidv4();
-		this.clients[id] = { socket, initialized: true };
+		this.clients[id] = { id, socket, initialized: false };
 		this.startHeartbeat(id);
 		this.askInit(id);
 
@@ -72,22 +74,24 @@ export class WSRegister {
 		socket.on('close', () => this.disconnect(id));
 	}
 
-	handleMessage(id: string, data: WebSockets.Data) {
+	async handleMessage(id: string, data: WebSockets.Data) {
 		const client = this.clients[id];
 
 		client.heartbeat?.resetTimeout();
 
 		const message = JSON.parse(data.toString());
-		const { action, id: respId, token } = message;
+		const { action, id: respId } = message;
 
-		if (client.initialized) {
-			this.onMessage(id, message);
-		} else if (
-			action === 'init'
-			// && respId === id
-		) {
-			const meta = this.authorization?.(token) || {};
-			this.setInitialized(id, meta);
+		if (action === 'init' && respId === id) {
+			try {
+				const meta = (await this.authorization?.(message)) || {};
+				await this.setInitialized(id, meta);
+			} catch (e) {
+				this.send(id, { error: e.toString() });
+				await this.disconnect(id);
+			}
+		} else if (client.initialized) {
+			this.onMessage(client, message);
 		} else {
 			this.askInit(id);
 		}
@@ -115,6 +119,7 @@ export class WSRegister {
 
 	setInitialized(id, meta) {
 		this.clients[id].initialized = true;
+		this.clients[id].meta = meta;
 		return connectionsDb.insertOne({ _id: id, createdAt: new Date(), nodeID: this.nodeID, meta });
 	}
 

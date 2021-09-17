@@ -1,6 +1,8 @@
 import { ServiceSchema } from 'moleculer';
+import { ObjectId } from 'mongodb';
 import { v4 } from 'uuid';
 import { DatabaseSchema } from '../../types/database.types';
+import { AuthMeta } from '../../types/users.types';
 import { mongoDB } from '../../utils/mongo';
 
 const databaseCollection = mongoDB.collection<DatabaseSchema>('databases');
@@ -17,11 +19,17 @@ export const DatabasesService: ServiceSchema<
 	{
 		post: {
 			database: DatabaseSchema;
+			projectId: ObjectId;
+			meta: AuthMeta;
 		};
 		get: {
 			id: string;
+			meta: AuthMeta;
 		};
-		getAll: Record<string, never>;
+		getAll: {
+			projectId: ObjectId;
+			meta: AuthMeta;
+		};
 	}
 > = {
 	name: 'databases',
@@ -29,6 +37,7 @@ export const DatabasesService: ServiceSchema<
 	actions: {
 		post: {
 			params: {
+				projectId: { type: 'objectID', ObjectID: ObjectId, convert: true },
 				database: [
 					{
 						type: 'object',
@@ -51,13 +60,21 @@ export const DatabasesService: ServiceSchema<
 				],
 			},
 			async handler(ctx) {
-				const { database } = ctx.params;
+				const { database, projectId } = ctx.params;
+				const { userId, projectId: authProjectId } = ctx.meta;
+
+				if (userId) {
+					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+				} else if (authProjectId.toString() !== projectId.toString()) {
+					throw new Error('No access to project');
+				}
 
 				const newId = database._id || v4();
 
 				await databaseCollection.updateOne(
-					{ _id: newId },
-					{ $setOnInsert: { _id: newId }, $set: database },
+					{ _id: newId, projectId },
+					{ $setOnInsert: { _id: newId }, $set: { ...database, projectId } },
 					{ upsert: true },
 				);
 
@@ -70,12 +87,37 @@ export const DatabasesService: ServiceSchema<
 			},
 			async handler(ctx) {
 				const { id } = ctx.params;
-				return databaseCollection.findOne({ _id: id });
+				const { userId, projectId: authProjectId } = ctx.meta;
+
+				const item = await databaseCollection.findOne({ _id: id });
+
+				if (userId) {
+					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId: item.projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+				} else if (authProjectId.toString() !== item.projectId.toString()) {
+					throw new Error('No access to project');
+				}
+
+				return item;
 			},
 		},
 		getAll: {
+			params: {
+				projectId: { type: 'objectID', ObjectID: ObjectId, convert: true },
+			},
 			async handler(ctx) {
-				const databases = await databaseCollection.find().toArray();
+				const { projectId } = ctx.params;
+				const { userId, projectId: authProjectId } = ctx.meta;
+
+				if (userId) {
+					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+				} else if (authProjectId.toString() !== projectId.toString()) {
+					throw new Error('No access to project');
+				}
+
+				const databases = await databaseCollection.find({ projectId }).toArray();
+
 				const result = await ctx.mcall(
 					databases.map(db => ({
 						action: `${db.type}Manager.queryBuilder`,

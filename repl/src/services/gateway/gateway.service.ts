@@ -6,7 +6,7 @@ import { WsMixin } from './ws.mixin';
 function getTokenFromReq(req) {
 	const auth = req.headers.authorization;
 	const bearerToken = auth?.startsWith('Bearer') ? auth.slice(7) : null;
-	return bearerToken || req.query.authToken || req.headers['auth-token'];
+	return bearerToken || req.query.authToken || req.headers['auth-token'] || req.headers.authtoken;
 }
 
 function onBeforeCall(ctx, route, req, res) {
@@ -33,20 +33,18 @@ export const GatewayService: ServiceSchema = {
 			origin: '*',
 		},
 		routes: [
-			// {
-			// 	path: '/auth',
-			// 	aliases: {
-			// 		diary: 'auth.diary',
-			// 		firebase: 'auth.firebase',
-			// 		findUsersWithDiaryAccount: 'auth.findUsersWithDiaryAccount',
-			// 	},
-			// 	onBeforeCall,
-			// 	bodyParsers: { json: true },
-			// },
+			{
+				path: '/auth',
+				aliases: {
+					firebase: 'auth.firebase',
+				},
+				onBeforeCall,
+				bodyParsers: { json: true },
+			},
 			{
 				path: '/',
 				whitelist: ['*.*'],
-				// authorization: true,
+				authorization: true,
 				onBeforeCall,
 				bodyParsers: {
 					json: { strict: false, limit: '8MB' },
@@ -61,8 +59,12 @@ export const GatewayService: ServiceSchema = {
 	methods: {
 		async authorize(ctx, route, req, res) {
 			const myToken = getTokenFromReq(req);
-			if (myToken) ctx.meta.user = await ctx.call('auth.userByToken', { authToken: myToken });
-			else if (route.authorization !== true || req.$endpoint?.action?.rest?.auth === false) ctx.meta.user = null;
+			if (myToken) {
+				const { projectId, userId } = await ctx.call('auth.validateToken', { authToken: myToken });
+				ctx.meta.userId = userId;
+				ctx.meta.projectId = projectId;
+			} else if (route.authorization !== true || req.$endpoint?.action?.rest?.auth === false) ctx.meta.user = null;
+			// TODO fix
 			else throw new UserAuthError('Авторизуйтесь');
 			return ctx;
 		},

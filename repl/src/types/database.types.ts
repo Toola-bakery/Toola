@@ -1,6 +1,7 @@
-export type DatabaseSchema = MongoDatabaseSchema;
+import { ObjectId } from 'mongodb';
+
+export type DatabaseSchema = { _id: string; projectId: ObjectId } & MongoDatabaseSchema;
 export type MongoDatabaseSchema = {
-	_id: string;
 	type: 'mongo';
 	name: string;
 	host: string;

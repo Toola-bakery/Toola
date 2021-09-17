@@ -1,5 +1,5 @@
 diff --git a/node_modules/moleculer/index.d.ts b/node_modules/moleculer/index.d.ts
-index 754b4ff..3088dfa 100644
+index 754b4ff..7b99f4e 100644
 --- a/node_modules/moleculer/index.d.ts
 +++ b/node_modules/moleculer/index.d.ts
 @@ -1,4 +1,5 @@
@@ -29,7 +29,7 @@ index 754b4ff..3088dfa 100644
 -		| ActionParamSchema;
 -	type ActionParams = { [key: string]: ActionParamTypes };
 +		| ValidationRule;
-+	type ActionParams<T = any> = { [key in keyof T]: ActionParamTypes };
++	type ActionParams<T = any> = { $$strict?: boolean | "remove"; } & { [key in keyof T]: ActionParamTypes };
  
  	interface HotReloadOptions {
  		modules?: Array<string>;

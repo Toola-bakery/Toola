@@ -25,6 +25,7 @@ module.exports = {
 		'max-classes-per-file': 'off',
 		'consistent-return': 'off',
 		'no-console': 'off',
+		'@typescript-eslint/naming-convention': 'off',
 		'object-shorthand': ['error', 'always', { avoidQuotes: false }],
 		'no-param-reassign': 'off',
 		'no-underscore-dangle': ['error', { allow: ['_id'] }],

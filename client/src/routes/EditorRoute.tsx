@@ -1,16 +1,17 @@
 import * as React from 'react';
-import { ProjectDrawer } from '../features/drawer/ProjectDrawer';
+import { ProjectDrawer } from '../features/drawer/components/ProjectDrawer';
+import { useRelocateToAnyPageIfNoPageSelected } from '../features/drawer/hooks/useRelocateToAnyPageIfNoPageSelected';
 import { Page } from '../features/editor/components/Page';
 import { WSProvider } from '../features/ws/components/WSProvider';
 
-const drawerWidth = 240;
+export default function EditorRoute() {
+	useRelocateToAnyPageIfNoPageSelected();
 
-export default function EditorRoute(): JSX.Element {
 	return (
 		<WSProvider>
 			<div style={{ display: 'flex', height: '100%' }}>
-				<div style={{ width: drawerWidth, flexShrink: 0 }}>
-					<ProjectDrawer drawerWidth={drawerWidth} />
+				<div style={{ flexShrink: 0 }}>
+					<ProjectDrawer />
 				</div>
 				<div style={{ flexGrow: 1, height: '100%' }}>
 					<Page />

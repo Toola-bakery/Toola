@@ -28,27 +28,37 @@ function awaitMessageResponse(messageId) {
 
 const ws = new WebSocket("ws://localhost:8080");
 
-const isWsReadyPromise = new Promise((resolve) => ws.on("open", resolve));
+let resolve = () => {};
+const isWsReadyPromise = new Promise((_resolve) => (resolve = _resolve));
 
 isWsReadyPromise.then();
 
 ws.on("message", function incoming(message) {
   const jsonMessage = JSON.parse(message);
-  if (jsonMessage.messageId) {
+
+  if (jsonMessage.action === "init") {
+    ws.send(
+      JSON.stringify({
+        action: "init",
+        id: jsonMessage.id,
+        token: process.env.token,
+      })
+    );
+    resolve();
+  } else if (jsonMessage.messageId) {
     mesPromises[jsonMessage.messageId](jsonMessage);
   }
 });
 
-function sendToUser(message, awaitResp) {
+async function sendToUser(message, awaitResp) {
   const messageId = v4();
-  ws.send(
-    JSON.stringify({
-      ...message,
-      messageId,
-      destinationId: process.env.wsId,
-      reqId: process.env.reqId,
-    })
-  );
+  const jsonMessage = JSON.stringify({
+    ...message,
+    messageId,
+    destinationId: process.env.wsId,
+    reqId: process.env.reqId,
+  });
+  ws.send(jsonMessage);
   return awaitResp ? awaitMessageResponse(messageId) : true;
 }
 
@@ -57,6 +67,7 @@ async function getProperty(...keys) {
   const value = getPreloadedState(
     ALLOWED_TOP_LEVEL_KEYS.includes(keys[0]) ? keys : ["blocks", ...keys]
   );
+
   if (typeof value !== "undefined") return value;
 
   const resp = await sendToUser(

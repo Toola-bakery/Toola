@@ -1,7 +1,4 @@
 import { useMemo, useRef, useState } from 'react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { useCaretPosition } from '../../editor/hooks/useCaretPosition';
 import { TextInput } from '../../ui/components/TextInput';
@@ -34,15 +31,16 @@ export function getSuggestionKeys(currentState: any) {
 }
 
 export function CodeHints({ hints, select }: { select: (value: string | null) => void; hints: Suggestion[] }) {
-	return (
-		<List sx={{ maxHeight: { sm: 200 }, overflow: 'scroll' }}>
-			{hints.map((hint) => (
-				<ListItem button onClick={() => select(hint.value)} key={hint.value}>
-					<ListItemText primary={hint.value} secondary={hint.type} />
-				</ListItem>
-			))}
-		</List>
-	);
+	return null;
+	// return (
+	// 	<List sx={{ maxHeight: { sm: 200 }, overflow: 'scroll' }}>
+	// 		{hints.map((hint) => (
+	// 			<ListItem button onClick={() => select(hint.value)} key={hint.value}>
+	// 				<ListItemText primary={hint.value} secondary={hint.type} />
+	// 			</ListItem>
+	// 		))}
+	// 	</List>
+	// );
 }
 
 export function CodeInput({

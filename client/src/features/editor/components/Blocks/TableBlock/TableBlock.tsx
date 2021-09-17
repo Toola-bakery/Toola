@@ -1,5 +1,4 @@
 import { Card, HTMLTable } from '@blueprintjs/core';
-import { TablePagination } from '@material-ui/core';
 import JSONTree from 'react-json-tree';
 import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import React, { useCallback } from 'react';
@@ -13,6 +12,7 @@ import { BasicBlock } from '../../../types/basicBlock';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useEditor } from '../../../hooks/useEditor';
 import { ColumnDnD } from './ColumnDnD';
+import { TablePagination } from './TablePagination';
 import { TableStyles } from './TableStyles';
 
 export type TableBlockType = TableBlockProps & TableBlockState;
@@ -111,6 +111,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 										{headerGroup.headers.map((column) => {
 											return (
 												<ColumnDnD
+													key={column.id}
 													column={column}
 													tableId={id}
 													onClick={(e) => {
@@ -174,14 +175,11 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 					</div>
 					<TablePagination
 						rowsPerPageOptions={[1, 5, 10, 25]}
-						component="div"
 						count={manualPagination ? -1 : rows.length}
 						rowsPerPage={pageSize}
 						page={pageIndex}
-						onPageChange={(_, pageNumber) => {
-							gotoPage(pageNumber);
-						}}
-						onRowsPerPageChange={(event) => setPageSize(+event.target.value)}
+						onPageChange={gotoPage}
+						onRowsPerPageChange={setPageSize}
 					/>
 				</Card>
 			</TableStyles>

@@ -51,14 +51,9 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 		},
 	);
 
-	const { data: { value: { page = null } = {} } = {} } = useQuery(
-		['page', subpageId],
-		() =>
-			ky.get(`${Config.domain}/pages/get`, { searchParams: { id: subpageId } }).json<{
-				value: { page: BasicBlock & PageBlockProps };
-			}>(),
-		{ enabled: Boolean(isFetched || isCreated) },
-	);
+	const { data: { value: { page = null } = {} } = {} } = useQuery<{
+		value: { page: BasicBlock & PageBlockProps };
+	}>(['/pages/get', { id: subpageId }], { enabled: Boolean(isFetched || isCreated) });
 
 	const { evaluate } = useReferenceEvaluator();
 

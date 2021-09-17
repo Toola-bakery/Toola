@@ -5,6 +5,12 @@ import { selectBlocksProps } from '../redux/editor';
 import { BasicBlock } from '../types/basicBlock';
 import { BlockMethods, BlockProps, Blocks, BlockStates } from '../types/blocks';
 
+declare global {
+	interface Window {
+		blocks: { [p: string]: BasicBlock & Blocks };
+	}
+}
+
 export function useBlocks(pageId: string, editing: boolean) {
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
@@ -65,6 +71,10 @@ export function useBlocks(pageId: string, editing: boolean) {
 		});
 		return response;
 	}, [blockParticles, blocksMethods, blocksProps, blocksState, editing, joinedBlock]);
+
+	useEffect(() => {
+		window.blocks = blocks;
+	}, [blocks]);
 
 	return { deleteBlockMethods, setBlockMethods, blocks, blocksMethods, blocksState, setBlockState, blocksProps };
 }

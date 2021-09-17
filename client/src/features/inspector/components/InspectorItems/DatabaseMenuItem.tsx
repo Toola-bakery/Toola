@@ -1,7 +1,7 @@
 import { MenuItem, Button, FormGroup } from '@blueprintjs/core';
 import { Select } from '@blueprintjs/select';
 import React, { useMemo } from 'react';
-import { Database, useDatabases } from '../../api/api';
+import { Database, useDatabases } from '../../hooks/useDatabases';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type DatabaseMenuItemProps = BasicItemProps & {

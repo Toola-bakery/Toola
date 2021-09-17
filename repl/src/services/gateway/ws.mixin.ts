@@ -66,7 +66,21 @@ export const WsMixin: ServiceSchema = {
 			interval: 5000,
 			timeout: 30 * 1000 * 100,
 			nodeID: broker.nodeID,
-			onMessage(id, message) {
+			async authorization({ token, projectId }: { token?: string; projectId?: string }) {
+				if (!token) throw new Error('Set token and projectId');
+
+				const { userId, projectId: authProjectId } = await broker.call('auth.validateToken', { authToken: token });
+				if (userId) {
+					const { hasAccess } = await broker.call('projects.hasAccess', { projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+
+					return { userId, projectId };
+				}
+				if (authProjectId) return { projectId: authProjectId };
+
+				throw new Error('Bad token auth');
+			},
+			onMessage(client, message) {
 				try {
 					const { action, destinationId } = message;
 
@@ -74,12 +88,12 @@ export const WsMixin: ServiceSchema = {
 						broker.broadcast('ws.send', {
 							message: {
 								...message,
-								redirectedFrom: id,
+								redirectedFrom: client.id,
 							},
 							id: destinationId,
 						});
 					} else {
-						broker.call(action, message, { meta: { wsId: id } });
+						broker.call(action, message, { meta: { wsId: client.id, ...client.meta } });
 					}
 				} catch (e) {
 					console.log(e);

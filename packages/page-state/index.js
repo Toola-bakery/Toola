@@ -12,10 +12,14 @@ const genericModuleProxy = (module, databaseId) =>
       get: (target2, action) => {
         return (options) => {
           const response = axios
-            .post(`http://localhost:8080/${module}Proxy/${action}`, {
-              ...options,
-              id: databaseId,
-            })
+            .post(
+              `http://localhost:8080/${module}Proxy/${action}`,
+              {
+                ...options,
+                id: databaseId,
+              },
+              { headers: { "auth-token": process.env.token } }
+            )
             .then((resp) => resp.data);
           response.catch((e) => console.log(e.response.data));
           return response;
