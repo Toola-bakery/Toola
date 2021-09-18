@@ -1,12 +1,11 @@
 import ky from 'ky';
 import { PropsWithChildren, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { useProjectsState } from '../features/user/hooks/useProjects';
 import { useAppSelector } from '../redux/hooks';
 
 export function QueryProvider({ children }: PropsWithChildren<{ a?: string }>) {
-	// This is the only place where you can get this values directly from redux.
-	// In other cases use useUser() or useProjects()
-	const { currentProjectId } = useAppSelector((state) => state.projects);
+	const { currentProjectId } = useProjectsState();
 	const { authToken } = useAppSelector((state) => state.user);
 
 	const api = useMemo(

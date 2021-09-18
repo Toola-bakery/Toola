@@ -10,12 +10,8 @@ export default function EditorRoute() {
 	return (
 		<WSProvider>
 			<div style={{ display: 'flex', height: '100%' }}>
-				<div style={{ flexShrink: 0 }}>
-					<ProjectDrawer />
-				</div>
-				<div style={{ flexGrow: 1, height: '100%' }}>
-					<Page />
-				</div>
+				<ProjectDrawer />
+				<Page />
 			</div>
 		</WSProvider>
 	);

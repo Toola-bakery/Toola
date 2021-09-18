@@ -7,7 +7,7 @@ export function ProjectBar() {
 	return (
 		<div
 			style={{
-				height: 65,
+				minHeight: 65,
 				backgroundColor: 'rgb(240, 240, 240)',
 				display: 'flex',
 				alignItems: 'center',

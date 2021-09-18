@@ -6,13 +6,12 @@ import { useHistory } from 'react-router-dom';
 import { Config } from '../config';
 import { useProjects } from '../features/user/hooks/useProjects';
 import { useUser } from '../features/user/hooks/useUser';
-import { setProjectId } from '../features/user/redux/projects';
 import { useAppDispatch } from '../redux/hooks';
 
 export default function CreateProject() {
 	const [projectName, setProjectName] = useState('');
 	const dispatch = useAppDispatch();
-	const { refetch: fetchProjects } = useProjects();
+	const { refetch: fetchProjects, selectProject } = useProjects();
 	const history = useHistory();
 
 	const { authToken } = useUser();
@@ -32,11 +31,11 @@ export default function CreateProject() {
 
 	useEffect(() => {
 		if (data?.projectId) {
-			dispatch(setProjectId(data.projectId));
+			selectProject(data.projectId);
 			fetchProjects();
 			history.replace('/');
 		}
-	}, [data, dispatch, fetchProjects, history]);
+	}, [data, dispatch, fetchProjects, history, selectProject]);
 
 	return (
 		<div style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center' }}>

@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
+import { useDrawer } from '../../drawer/hooks/useDrawer';
 import { useBlocks } from '../hooks/useBlocks';
 import { useBlocksSync } from '../hooks/useBlocksSync';
 import { useStateToWS } from '../hooks/useStateToWS';
@@ -56,6 +57,7 @@ export function Page(): JSX.Element {
 	const [editing, setEditing] = useLocalStorage('editing', true);
 	const { navigate } = usePageNavigator();
 	const { width } = useWindowSize({ width: 1000 });
+	const { width: drawerWidth } = useDrawer();
 
 	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState, blocksProps } =
 		useBlocks(pageId, editing);
@@ -104,7 +106,7 @@ export function Page(): JSX.Element {
 			<PageContext.Provider value={value}>
 				<WSHandler />
 
-				<div style={{ width: width - 240, overflowX: 'clip', height: '100%' }}>
+				<div style={{ width: width - drawerWidth, overflowX: 'clip', height: '100%' }}>
 					{isError ? (
 						<NonIdealState
 							icon="search"

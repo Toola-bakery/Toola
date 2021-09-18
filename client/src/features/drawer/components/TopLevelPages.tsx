@@ -17,7 +17,7 @@ export function TopLevelPages() {
 	const { navigate } = usePageNavigator();
 
 	return (
-		<Menu>
+		<Menu style={{ minWidth: 50 }}>
 			<MenuDivider
 				title={
 					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -2,14 +2,12 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { editorReducer } from '../features/editor/redux/editor';
-import { projectsSlice } from '../features/user/redux/projects';
 import { userSlice } from '../features/user/redux/user';
 import { immerSlice } from './immerSlice';
 
 const rootReducer = combineReducers({
 	editor: editorReducer,
 	user: userSlice.reducer,
-	projects: projectsSlice.reducer,
 	immer: immerSlice.reducer,
 });
 

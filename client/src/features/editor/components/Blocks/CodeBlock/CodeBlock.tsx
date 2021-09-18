@@ -1,4 +1,4 @@
-import { Button } from '@blueprintjs/core';
+import { Button, Card } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
 import { stringify, parse } from 'flatted';
 import React, { useRef, useCallback, useState, useMemo } from 'react';
@@ -105,7 +105,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 	if (!block.show) return <></>;
 
 	return (
-		<>
+		<Card>
 			<BlockInspector {...inspectorProps} />
 			<div>
 				<Editor
@@ -159,6 +159,6 @@ export const pageState: {
 					</pre>
 				) : null}
 			</div>
-		</>
+		</Card>
 	);
 }
