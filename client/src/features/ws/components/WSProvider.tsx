@@ -20,7 +20,12 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 
 	const [ws, setWs] = useState(() => new WebSocket(Config.websocket));
 
-	const sendWS = useCallback((data: unknown) => ws.send(JSON.stringify(data)), [ws]);
+	const sendWS = useCallback(
+		(data: unknown) => {
+			if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(data));
+		},
+		[ws],
+	);
 
 	useEffect(() => {
 		ws.onmessage = (event) => {

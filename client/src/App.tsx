@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import { FocusStyleManager } from '@blueprintjs/core';
+import { FocusStyleManager, HotkeysProvider } from '@blueprintjs/core';
 import { PersistGate } from 'redux-persist/integration/react';
 import { QueryProvider } from './components/QueryProvider';
 import { persistor, store } from './redux';
@@ -16,7 +16,9 @@ export default function App(): JSX.Element {
 			<PersistGate loading={null} persistor={persistor}>
 				<QueryProvider>
 					<AppStyles>
-						<AppRouters />
+						<HotkeysProvider>
+							<AppRouters />
+						</HotkeysProvider>
 					</AppStyles>
 				</QueryProvider>
 			</PersistGate>

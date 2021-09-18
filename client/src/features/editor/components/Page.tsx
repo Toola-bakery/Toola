@@ -8,6 +8,7 @@ import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { useDrawer } from '../../drawer/hooks/useDrawer';
 import { useBlocks } from '../hooks/useBlocks';
 import { useBlocksSync } from '../hooks/useBlocksSync';
+import { useIsEditing } from '../hooks/useIsEditing';
 import { useStateToWS } from '../hooks/useStateToWS';
 import { Block } from './Block';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
@@ -54,7 +55,7 @@ function WSHandler() {
 export function Page(): JSX.Element {
 	const { pageId } = useParams<{ pageId: string }>();
 	const { state: pageParams } = useLocation();
-	const [editing, setEditing] = useLocalStorage('editing', true);
+	const { editing, setEditing } = useIsEditing();
 	const { navigate } = usePageNavigator();
 	const { width } = useWindowSize({ width: 1000 });
 	const { width: drawerWidth } = useDrawer();
