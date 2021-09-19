@@ -4,7 +4,8 @@ import { useProjects } from '../../user/hooks/useProjects';
 
 export function useTopLevelPages() {
 	const { currentProjectId } = useProjects();
-	const { data = [] } = useQuery<{ title: string; id: string }[]>(
+
+	const { data = [], refetch } = useQuery<{ title: string; id: string }[]>(
 		['/pages/topLevelPages', { projectId: currentProjectId || '' }],
 		{ enabled: !!currentProjectId },
 	);
@@ -18,5 +19,6 @@ export function useTopLevelPages() {
 			}) as { title: string; id: string }[],
 		[data],
 	);
-	return { pages: sortedList };
+
+	return { pages: sortedList, refetch };
 }

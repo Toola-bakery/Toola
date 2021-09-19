@@ -16,7 +16,7 @@ const putPage = debounce((pageId: string, blocksProps: { [key: string]: BlockPro
 	});
 }, 300);
 
-export function useBlocksSync(pageId: string, blocksProps: { [key: string]: BlockProps }) {
+export function usePage(pageId: string, blocksProps: { [key: string]: BlockProps }) {
 	const dispatch = useAppDispatch();
 	const { authToken } = useUser();
 

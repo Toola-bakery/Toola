@@ -8,6 +8,7 @@ type PageSchema = {
 	_id: string;
 	projectId: ObjectId;
 	value: any;
+	deleted?: boolean;
 };
 
 const pagesCollection = mongoDB.collection<PageSchema>('pages');
@@ -16,6 +17,7 @@ export const PagesService: ServiceSchema<
 	'pages',
 	{
 		create: { id: string; parentPageId: string | null; title: string; projectId: ObjectId; meta: AuthMeta };
+		delete: { id: string; meta: AuthMeta };
 		get: { id: string; meta: AuthMeta };
 		post: { id: string; title?: string; value: any; meta: AuthMeta };
 		topLevelPages: { projectId: ObjectId; meta: AuthMeta };
@@ -95,8 +97,26 @@ export const PagesService: ServiceSchema<
 				} else if (authProjectId.toString() !== resp.projectId.toString()) {
 					throw new Error('No access to project');
 				}
-
+				// TODO block edit when deleted
 				return pagesCollection.updateOne({ _id: id }, { $set: { value } });
+			},
+		},
+		delete: {
+			params: { id: { type: 'string' } },
+			async handler(ctx) {
+				const { id } = ctx.params;
+				const { userId, projectId: authProjectId } = ctx.meta; // TODO REPLATE projectId: authProjectId to check rights
+
+				const resp = await pagesCollection.findOne({ _id: id }, { projection: { projectId: 1 } });
+
+				if (userId) {
+					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId: resp.projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+				} else if (authProjectId.toString() !== resp.projectId.toString()) {
+					throw new Error('No access to project');
+				}
+
+				return pagesCollection.updateOne({ _id: id }, { $set: { deleted: true } });
 			},
 		},
 		topLevelPages: {
@@ -116,7 +136,7 @@ export const PagesService: ServiceSchema<
 
 				return pagesCollection
 					.aggregate<{ pages: { title: string; id: string }[] }>([
-						{ $match: { 'value.page.parentId': null, projectId } },
+						{ $match: { 'value.page.parentId': null, projectId, deleted: { $in: [null, false] } } },
 						{
 							$group: {
 								_id: null,

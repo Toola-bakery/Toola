@@ -19,7 +19,7 @@ export type SubPageBlockProps = {
 	isCreated: boolean;
 };
 
-export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }): JSX.Element {
+export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }) {
 	const { id, subpageId, pageId, state = '', isCreated = false } = block;
 	const { immerBlockProps, updateBlockProps } = useEditor();
 
@@ -57,7 +57,7 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 
 	const { evaluate } = useReferenceEvaluator();
 
-	if (!block.show) return <></>;
+	if (!block.show) return null;
 
 	return (
 		<>

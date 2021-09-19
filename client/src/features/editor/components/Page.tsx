@@ -7,7 +7,7 @@ import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { useDrawer } from '../../drawer/hooks/useDrawer';
 import { useBlocks } from '../hooks/useBlocks';
-import { useBlocksSync } from '../hooks/useBlocksSync';
+import { usePage } from '../hooks/usePage';
 import { useIsEditing } from '../hooks/useIsEditing';
 import { useStateToWS } from '../hooks/useStateToWS';
 import { Block } from './Block';
@@ -65,7 +65,7 @@ export function Page(): JSX.Element {
 
 	const page = blocks?.page as BasicBlock & PageBlockType;
 
-	const { isError } = useBlocksSync(pageId, blocksProps);
+	const { isError } = usePage(pageId, blocksProps);
 
 	const hiddenBlocks = useMemo(() => {
 		return Object.values(blocks).filter((block) => !block.show);
