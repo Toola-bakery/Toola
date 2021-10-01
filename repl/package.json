@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@types/uuid": "^8.3.1",
 		"@types/ws": "^7.4.6",
+		"aws-sdk": "^2.999.0",
 		"axios": "^0.21.1",
 		"connection-string-parser": "^1.0.3",
 		"dotenv": "^8.0.0",

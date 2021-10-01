@@ -1,6 +1,6 @@
 {
-	"name": "page-state",
-	"version": "0.0.0",
+	"name": "@levankvirkvelia/page-state",
+	"version": "0.0.3",
 	"description": "My awesome module",
 	"license": "MIT",
 	"repository": "YOUR-GITHUB-USERNAME/unicorn-fun",
@@ -18,7 +18,8 @@
 		"test": "xo && ava"
 	},
 	"files": [
-		"index.js"
+		"index.js",
+		"modules"
 	],
 	"keywords": [
 		"unicorn",

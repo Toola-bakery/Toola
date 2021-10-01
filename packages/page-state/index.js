@@ -5,6 +5,8 @@ const customModules = {
   pageState,
 };
 
+const API_HOST = process.env.API_HOST || "localhost:8080";
+
 const genericModuleProxy = (module, databaseId) =>
   new Proxy(
     {},
@@ -13,7 +15,7 @@ const genericModuleProxy = (module, databaseId) =>
         return (options) => {
           const response = axios
             .post(
-              `http://localhost:8080/${module}Proxy/${action}`,
+              `http://${API_HOST}/${module}Proxy/${action}`,
               {
                 ...options,
                 id: databaseId,
@@ -21,7 +23,7 @@ const genericModuleProxy = (module, databaseId) =>
               { headers: { "auth-token": process.env.token } }
             )
             .then((resp) => resp.data);
-          response.catch((e) => console.log(e.response.data));
+          response.catch((e) => console.log(e?.response?.data || e));
           return response;
         };
       },

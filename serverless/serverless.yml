@@ -1,0 +1,16 @@
+org: lekvirkvelia
+app: workspace
+service: serverless-workspace
+
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: eu-central-1
+
+functions:
+  hello:
+    handler: ./src/handler.handler

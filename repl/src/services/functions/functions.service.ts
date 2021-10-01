@@ -1,6 +1,6 @@
 import { ServiceSchema } from 'moleculer';
 import { ObjectId } from 'mongodb';
-import { executeFunction } from './executeFunction';
+import AWS from 'aws-sdk';
 
 export const FunctionsService: ServiceSchema<
 	'functions',
@@ -35,28 +35,57 @@ export const FunctionsService: ServiceSchema<
 
 				await ctx.broadcast('ws.send', { message: { action: 'function.start', id: reqId }, id: wsId });
 
-				executeFunction({
-					code,
-					output: data =>
-						ctx.broadcast('ws.send', {
-							id: wsId,
-							message: { action: 'function.output', id: reqId, data: data.toString('utf-8') },
+				const lambda = new AWS.Lambda({
+					apiVersion: '2015-03-31',
+					credentials: {
+						accessKeyId: process.env.AWS_ACCESS_KEY,
+						secretAccessKey: process.env.AWS_SECRET_KEY,
+					},
+					region: 'eu-central-1',
+				});
+
+				const result = await lambda
+					.invoke({
+						FunctionName: 'arn:aws:lambda:eu-central-1:478939661155:function:serverless-workspace-dev-hello',
+						Payload: JSON.stringify({
+							token,
+							reqId,
+							code,
+							callArgs: [],
+							preloadState,
 						}),
-					callArgs,
-					env: { wsId, token, projectId: projectId.toString(), reqId, preloadState: JSON.stringify(preloadState) },
-				})
-					.then(result =>
-						ctx.broadcast('ws.send', {
-							id: wsId,
-							message: { action: 'function.end', result, id: reqId },
-						}),
-					)
-					.catch(error =>
-						ctx.broadcast('ws.send', {
-							id: wsId,
-							message: { action: 'function.end', result: 'error', id: reqId },
-						}),
-					);
+					})
+					.promise();
+
+				console.log({ result });
+
+				ctx.broadcast('ws.send', {
+					id: wsId,
+					message: { action: 'function.end', result: JSON.parse(result.Payload as string), id: reqId },
+				});
+
+				// executeFunction({
+				// 	code,
+				// 	output: data =>
+				// 		ctx.broadcast('ws.send', {
+				// 			id: wsId,
+				// 			message: { action: 'function.output', id: reqId, data: data.toString('utf-8') },
+				// 		}),
+				// 	callArgs,
+				// 	env: { wsId, token, projectId: projectId.toString(), reqId, preloadState: JSON.stringify(preloadState) },
+				// })
+				// 	.then(result =>
+				// 		ctx.broadcast('ws.send', {
+				// 			id: wsId,
+				// 			message: { action: 'function.end', result, id: reqId },
+				// 		}),
+				// 	)
+				// 	.catch(error =>
+				// 		ctx.broadcast('ws.send', {
+				// 			id: wsId,
+				// 			message: { action: 'function.end', result: 'error', id: reqId },
+				// 		}),
+				// 	);
 			},
 		},
 	},
