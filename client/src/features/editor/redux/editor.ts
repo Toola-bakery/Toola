@@ -4,7 +4,7 @@ import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
 import { BasicBlock } from '../types/basicBlock';
-import { BlockProps, BlockPropsAndState, Blocks, BlockStates, LayoutBlocks } from '../types/blocks';
+import { BlockProps, Blocks, LayoutBlocks } from '../types/blocks';
 
 type PageState = {
 	blocksProperties: { [id: string]: BlockProps & BasicBlock };

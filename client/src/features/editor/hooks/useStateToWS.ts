@@ -1,7 +1,7 @@
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { evalGet } from '../../executor/hooks/useWatchList';
 import { useWS } from '../../ws/hooks/useWS';
-import { useEventListener, useEvents } from './useEvents';
+import { useEventListener } from './useEvents';
 
 export type SateGetEvent = {
 	keys: string[];

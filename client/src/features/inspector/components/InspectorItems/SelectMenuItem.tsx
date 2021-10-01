@@ -17,6 +17,7 @@ export function SelectMenuItem({ item, Wrapper = MenuItem, inline }: InspectorIt
 			icon={item.icon}
 			text={
 				<SimpleSelect
+					formGroupStyle={{ marginBottom: 0 }}
 					inline={inline}
 					options={item.options.map((option) =>
 						typeof option === 'string'

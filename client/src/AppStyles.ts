@@ -8,7 +8,8 @@ export const AppStyles = styled.div`
 	}
 
 	.bp4-inline .bp4-label {
-		width: 130px;
+		width: 140px;
+		text-align: right;
 	}
 
 	[contenteditable] {

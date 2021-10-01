@@ -13,9 +13,15 @@ export function ColumnDnD({
 	column,
 	tableId,
 	onClick,
+	allowResize = true,
 	...tableCell
 }: PropsWithChildren<
-	{ column: HeaderGroup; tableId: string; onClick: MouseEventHandler } & TdHTMLAttributes<HTMLTableHeaderCellElement>
+	{
+		column: HeaderGroup;
+		tableId: string;
+		onClick: MouseEventHandler;
+		allowResize?: boolean;
+	} & TdHTMLAttributes<HTMLTableHeaderCellElement>
 >) {
 	const { editing } = usePageContext();
 
@@ -110,7 +116,9 @@ export function ColumnDnD({
 						{column.render('Header')}
 					</div>
 				</div>
-				<div {...column.getResizerProps()} className={`resizer ${column.isResizing ? 'isResizing' : ''}`} />
+				{allowResize ? (
+					<div {...column.getResizerProps()} className={`resizer ${column.isResizing ? 'isResizing' : ''}`} />
+				) : null}
 			</div>
 		</th>
 	);

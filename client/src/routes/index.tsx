@@ -1,29 +1,10 @@
-import { PropsWithChildren, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, RouteProps, Redirect, useHistory } from 'react-router-dom';
-import { useProjects } from '../features/user/hooks/useProjects';
-import { useUser } from '../features/user/hooks/useUser';
-import CreateProject from './CreateProject';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import CreateProjectRoute from './CreateProjectRoute';
 import EditorRoute from './EditorRoute';
 import LoginRoute from './LoginRoute';
-
-function PrivateRoute({
-	children,
-	allowWithoutProject = false,
-	...rest
-}: PropsWithChildren<{ allowWithoutProject?: boolean } & RouteProps>) {
-	const { userId } = useUser();
-	const { currentProjectId, projects, isFetched, selectProject } = useProjects();
-	const history = useHistory();
-
-	useEffect(() => {
-		if (!userId) return history.replace('/login');
-		if (allowWithoutProject) return;
-		if (!projects?.length && isFetched) return history.replace('/createProject');
-		if (projects?.length && !currentProjectId) selectProject(projects[0]._id);
-	}, [allowWithoutProject, isFetched, currentProjectId, history, userId, projects, selectProject]);
-
-	return <Route {...rest} render={() => (userId && (currentProjectId || allowWithoutProject) ? children : null)} />;
-}
+import { ResourcesRoute } from './Resources/ResourcesRoute';
+import { PrivateRoute } from './wrappers/PrivateRoute';
+import { RouteWithDrawer } from './wrappers/RouteWithDrawer';
 
 export function AppRouters() {
 	return (
@@ -34,14 +15,19 @@ export function AppRouters() {
 				</Route>
 
 				<PrivateRoute allowWithoutProject path="/createProject">
-					<CreateProject />
+					<CreateProjectRoute />
 				</PrivateRoute>
 
-				<PrivateRoute path="/:pageId">
-					<EditorRoute />
+				<PrivateRoute path="/resources">
+					<RouteWithDrawer>
+						<ResourcesRoute />
+					</RouteWithDrawer>
 				</PrivateRoute>
-				<PrivateRoute path="/">
-					<EditorRoute />
+
+				<PrivateRoute path={['/:pageId', '/']}>
+					<RouteWithDrawer>
+						<EditorRoute />
+					</RouteWithDrawer>
 				</PrivateRoute>
 			</Switch>
 		</Router>

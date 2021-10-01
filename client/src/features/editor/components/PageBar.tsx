@@ -1,4 +1,4 @@
-import { H3, Switch } from '@blueprintjs/core';
+import { H4, Switch } from '@blueprintjs/core';
 import { decode } from 'html-entities';
 import { useCallback } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
@@ -20,9 +20,10 @@ export function PageBar() {
 			style={{
 				position: 'sticky',
 				top: 0,
-				backgroundColor: 'rgb(240 240 240)',
+				// backgroundColor: 'rgb(240 240 240)',
+				backgroundColor: 'rgb(255 255 255)',
 				zIndex: 20,
-				height: 65,
+				height: 40,
 				display: 'flex',
 				justifyContent: 'center',
 				alignItems: 'center',
@@ -32,7 +33,7 @@ export function PageBar() {
 			}}
 		>
 			<div style={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
-				<H3 style={{ fontWeight: 400, margin: 0 }}>
+				<H4 style={{ fontWeight: 400, margin: 0 }}>
 					<ContentEditable
 						disabled={!editing || !id}
 						html={title || ''}
@@ -40,7 +41,7 @@ export function PageBar() {
 						style={{ margin: 0, marginBottom: 10 }}
 						onChange={onChangeHandler}
 					/>
-				</H3>
+				</H4>
 			</div>
 			<div style={{ flexShrink: 1 }}>
 				<Switch

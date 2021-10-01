@@ -1,7 +1,7 @@
 import { MenuItem, Button, FormGroup } from '@blueprintjs/core';
 import { Select } from '@blueprintjs/select';
 import React, { useMemo } from 'react';
-import { Database, useDatabases } from '../../hooks/useDatabases';
+import { Database, useDatabases } from '../../../resources/hooks/useDatabases';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type DatabaseMenuItemProps = BasicItemProps & {
@@ -28,8 +28,10 @@ export function DatabaseMenuItem({ item, Wrapper = MenuItem, inline }: Inspector
 					<DatabaseSelect
 						items={data || []}
 						itemPredicate={(query, database) => database.name.toLowerCase().includes(query.toLowerCase())}
-						noResults={<MenuItem disabled text="No results." />}
-						itemRenderer={(database, { handleClick }) => <MenuItem onClick={handleClick} text={database.name} />}
+						noResults={<MenuItem key="no results" disabled text="No results." />}
+						itemRenderer={(database, { handleClick }) => (
+							<MenuItem key={database._id} onClick={handleClick} text={database.name} />
+						)}
 						onItemSelect={(a) => item.onChange(a)}
 					>
 						<Button fill text={selectedDatabase?.name || 'Выберите базу данных'} rightIcon="double-caret-vertical" />

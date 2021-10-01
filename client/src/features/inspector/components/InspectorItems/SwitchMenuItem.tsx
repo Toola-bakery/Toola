@@ -1,7 +1,6 @@
 import { MenuItem, Switch } from '@blueprintjs/core';
 import React from 'react';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
-import { MenuItemWithInput } from '../MenuItemWithInput';
 
 export type SwitchMenuItemProps = BasicItemProps & {
 	type: 'switch';
@@ -21,6 +20,7 @@ export function SwitchMenuItem({ item, Wrapper = MenuItem, inline }: InspectorIt
 			text={item.label}
 			labelElement={
 				<Switch
+					style={{ marginBottom: 0 }}
 					checked={item.value}
 					onChange={() => {
 						item.onChange(!item.value);

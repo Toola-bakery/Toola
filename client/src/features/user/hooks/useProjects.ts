@@ -15,7 +15,7 @@ export function useProjectsState() {
 	const [data = {}, immer] = useImmerState<{
 		currentProjectId?: string;
 		projectsCache?: ProjectSchema[];
-	}>('projects');
+	}>('projects', {});
 	const { currentProjectId, projectsCache } = data;
 	return { currentProjectId, projectsCache, immer };
 }

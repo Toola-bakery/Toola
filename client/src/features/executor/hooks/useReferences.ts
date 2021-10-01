@@ -1,7 +1,5 @@
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useMemo, useRef } from 'react';
 import { PageContext } from '../../editor/components/Page';
-import { useBlock } from '../../editor/hooks/useBlock';
-import { useEditor } from '../../editor/hooks/useEditor';
 import { useWatchList, WatchListProps } from './useWatchList';
 
 export function usePageContext() {

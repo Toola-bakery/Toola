@@ -8,6 +8,7 @@ export type SimpleSelectProps = {
 	value?: string;
 	options: (string | OptionProps)[];
 	inputRef?: Exclude<React.Ref<HTMLSelectElement>, null>;
+	formGroupStyle?: React.CSSProperties;
 };
 
 export function SimpleSelect({
@@ -17,10 +18,11 @@ export function SimpleSelect({
 	value,
 	inputRef,
 	options,
+	formGroupStyle,
 	...rest
 }: SimpleSelectProps & Omit<SelectHTMLAttributes<HTMLSelectElement>, keyof SimpleSelectProps | 'multiple'>) {
 	return (
-		<FormGroup label={label} inline={inline}>
+		<FormGroup style={formGroupStyle} label={label} inline={inline}>
 			<HTMLSelect {...rest} value={value} fill={fill} ref={inputRef} options={options} />
 		</FormGroup>
 	);

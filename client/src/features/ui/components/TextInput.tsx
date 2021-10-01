@@ -7,6 +7,8 @@ export type TextInputProps<T extends boolean> = {
 	inline?: boolean;
 	multiline?: T;
 	value?: string;
+	formGroupStyle?: React.CSSProperties;
+	inputStyle?: React.CSSProperties;
 	inputRef?: Exclude<React.Ref<T extends true ? HTMLTextAreaElement : HTMLInputElement>, null>;
 };
 
@@ -17,6 +19,8 @@ export function TextInput<T extends boolean>({
 	value,
 	inputRef,
 	multiline,
+	inputStyle,
+	formGroupStyle,
 	...rest
 }: TextInputProps<T> &
 	Omit<
@@ -24,15 +28,15 @@ export function TextInput<T extends boolean>({
 		keyof TextInputProps<T> | 'defaultValue'
 	>) {
 	return (
-		<FormGroup label={label} inline={inline}>
+		<FormGroup style={formGroupStyle} label={label} inline={inline}>
 			{multiline === true ? (
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				<TextArea {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
+				<TextArea style={inputStyle} {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
 			) : (
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				<InputGroup {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
+				<InputGroup style={inputStyle} {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
 			)}
 		</FormGroup>
 	);

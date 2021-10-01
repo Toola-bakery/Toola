@@ -5,15 +5,25 @@ import { editorReducer } from '../features/editor/redux/editor';
 import { userSlice } from '../features/user/redux/user';
 import { immerSlice } from './immerSlice';
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
 	editor: editorReducer,
 	user: userSlice.reducer,
 	immer: immerSlice.reducer,
 });
 
+const PERSIST_KEY = 'root';
+
+const rootReducer: typeof appReducer = (state, action) => {
+	if (action.type === 'USER_LOGOUT') {
+		localStorage.removeItem(`persist:${PERSIST_KEY}`);
+		return appReducer(undefined, action);
+	}
+
+	return appReducer(state, action);
+};
 const persistedReducer = persistReducer(
 	{
-		key: 'root',
+		key: PERSIST_KEY,
 		storage,
 		blacklist: ['editor'],
 	},

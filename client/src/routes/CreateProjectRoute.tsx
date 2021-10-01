@@ -1,6 +1,6 @@
 import { Button, FormGroup, H1, InputGroup } from '@blueprintjs/core';
 import ky from 'ky';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { Config } from '../config';
@@ -8,7 +8,7 @@ import { useProjects } from '../features/user/hooks/useProjects';
 import { useUser } from '../features/user/hooks/useUser';
 import { useAppDispatch } from '../redux/hooks';
 
-export default function CreateProject() {
+export default function CreateProjectRoute() {
 	const [projectName, setProjectName] = useState('');
 	const dispatch = useAppDispatch();
 	const { refetch: fetchProjects, selectProject } = useProjects();

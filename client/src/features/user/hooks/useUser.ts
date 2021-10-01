@@ -1,6 +1,7 @@
 import ky from 'ky';
 import { useCallback } from 'react';
 import { useQuery } from 'react-query';
+import { useHistory } from 'react-router-dom';
 import { Config } from '../../../config';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { setAuthValues } from '../redux/user';
@@ -8,6 +9,7 @@ import { setAuthValues } from '../redux/user';
 export function useUser(skipFetch = false) {
 	const { userId, authToken, currentUser } = useAppSelector((state) => state.user);
 	const dispatch = useAppDispatch();
+	const history = useHistory();
 
 	const {
 		data: user,
@@ -26,5 +28,10 @@ export function useUser(skipFetch = false) {
 		[dispatch],
 	);
 
-	return { authToken, userId, user, isLoading, refetch, authByToken };
+	const logOut = useCallback(() => {
+		dispatch({ type: 'USER_LOGOUT' });
+		history.push('/');
+	}, [dispatch, history]);
+
+	return { authToken, userId, user, isLoading, refetch, authByToken, logOut };
 }

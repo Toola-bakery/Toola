@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useOnMountedEffect } from '../../../hooks/useOnMounted';
 import { usePrevious } from '../../../hooks/usePrevious';
 import { useBlock } from '../../editor/hooks/useBlock';
 import { useEditor } from '../../editor/hooks/useEditor';

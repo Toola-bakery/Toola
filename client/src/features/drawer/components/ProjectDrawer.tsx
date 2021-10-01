@@ -12,7 +12,8 @@ const DrawerResizable = styled.div`
 	width: ${RESIZABLE_WIDTH}px;
 	height: 100%;
 	cursor: col-resize;
-	&:hover {
+	&:hover,
+	&.move {
 		background-color: rgba(0, 0, 0, 0.21);
 	}
 `;
@@ -21,13 +22,17 @@ export function ProjectDrawer() {
 	const { width, setWidth } = useDrawer();
 
 	const isMoving = useRef(false);
+	const resizableRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		function handleCursor(event: MouseEvent) {
-			if (isMoving.current) setWidth(event.pageX + 1);
+			if (!isMoving.current) return;
+			resizableRef.current?.classList.add('move');
+			setWidth(event.pageX + 1);
 			event.preventDefault();
 		}
 		function handleMouseUp() {
+			resizableRef.current?.classList.remove('move');
 			isMoving.current = false;
 		}
 
@@ -42,7 +47,16 @@ export function ProjectDrawer() {
 
 	return (
 		<div style={{ width, height: '100%', position: 'relative' }}>
-			<div style={{ width, height: '100%', display: 'flex', flexDirection: 'row', position: 'fixed' }}>
+			<div
+				style={{
+					width,
+					height: '100%',
+					backgroundColor: 'rgb(240, 240, 240)',
+					display: 'flex',
+					flexDirection: 'row',
+					position: 'fixed',
+				}}
+			>
 				<div style={{ width, display: 'flex', flexDirection: 'column' }}>
 					<ProjectBar />
 					<div style={{ overflowY: 'auto', flexShrink: 1 }}>
@@ -50,6 +64,7 @@ export function ProjectDrawer() {
 					</div>
 				</div>
 				<DrawerResizable
+					ref={resizableRef}
 					onMouseDown={() => {
 						isMoving.current = true;
 					}}

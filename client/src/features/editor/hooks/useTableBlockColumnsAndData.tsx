@@ -6,7 +6,7 @@ import { BasicBlock } from '../types/basicBlock';
 import { useEditor } from './useEditor';
 import { useReferenceEvaluator } from '../../executor/hooks/useReferences';
 
-export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType) {
+export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType, isEditing: boolean) {
 	const { columns, value, id, pageId } = block;
 
 	const { evaluate, isLoading } = useReferenceEvaluator();
@@ -51,17 +51,18 @@ export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType) 
 			id: col.id,
 		}));
 		const addCellWidth = 35;
-		cols.push({
-			id: 'add',
-			Header: '+',
-			accessor: () => '',
-			maxWidth: addCellWidth,
-			minWidth: addCellWidth,
-			width: addCellWidth,
-			// type: ColumnTypes.text,
-		});
+		if (isEditing)
+			cols.push({
+				id: 'add',
+				Header: '+',
+				accessor: () => '',
+				maxWidth: addCellWidth,
+				minWidth: addCellWidth,
+				width: addCellWidth,
+				// type: ColumnTypes.text,
+			});
 		return cols;
-	}, [columnsProp, evaluate]);
+	}, [columnsProp, evaluate, isEditing]);
 
 	return { calculatedColumns, data, isLoading };
 }

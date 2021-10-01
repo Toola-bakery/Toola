@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom';
 import { GoogleLoginButton } from 'react-social-login-buttons';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useUser } from '../features/user/hooks/useUser';
-import { useOnMountedEffect } from '../hooks/useOnMounted';
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
@@ -20,7 +19,7 @@ export default function LoginRoute() {
 
 	const googleAuth = useCallback(async () => {
 		const auth = getAuth();
-		const result = await signInWithPopup(auth, googleProvider);
+		await signInWithPopup(auth, googleProvider);
 		const token = await auth?.currentUser?.getIdToken();
 		if (token) {
 			authByToken(token);

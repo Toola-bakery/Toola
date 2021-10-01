@@ -3,8 +3,10 @@ import JSONTree from 'react-json-tree';
 import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
+import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { usePageNavigator } from '../../../../../hooks/usePageNavigator';
+import { usePage } from '../../../hooks/usePage';
 import { useTableBlockColumnsAndData } from '../../../hooks/useTableBlockColumnsAndData';
 import { useTableColumnResizing } from '../../../hooks/useTableColumnResizing';
 import { useTableInspector } from '../../../hooks/useTableInspector';
@@ -47,10 +49,10 @@ export type TableBlockState = {
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { id, manualPagination, connectedPage } = block;
-
+	const { editing } = usePageContext();
 	const { updateBlockState, immerBlockProps } = useEditor();
 	const { navigate } = usePageNavigator();
-	const { data, calculatedColumns } = useTableBlockColumnsAndData(block);
+	const { data, calculatedColumns } = useTableBlockColumnsAndData(block, editing);
 
 	const {
 		getTableProps,
@@ -90,13 +92,13 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		});
 	}, [id, immerBlockProps]);
 
-	if (!block.show) return <></>;
+	if (!block.show) return null;
 
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
-				<Card style={{ padding: 0, zIndex: 1000 }}>
+				<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
 					<div style={{ overflow: 'scroll', maxHeight: 500 }}>
 						<HTMLTable
 							bordered
@@ -114,6 +116,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 													key={column.id}
 													column={column}
 													tableId={id}
+													allowResize={editing}
 													onClick={(e) => {
 														if (column.id === 'add') addColumn();
 														else onContextMenu(e, [`col${column.id}`]);

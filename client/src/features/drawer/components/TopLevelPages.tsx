@@ -41,7 +41,7 @@ export function TopLevelPages() {
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
-			<Menu style={{ minWidth: 50 }}>
+			<Menu style={{ minWidth: 50, background: 'transparent' }}>
 				<StyledMenuDivider
 					title={
 						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -53,6 +53,7 @@ export function TopLevelPages() {
 
 				{pages.map((page) => (
 					<MenuItem
+						key={page.id}
 						onContextMenu={(e) => onContextMenu(e, [page.id])}
 						onClick={() => navigate(page.id)}
 						active={page.id === pageId}

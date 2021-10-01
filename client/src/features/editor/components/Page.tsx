@@ -125,7 +125,7 @@ export function Page(): JSX.Element {
 				</div>
 				<div>
 					{hiddenBlocks.map((block) => (
-						<Block block={block} />
+						<Block key={block.id} block={block} />
 					))}
 				</div>
 			</PageContext.Provider>

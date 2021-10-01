@@ -1,4 +1,4 @@
-import { DependencyList, useEffect, useRef, useState } from 'react';
+import { DependencyList, useEffect, useState } from 'react';
 import { useIsMounted } from './useOnMounted';
 
 export function useMap<Key, Value>(deps: DependencyList = []): Map<Key, Value> {

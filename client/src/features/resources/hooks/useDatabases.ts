@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { useProjects } from '../../user/hooks/useProjects';
-import { QueryProperty } from './useQueryConstructor';
+import { QueryProperty } from '../../inspector/hooks/useQueryConstructor';
 
 export type Database = {
 	_id: string;
 	name: string;
 	type: 'mongodb';
+	dbName: string;
 	actions: DatabaseAction[];
 };
 
@@ -17,28 +18,12 @@ export type DatabaseAction = {
 
 export function useDatabases() {
 	const { currentProjectId } = useProjects();
-	const { data, ...rest } = useQuery<Database[]>(['/databases/getAll', { projectId: currentProjectId }]);
-
-	const newData: Database[] =
-		data?.map((db: Omit<Database, 'actions'> & { actions?: Database['actions'] }) => ({
-			actions: [
-				{
-					name: 'find',
-					fields: [
-						{ type: 'string', label: 'Collection', id: 'collection' },
-						{ type: 'object', label: 'Filter', id: 'filter' },
-						{ type: 'object', label: 'Project', id: 'project' },
-						{ type: 'object', label: 'Sort', id: 'sort' },
-						{ type: 'number', label: 'Limit', id: 'limit' },
-						{ type: 'number', label: 'Skip', id: 'skip' },
-					],
-				},
-			],
-			...db,
-		})) || [];
+	const { data, ...rest } = useQuery<Database[]>(['/databases/getAll', { projectId: currentProjectId }], {
+		initialData: [],
+	});
 
 	return {
-		data: newData,
+		data: data || [],
 		...rest,
 	};
 }
