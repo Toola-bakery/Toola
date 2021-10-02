@@ -26,7 +26,11 @@ function awaitMessageResponse(messageId) {
   return p;
 }
 
-const ws = new WebSocket("ws://localhost:8080");
+const API_HOST = process.env.API_HOST
+  ? `wss://${process.env.API_HOST}`
+  : "ws://localhost:8080";
+
+const ws = new WebSocket(API_HOST);
 
 let resolve = () => {};
 const isWsReadyPromise = new Promise((_resolve) => (resolve = _resolve));

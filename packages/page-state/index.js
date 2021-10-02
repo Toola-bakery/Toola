@@ -5,7 +5,9 @@ const customModules = {
   pageState,
 };
 
-const API_HOST = process.env.API_HOST || "localhost:8080";
+const API_HOST = process.env.API_HOST
+  ? `https://${process.env.API_HOST}`
+  : "http://localhost:8080";
 
 const genericModuleProxy = (module, databaseId) =>
   new Proxy(
@@ -15,7 +17,7 @@ const genericModuleProxy = (module, databaseId) =>
         return (options) => {
           const response = axios
             .post(
-              `http://${API_HOST}/${module}Proxy/${action}`,
+              `${API_HOST}/${module}Proxy/${action}`,
               {
                 ...options,
                 id: databaseId,

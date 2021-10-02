@@ -17,7 +17,7 @@
     "firebase-admin": "^9.11.1",
     "jose": "^3.17.0",
     "mongodb": "^4.0.1",
-    "@levankvirkvelia/page-state": "0.0.3",
+    "@levankvirkvelia/page-state": "0.0.6",
     "uuid": "^8.3.2",
     "ws": "^7.5.3"
   }

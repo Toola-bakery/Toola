@@ -1,4 +1,4 @@
-import { Button, HTMLSelect } from '@blueprintjs/core';
+import { Button, HTMLSelect, Spinner } from '@blueprintjs/core';
 
 export type TablePaginationProps = {
 	page: number;
@@ -8,6 +8,7 @@ export type TablePaginationProps = {
 	rowsPerPage: number;
 	rowsPerPageOptions: number[];
 	onRowsPerPageChange: (rowsPerPage: number) => void;
+	isLoading: boolean;
 };
 export function TablePagination({
 	count,
@@ -16,6 +17,7 @@ export function TablePagination({
 	onRowsPerPageChange,
 	rowsPerPageOptions,
 	onPageChange,
+	isLoading,
 }: TablePaginationProps) {
 	const maxPage = count === -1 ? 99999999 : Math.ceil(count / rowsPerPage);
 
@@ -40,7 +42,8 @@ export function TablePagination({
 				/>
 			</div>
 			<div style={{ display: 'flex', alignItems: 'center' }}>
-				{`Page ${page + 1}${count === -1 ? '' : ` of ${maxPage}`}`}
+				{isLoading ? <Spinner size={18} /> : null}
+				<span style={{ marginLeft: 8 }}>{`Page ${page + 1}${count === -1 ? '' : ` of ${maxPage}`}`}</span>
 				<Button minimal disabled={page === 0} onClick={() => onPageChange(Math.max(page - 1, 0))} icon="chevron-left" />
 				<Button
 					minimal

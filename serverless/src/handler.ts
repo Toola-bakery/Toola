@@ -14,7 +14,11 @@ export const handler: Handler<{
 
   const result = await executeFunction({
     code,
-    env: { ...rest, preloadState: JSON.stringify(preloadState) },
+    env: {
+      ...rest,
+      API_HOST: "workspace-5wcfu.ondigitalocean.app",
+      preloadState: JSON.stringify(preloadState),
+    },
     output(e) {
       console.log(e.toString("utf-8"));
     },

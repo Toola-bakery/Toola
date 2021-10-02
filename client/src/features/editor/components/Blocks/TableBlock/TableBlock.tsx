@@ -52,7 +52,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { editing } = usePageContext();
 	const { updateBlockState, immerBlockProps } = useEditor();
 	const { navigate } = usePageNavigator();
-	const { data, calculatedColumns } = useTableBlockColumnsAndData(block, editing);
+	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData(block, editing);
 
 	const {
 		getTableProps,
@@ -183,6 +183,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 						page={pageIndex}
 						onPageChange={gotoPage}
 						onRowsPerPageChange={setPageSize}
+						isLoading={isLoading}
 					/>
 				</Card>
 			</TableStyles>

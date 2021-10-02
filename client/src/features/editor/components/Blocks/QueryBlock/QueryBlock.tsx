@@ -72,7 +72,7 @@ export function QueryBlock({ block }: QueryBlockComponentProps) {
 
 	const { editing } = usePageContext();
 
-	const code = `const SDK = require('page-state');
+	const code = `const SDK = require('@levankvirkvelia/page-state');
 
 async function main () {
   const resp = await SDK

@@ -57,8 +57,6 @@ export const FunctionsService: ServiceSchema<
 					})
 					.promise();
 
-				console.log({ result });
-
 				ctx.broadcast('ws.send', {
 					id: wsId,
 					message: { action: 'function.end', result: JSON.parse(result.Payload as string), id: reqId },
