@@ -1,5 +1,5 @@
 import { useMutation } from 'react-query';
-import { Config } from '../../../config';
+import { Config } from '../../../Config';
 import { useKy } from '../../../hooks/useKy';
 
 export function useMutateResource() {

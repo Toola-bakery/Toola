@@ -2,7 +2,7 @@ import { Button } from '@blueprintjs/core';
 import ky from 'ky';
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Config } from '../../../../config';
+import { Config } from '../../../../Config';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';

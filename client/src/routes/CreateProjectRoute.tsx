@@ -3,7 +3,7 @@ import ky from 'ky';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import { Config } from '../config';
+import { Config } from '../Config';
 import { useProjects } from '../features/user/hooks/useProjects';
 import { useUser } from '../features/user/hooks/useUser';
 import { useAppDispatch } from '../redux/hooks';

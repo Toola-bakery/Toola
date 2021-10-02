@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useEventListener, useEvents } from '../../editor/hooks/useEvents';
-import { Config } from '../../../config';
+import { Config } from '../../../Config';
 import { useProjects } from '../../user/hooks/useProjects';
 import { useUser } from '../../user/hooks/useUser';
 

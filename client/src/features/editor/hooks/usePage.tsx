@@ -2,7 +2,7 @@ import debounce from 'just-debounce';
 import ky from 'ky';
 import { useEffect } from 'react';
 import { useQuery } from 'react-query';
-import { Config } from '../../../config';
+import { Config } from '../../../Config';
 import { useAppDispatch } from '../../../redux/hooks';
 import { useUser } from '../../user/hooks/useUser';
 import { setPage } from '../redux/editor';

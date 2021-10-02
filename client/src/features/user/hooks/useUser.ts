@@ -2,7 +2,7 @@ import ky from 'ky';
 import { useCallback } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import { Config } from '../../../config';
+import { Config } from '../../../Config';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { setAuthValues } from '../redux/user';
 
