@@ -1,6 +1,7 @@
 import ky from 'ky';
 import { PropsWithChildren, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { Config } from '../Config';
 import { useProjectsState } from '../features/user/hooks/useProjects';
 import { useAppSelector } from '../redux/hooks';
 
@@ -23,7 +24,7 @@ export function QueryProvider({ children }: PropsWithChildren<{ a?: string }>) {
 				defaultOptions: {
 					queries: {
 						queryFn({ queryKey }) {
-							return api.get(`http://localhost:8080${queryKey[0]}`, { searchParams: queryKey[1] as any }).json();
+							return api.get(`${Config.domain}${queryKey[0]}`, { searchParams: queryKey[1] as any }).json();
 						},
 					},
 				},
