@@ -1,6 +1,6 @@
 import ApiGwService from 'moleculer-web';
 import { ServiceSchema } from 'moleculer';
-import { UserAuthError } from 'types/api.types';
+import { UserAuthError } from '../../types/api.types';
 import { WsMixin } from './ws.mixin';
 
 function getTokenFromReq(req) {

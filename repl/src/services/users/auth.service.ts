@@ -11,6 +11,8 @@ import '../../utils/firebase';
 import firebaseAdmin from 'firebase-admin';
 import { UserSchema } from '../../types/users.types';
 import { mongoDB } from '../../utils/mongo';
+import { privateKeyString } from './keys/private.key';
+import { publicKeyString } from './keys/public.key';
 
 export type TokenSchema = {
 	_id: ObjectId;
@@ -36,8 +38,8 @@ tokensCollection.createIndex({ userId: 1, isValid: 1 });
 
 const SALT = '36d21a4d-ba92-4d8c-86aa-45f9daee637e';
 
-const privateKey = createPrivateKey(fs.readFileSync(path.join(__dirname, './keys/private.key')));
-const publicKey = createPublicKey(fs.readFileSync(path.join(__dirname, './keys/public.key')));
+const privateKey = createPrivateKey(privateKeyString);
+const publicKey = createPublicKey(publicKeyString);
 
 export const AuthService: ServiceSchema<
 	'auth',

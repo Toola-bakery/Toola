@@ -44,7 +44,5 @@ export const moleculerDefaultConfig: Moleculer.BrokerOptions = {
 	namespace: 'nodes',
 	metrics: true,
 	cacher: 'Memory',
-	...(process.env.NODE_ENV !== 'development' || process.env.REDIS
-		? redisTransporterAndRegistry
-		: localTranporterAndRegistry),
+	...localTranporterAndRegistry,
 };
