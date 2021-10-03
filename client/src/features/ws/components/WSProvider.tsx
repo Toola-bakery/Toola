@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useEventListener, useEvents } from '../../editor/hooks/useEvents';
 import { Config } from '../../../Config';
 import { useProjects } from '../../user/hooks/useProjects';
@@ -14,9 +15,12 @@ export const WSProviderContext = React.createContext<WSProviderContextType>({
 });
 
 let resolve = () => {};
-const isWsReadyPromise = new Promise<void>((_resolve) => {
-	resolve = _resolve;
-});
+const getNewPromise = () =>
+	new Promise<void>((_resolve) => {
+		resolve = _resolve;
+	});
+
+let isWsReadyPromise = getNewPromise();
 isWsReadyPromise.then();
 
 export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
@@ -24,7 +28,20 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 	const { authToken } = useUser();
 	const { currentProjectId } = useProjects();
 
-	const [ws, setWs] = useState(() => new WebSocket(Config.websocket));
+	const [ws, setWs] = useState(
+		() =>
+			new ReconnectingWebSocket(Config.websocket, [], {
+				maxReconnectionDelay: 6000,
+				minReconnectionDelay: 1000,
+				reconnectionDelayGrowFactor: 1.3,
+				minUptime: 5000,
+				connectionTimeout: 4000,
+				maxRetries: Infinity,
+				maxEnqueuedMessages: Infinity,
+				startClosed: false,
+				debug: true,
+			}),
+	);
 
 	const sendWS = useCallback(
 		async (data: unknown, skipReady = false) => {
@@ -35,12 +52,24 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 	);
 
 	useEffect(() => {
-		ws.onmessage = (event) => {
+		const onMessage = (event: any) => {
 			const jsonEvent = JSON.parse(event.data);
 			if (jsonEvent.id) send(`ws/${jsonEvent.id}`, jsonEvent);
 			if (jsonEvent.action) send(`ws/${jsonEvent.action}`, jsonEvent);
 		};
+
+		ws.addEventListener('message', onMessage);
+		return () => ws.removeEventListener('message', onMessage);
 	}, [send, ws]);
+
+	useEffect(() => {
+		const closeListener = () => {
+			isWsReadyPromise = getNewPromise();
+		};
+
+		ws.addEventListener('close', closeListener);
+		return () => ws.removeEventListener('close', closeListener);
+	}, [ws]);
 
 	useEventListener(
 		'ws/init',
@@ -53,7 +82,7 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 
 	useEventListener('ws/auth.success', resolve, [sendWS]);
 
-	const value = useMemo<WSProviderContextType>(() => ({ ws, sendWS }), [ws, sendWS]);
+	const value = useMemo<WSProviderContextType>(() => ({ ws: ws as WebSocket, sendWS }), [ws, sendWS]);
 
 	return (
 		<WSProviderContext.Provider value={value}>

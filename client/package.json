@@ -38,6 +38,7 @@
 		"react-scripts": "latest",
 		"react-social-login-buttons": "^3.5.1",
 		"react-table": "^7.7.0",
+		"reconnecting-websocket": "^4.4.0",
 		"redux-persist": "^6.0.0",
 		"reselect": "^4.0.0",
 		"styled-components": "latest",
