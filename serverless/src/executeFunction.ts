@@ -39,7 +39,6 @@ export function executeFunction({
     let response = "";
 
     function catchData(data: Buffer) {
-      console.log(data.toString("utf-8"));
       const stringData = data.toString("utf-8");
       if (!madeFullResponse && (stringData.includes(id) || mentionedOnce)) {
         if (!mentionedOnce) {
