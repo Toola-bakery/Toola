@@ -51,6 +51,7 @@ export const FunctionsService: ServiceSchema<
 							token,
 							reqId,
 							code,
+							wsId,
 							projectId: projectId.toString(),
 							callArgs: [],
 							preloadState,
