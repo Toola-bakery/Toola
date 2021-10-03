@@ -66,7 +66,7 @@ export const WsMixin: ServiceSchema = {
 			interval: 5000,
 			timeout: 30 * 1000 * 100,
 			nodeID: broker.nodeID,
-			async authorization({ token, projectId }: { token?: string; projectId?: string }) {
+			async authorization(client, { token, projectId }: { token?: string; projectId?: string }) {
 				if (!token) throw new Error('Set token and projectId');
 
 				const { userId, projectId: authProjectId } = await broker.call('auth.validateToken', { authToken: token });
@@ -77,7 +77,6 @@ export const WsMixin: ServiceSchema = {
 					return { userId, projectId };
 				}
 				if (authProjectId) return { projectId: authProjectId };
-
 				throw new Error('Bad token auth');
 			},
 			onMessage(client, message) {

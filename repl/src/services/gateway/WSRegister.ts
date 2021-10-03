@@ -32,7 +32,7 @@ export class WSRegister {
 
 	readonly onMessage: (client: WSClient, data: any) => void;
 
-	readonly authorization: (message: unknown) => unknown | Promise<unknown>;
+	readonly authorization: (client: WSClient, message: unknown) => unknown | Promise<unknown>;
 
 	readonly heartbeatInterval;
 
@@ -84,10 +84,10 @@ export class WSRegister {
 
 		if (action === 'init' && respId === id) {
 			try {
-				const meta = (await this.authorization?.(message)) || {};
+				const meta = (await this.authorization?.(client, message)) || {};
 				await this.setInitialized(id, meta);
 			} catch (e) {
-				this.send(id, { error: e.toString() });
+				this.send(id, { error: e.message || e });
 				await this.disconnect(id);
 			}
 		} else if (client.initialized) {

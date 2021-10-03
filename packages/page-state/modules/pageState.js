@@ -46,6 +46,7 @@ ws.on("message", function incoming(message) {
         action: "init",
         id: jsonMessage.id,
         token: process.env.token,
+        projectId: process.env.projectId,
       })
     );
     resolve();
