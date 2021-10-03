@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { decode } from 'html-entities';
 import { useEditor } from '../../../hooks/useEditor';
@@ -9,8 +9,6 @@ import { usePageContext, useReferences } from '../../../../executor/hooks/useRef
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
 import { useTextBlockOnKeyDownHandler } from './useTextBlockOnKeyDownHandler';
-
-const CMD_KEY = '/';
 
 export type TextBlockType = TextBlockProps;
 
@@ -33,6 +31,10 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	const [isEditing, setEditing] = useState(false);
 	const isEditingRef = useRefLatest(isEditing);
 
+	useEffect(() => {
+		setValue(realValue);
+	}, [realValue]);
+
 	const contentEditableRef = useRef<HTMLElement>(null);
 
 	const onChangeHandler = useCallback(
@@ -49,7 +51,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	useEventListener(
 		id,
 		(event) => {
-			if (event.eventName === 'focus') contentEditableRef?.current?.focus();
+			if (event.action === 'focus') contentEditableRef?.current?.focus();
 		},
 		[],
 	);

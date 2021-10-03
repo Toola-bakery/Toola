@@ -1,6 +1,7 @@
 import { KeyboardEventHandler, RefObject } from 'react';
 import { useRefsLatest } from '../../../../../hooks/useRefLatest';
 import { useAppSelector } from '../../../../../redux/hooks';
+import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { InspectorPropsType } from '../../../../inspector/hooks/useBlockInspectorState';
 import { getCaretGlobalPosition, getCaretIndex } from '../../../helpers/caretOperators';
 import { useBlock } from '../../../hooks/useBlock';
@@ -18,9 +19,9 @@ export function useTextBlockOnKeyDownHandler({
 	inspectorProps: InspectorPropsType;
 }) {
 	const { id, value } = useBlock<TextBlockProps>();
+	const { pageId } = usePageContext();
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
-	const { previous } = useAppSelector((state) => selectBlockNeighborsProps(state, id));
-
+	const { previous } = useAppSelector((state) => selectBlockNeighborsProps(state, pageId, id));
 	const { addBlockAfterRef, deleteBlockRef, previousRef, valueRef, inspectorPropsRef } = useRefsLatest({
 		previous,
 		addBlockAfter,
