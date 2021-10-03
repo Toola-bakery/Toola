@@ -13,6 +13,12 @@ export const WSProviderContext = React.createContext<WSProviderContextType>({
 	sendWS: () => {},
 });
 
+let resolve = () => {};
+const isWsReadyPromise = new Promise<void>((_resolve) => {
+	resolve = _resolve;
+});
+isWsReadyPromise.then();
+
 export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
 	const { send } = useEvents();
 	const { authToken } = useUser();
@@ -21,7 +27,8 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 	const [ws, setWs] = useState(() => new WebSocket(Config.websocket));
 
 	const sendWS = useCallback(
-		(data: unknown) => {
+		async (data: unknown, skipReady = false) => {
+			if (!skipReady) await isWsReadyPromise;
 			if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(data));
 		},
 		[ws],
@@ -39,10 +46,12 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 		'ws/init',
 		(event) => {
 			if (event.action === 'init')
-				sendWS({ action: 'init', id: event.id, token: authToken, projectId: currentProjectId });
+				sendWS({ action: 'init', id: event.id, token: authToken, projectId: currentProjectId }, true);
 		},
 		[sendWS],
 	);
+
+	useEventListener('ws/auth.success', resolve, [sendWS]);
 
 	const value = useMemo<WSProviderContextType>(() => ({ ws, sendWS }), [ws, sendWS]);
 

@@ -5,7 +5,6 @@ import { executeFunction } from "./executeFunction";
 
 let resolve = () => {};
 const isWsReadyPromise = new Promise<void>((_resolve) => (resolve = _resolve));
-
 isWsReadyPromise.then();
 
 export const handler: Handler<{

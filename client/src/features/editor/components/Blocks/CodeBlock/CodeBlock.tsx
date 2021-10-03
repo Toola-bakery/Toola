@@ -1,4 +1,4 @@
-import { Button, Card } from '@blueprintjs/core';
+import { Button, Card, Spinner } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
 import { stringify, parse } from 'flatted';
 import React, { useRef, useCallback, useState, useMemo } from 'react';
@@ -118,7 +118,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 						setupMonaco(monaco);
 						monaco.languages.typescript.javascriptDefaults.addExtraLib(
 							[
-								'declare module "page-state" {',
+								'declare module "@lekvirkvelia/page-state" {',
 								`export function mongo(databaseId: string): {
   find<T = any>(options: {
     collection: string;
@@ -144,13 +144,20 @@ export const pageState: {
 };`,
 								'};',
 							].join('\n'),
-							'ts:page-state',
+							'ts:@lekvirkvelia/page-state',
 						);
 					}}
 					language="javascript"
 				/>
-				<Button onClick={() => setShowLogs((v) => !v)} text={showLogs ? 'HIDE LOGS' : 'SHOW LOGS'} />
-				<Button loading={loading} onClick={() => trigger()} text="Run CODE" />
+				<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<Button
+						style={{ marginRight: 8 }}
+						onClick={() => setShowLogs((v) => !v)}
+						text={showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}
+					/>
+					<Button style={{ marginRight: 8 }} onClick={() => trigger()} text="Run CODE" />
+					<div>{loading ? <Spinner size={20} /> : null}</div>
+				</div>
 
 				{showLogs ? (
 					<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>

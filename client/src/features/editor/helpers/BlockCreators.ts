@@ -16,7 +16,28 @@ export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: BlockProps) => 
 	page: (anyBlock) => copyProps({ type: 'page', title: 'Untitled', blocks: [] }, anyBlock),
 	column: (anyBlock) => copyProps({ type: 'column', blocks: [] }, anyBlock),
 	row: (anyBlock) => copyProps({ type: 'row', blocks: [] }, anyBlock),
-	code: (anyBlock) => copyProps({ type: 'code', language: 'javascript', value: '', manualControl: false }, anyBlock),
+	code: (anyBlock) => {
+		const copyAny = { ...anyBlock } as typeof anyBlock;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		delete copyAny.value;
+		return copyProps(
+			{
+				type: 'code',
+				language: 'javascript',
+				value: `const SDK = require("@levankvirkvelia/page-state");
+
+async function main(){
+    console.log('press show logs to see this message');
+    
+    const resp = await SDK.pageState.getProperty("globals", "pageId") // Этот метод получает значение pageId из клиента по вебсокету
+    console.log("this is page id", resp)
+}`,
+				manualControl: false,
+			},
+			copyAny,
+		);
+	},
 	query: (anyBlock) => copyProps({ type: 'query', values: {}, manualControl: false }, anyBlock),
 	JSONView: (anyBlock) => copyProps({ type: 'JSONView', value: '' }, anyBlock),
 	keyValue: (anyBlock) => copyProps({ type: 'keyValue', value: '' }, anyBlock),

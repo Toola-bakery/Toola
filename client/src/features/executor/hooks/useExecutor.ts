@@ -43,7 +43,11 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value,
 		`ws/${UUID}`,
 		(event) => {
 			if (event.action === 'function.end') {
-				setResult(parse(event.result as string));
+				try {
+					if (event.result !== 'error') setResult(parse(event.result as string));
+				} catch (e) {
+					console.error(e);
+				}
 				setLoading(false);
 			} else setLogs((oldLogs) => [...oldLogs, event.data]);
 
