@@ -1,6 +1,6 @@
 {
 	"name": "@levankvirkvelia/page-state",
-	"version": "0.0.7",
+	"version": "0.0.11",
 	"description": "My awesome module",
 	"license": "MIT",
 	"repository": "YOUR-GITHUB-USERNAME/unicorn-fun",
@@ -15,6 +15,7 @@
 		"node": ">=12"
 	},
 	"scripts": {
+		"publ": "yarn publish --patch --no-git-tag-version",
 		"test": "xo && ava"
 	},
 	"files": [

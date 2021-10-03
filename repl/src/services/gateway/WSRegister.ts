@@ -120,7 +120,10 @@ export class WSRegister {
 	setInitialized(id, meta) {
 		this.clients[id].initialized = true;
 		this.clients[id].meta = meta;
-		return connectionsDb.insertOne({ _id: id, createdAt: new Date(), nodeID: this.nodeID, meta });
+		return connectionsDb.insertOne({ _id: id, createdAt: new Date(), nodeID: this.nodeID, meta }).then(resp => {
+			this.send(id, { action: 'auth.success' });
+			return resp;
+		});
 	}
 
 	startHeartbeat(id) {

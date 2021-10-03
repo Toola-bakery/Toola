@@ -49,6 +49,7 @@ ws.on("message", function incoming(message) {
         projectId: process.env.projectId,
       })
     );
+  } else if (jsonMessage.action === "auth.success") {
     resolve();
   } else if (jsonMessage.messageId) {
     mesPromises[jsonMessage.messageId](jsonMessage);
