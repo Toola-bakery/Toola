@@ -17,7 +17,6 @@ export function useImmerState<D>(key: string) {
 	const immer = useCallback(
 		(recipe: (draft: Draft<D>) => undefined | void | D) => {
 			const [ns, patches] = produceWithPatches<D>(data || {}, recipe);
-			console.log({ patches });
 			if (patches.length) dispatch(immerPatch({ key, patches }));
 		},
 

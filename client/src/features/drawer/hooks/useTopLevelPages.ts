@@ -1,11 +1,14 @@
-import { useMemo } from 'react';
-import { useQuery } from 'react-query';
+import { useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
 import { useProjects } from '../../user/hooks/useProjects';
+
+type TopLevelPageItem = { title: string; id: string };
 
 export function useTopLevelPages() {
 	const { currentProjectId } = useProjects();
+	const queryClient = useQueryClient();
 
-	const { data = [], refetch } = useQuery<{ title: string; id: string }[]>(
+	const { data = [], refetch } = useQuery<TopLevelPageItem[]>(
 		['/pages/topLevelPages', { projectId: currentProjectId || '' }],
 		{ enabled: !!currentProjectId },
 	);
@@ -20,5 +23,27 @@ export function useTopLevelPages() {
 		[data],
 	);
 
-	return { pages: sortedList, refetch };
+	const appendPage = useCallback(
+		({ title, id }: { title: string; id: string }) => {
+			queryClient.setQueryData<TopLevelPageItem[]>(
+				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
+				[...data, { title, id }],
+			);
+		},
+		[currentProjectId, data, queryClient],
+	);
+
+	const renamePage = useCallback(
+		({ title, id }: { title: string; id: string }) => {
+			const items = data.map((item) => (item.id !== id ? item : { title, id }));
+			console.log({ title, id }, { items });
+			queryClient.setQueryData<TopLevelPageItem[]>(
+				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
+				items,
+			);
+		},
+		[currentProjectId, data, queryClient],
+	);
+
+	return { pages: sortedList, refetch, appendPage, renamePage };
 }

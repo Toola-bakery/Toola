@@ -39,7 +39,6 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 				maxRetries: Infinity,
 				maxEnqueuedMessages: Infinity,
 				startClosed: false,
-				debug: true,
 			}),
 	);
 

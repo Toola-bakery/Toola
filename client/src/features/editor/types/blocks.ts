@@ -9,7 +9,7 @@ import {
 	QueryBlockType,
 } from '../components/Blocks/QueryBlock/QueryBlock';
 import { SubPageBlockProps, SubPageBlockType } from '../components/Blocks/SubPageBlock';
-import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock';
+import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock/TextBlock';
 import {
 	CodeBlockMethods,
 	CodeBlockProps,

@@ -6,7 +6,7 @@ import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
 import { KeyValueBlock, KeyValueBlockType } from './Blocks/KeyValueBlock';
 import { QueryBlock, QueryBlockType } from './Blocks/QueryBlock/QueryBlock';
 import { SubPageBlock, SubPageBlockType } from './Blocks/SubPageBlock';
-import { TextBlock, TextBlockType } from './Blocks/TextBlock';
+import { TextBlock, TextBlockType } from './Blocks/TextBlock/TextBlock';
 import { BasicBlock } from '../types/basicBlock';
 import { Blocks } from '../types/blocks';
 import { CodeBlock, CodeBlockType } from './Blocks/CodeBlock/CodeBlock';
@@ -16,7 +16,7 @@ import { useHover } from '../../../hooks/useHover';
 import { ImageBlock, ImageBlockType } from './Blocks/ImageBlock';
 import { InputBlock, InputBlockType } from './Blocks/InputBlock';
 
-export type BlockContextType = null | (BasicBlock & Blocks);
+export type BlockContextType<T extends Blocks = Blocks> = null | (BasicBlock & T);
 
 export const BlockContext = React.createContext<BlockContextType>(null);
 

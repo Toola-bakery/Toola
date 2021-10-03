@@ -1,9 +1,8 @@
 import { Button, NonIdealState } from '@blueprintjs/core';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { useDrawer } from '../../drawer/hooks/useDrawer';
 import { useBlocks } from '../hooks/useBlocks';

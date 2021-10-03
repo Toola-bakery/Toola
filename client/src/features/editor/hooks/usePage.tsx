@@ -25,7 +25,7 @@ export function usePage(pageId: string, blocksProps: { [key: string]: BlockProps
 	}>(['/pages/get', { id: pageId }], {
 		retry: false,
 		refetchOnWindowFocus: false,
-		enabled: !!authToken,
+		enabled: !!authToken && !!pageId,
 	});
 
 	useEffect(() => {
@@ -36,5 +36,5 @@ export function usePage(pageId: string, blocksProps: { [key: string]: BlockProps
 		if (isSuccess && authToken) putPage(pageId, blocksProps, authToken);
 	}, [isSuccess, blocksProps, pageId, authToken]);
 
-	return { data, isLoading, isError, error, isSuccess, refetch };
+	return { data, isLoading, isError: isError || !pageId, error, isSuccess, refetch };
 }

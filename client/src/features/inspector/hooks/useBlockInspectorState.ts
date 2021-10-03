@@ -1,3 +1,4 @@
+import React from 'react';
 import { useInspectorState } from './useInspectorState';
 import { MenuItemProps } from '../components/InspectorItem';
 import { BlockProps, Blocks } from '../../editor/types/blocks';
@@ -20,6 +21,15 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 	['Input', 'input'],
 	['Button', 'button'],
 ];
+
+export type InspectorPropsType = {
+	menu: MenuItemProps[];
+	close: () => void;
+	open: (x: number, y: number, _path?: string[]) => void;
+	isOpen: false | [number, number];
+	path: string[];
+	setPath: React.Dispatch<React.SetStateAction<string[]>>;
+};
 
 export function useBlockInspectorState(
 	menuConfig: ((defaultMenu: MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],

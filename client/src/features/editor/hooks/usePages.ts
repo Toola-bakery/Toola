@@ -1,5 +1,6 @@
 import ky from 'ky';
 import { useCallback } from 'react';
+import { useQueryClient } from 'react-query';
 import { v4 } from 'uuid';
 import { Config } from '../../../Config';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
@@ -13,7 +14,7 @@ export function usePages() {
 	const { authToken } = useUser();
 	const { currentProjectId } = useProjects();
 	const { navigate } = usePageNavigator();
-	const { refetch } = useTopLevelPages();
+	const { refetch, appendPage } = useTopLevelPages();
 
 	const createPage = useCallback(() => {
 		const id = v4();
@@ -23,9 +24,9 @@ export function usePages() {
 		}).json<{
 			value: { page: BasicBlock & PageBlockProps };
 		}>();
+		appendPage({ title: 'Untitled', id });
 		navigate(id);
-		refetch();
-	}, [authToken, currentProjectId, navigate, refetch]);
+	}, [appendPage, authToken, currentProjectId, navigate]);
 
 	const deletePage = useCallback(
 		async (pageId: string) => {

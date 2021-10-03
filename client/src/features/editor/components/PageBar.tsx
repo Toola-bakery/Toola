@@ -2,18 +2,24 @@ import { H4, Switch } from '@blueprintjs/core';
 import { decode } from 'html-entities';
 import { useCallback } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import { useTopLevelPages } from '../../drawer/hooks/useTopLevelPages';
 import { useEditor } from '../hooks/useEditor';
 import { usePageContext } from '../../executor/hooks/useReferences';
 
 export function PageBar() {
-	const { editing, setEditing, page: { id, title } = {} } = usePageContext();
+	const { editing, setEditing, page: { id, title, parentId } = {}, pageId } = usePageContext();
+	const { renamePage } = useTopLevelPages();
 
 	const { updateBlockProps } = useEditor();
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
-			if (id) updateBlockProps({ id, title: decode(e.currentTarget.textContent) });
+			if (id) {
+				const newTitle = decode(e.currentTarget.textContent);
+				updateBlockProps({ id, title: newTitle });
+				if (!parentId) renamePage({ id: pageId, title: newTitle });
+			}
 		},
-		[id, updateBlockProps],
+		[id, pageId, parentId, renamePage, updateBlockProps],
 	);
 	return (
 		<div
