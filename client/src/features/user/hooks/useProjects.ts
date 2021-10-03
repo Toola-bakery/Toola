@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { useImmerState } from '../../../redux/hooks';
 import { useUser } from './useUser';
@@ -12,11 +12,12 @@ export type ProjectSchema = {
 };
 
 export function useProjectsState() {
-	const [data = {}, immer] = useImmerState<{
+	const [data, immer] = useImmerState<{
 		currentProjectId?: string;
 		projectsCache?: ProjectSchema[];
-	}>('projects', {});
-	const { currentProjectId, projectsCache } = data;
+	}>('projects');
+
+	const { currentProjectId, projectsCache } = data || {};
 	return { currentProjectId, projectsCache, immer };
 }
 
@@ -26,20 +27,19 @@ export function useProjects() {
 	const {
 		isLoading,
 		isFetched,
-		data: { projects } = { projects: [] },
+		data: { projects } = {},
 		refetch,
+		remove,
 	} = useQuery<{ projects: ProjectSchema[] }>('/projects/get', {
 		enabled: !!authToken,
 		initialData: { projects: projectsCache },
 		retry: 1,
-	});
-
-	useEffect(() => {
-		if (projects)
+		onSuccess: () => {
 			immer((draft) => {
 				draft.projectsCache = projects;
 			});
-	}, [immer, projects]);
+		},
+	});
 
 	const selectProject = useCallback(
 		(projectId: string) => {
@@ -54,5 +54,14 @@ export function useProjects() {
 		return projects?.find?.((project) => project._id === currentProjectId);
 	}, [projects, currentProjectId]);
 
-	return { currentProjectId, currentProject, selectProject, isLoading, isFetched, projects, refetch };
+	return {
+		currentProjectId,
+		currentProject,
+		selectProject,
+		remove,
+		isLoading,
+		isFetched,
+		projects,
+		refetch,
+	};
 }

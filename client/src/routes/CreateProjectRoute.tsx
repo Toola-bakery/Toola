@@ -1,41 +1,28 @@
 import { Button, FormGroup, H1, InputGroup } from '@blueprintjs/core';
-import ky from 'ky';
 import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { Config } from '../Config';
 import { useProjects } from '../features/user/hooks/useProjects';
-import { useUser } from '../features/user/hooks/useUser';
-import { useAppDispatch } from '../redux/hooks';
+import { useKy } from '../hooks/useKy';
 
 export default function CreateProjectRoute() {
 	const [projectName, setProjectName] = useState('');
-	const dispatch = useAppDispatch();
-	const { refetch: fetchProjects, selectProject } = useProjects();
+	const { selectProject, refetch } = useProjects();
 	const history = useHistory();
 
-	const { authToken } = useUser();
+	const ky = useKy();
 
-	const { data, isLoading, refetch, isError } = useQuery(
-		['createProject'],
-		() => {
-			return ky
-				.post(`${Config.domain}/projects/create`, {
-					json: { name: projectName },
-					headers: { 'auth-token': authToken },
-				})
-				.json<{ projectId: string }>();
-		},
-		{ enabled: false, cacheTime: 0, retry: false, retryOnMount: false },
-	);
+	const { data, isLoading, isError, mutate } = useMutation((name: string) => {
+		return ky.post(`${Config.domain}/projects/create`, { json: { name } }).json<{ projectId: string }>();
+	});
 
 	useEffect(() => {
 		if (data?.projectId) {
 			selectProject(data.projectId);
-			fetchProjects();
-			history.replace('/');
+			refetch().then(() => history.replace('/'));
 		}
-	}, [data, dispatch, fetchProjects, history, selectProject]);
+	}, [data, history, refetch, selectProject]);
 
 	return (
 		<div style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
@@ -50,7 +37,7 @@ export default function CreateProjectRoute() {
 						placeholder="Project name"
 					/>
 				</FormGroup>
-				<Button text="Create" onClick={() => refetch()} disabled={isLoading} loading={isLoading} />
+				<Button text="Create" onClick={() => mutate(projectName)} disabled={isLoading} loading={isLoading} />
 			</div>
 		</div>
 	);

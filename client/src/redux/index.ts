@@ -25,7 +25,7 @@ const persistedReducer = persistReducer(
 	{
 		key: PERSIST_KEY,
 		storage,
-		blacklist: ['editor'],
+		blacklist: ['editor', 'immer'],
 	},
 	rootReducer,
 );

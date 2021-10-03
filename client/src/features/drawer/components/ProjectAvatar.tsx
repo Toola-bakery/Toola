@@ -11,7 +11,7 @@ type ProjectAvatarProps = {
 export function ProjectAvatar({ id, size = 30, style }: ProjectAvatarProps) {
 	const { projects, currentProjectId } = useProjects();
 	const project = useMemo(
-		() => projects.find((p) => p._id === (id || currentProjectId)),
+		() => projects?.find((p) => p._id === (id || currentProjectId)),
 		[currentProjectId, id, projects],
 	);
 
