@@ -118,7 +118,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 						setupMonaco(monaco);
 						monaco.languages.typescript.javascriptDefaults.addExtraLib(
 							[
-								'declare module "@lekvirkvelia/page-state" {',
+								'declare module "@levankvirkvelia/page-state" {',
 								`export function mongo(databaseId: string): {
   find<T = any>(options: {
     collection: string;
@@ -144,7 +144,7 @@ export const pageState: {
 };`,
 								'};',
 							].join('\n'),
-							'ts:@lekvirkvelia/page-state',
+							'ts:@levankvirkvelia/page-state',
 						);
 					}}
 					language="javascript"
