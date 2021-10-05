@@ -88,9 +88,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 				disabled={!editing}
 				onContextMenu={onContextMenu}
 				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
-				onFocus={(e) => {
-					setIsFocused(true);
-				}}
+				onFocus={() => setIsFocused(true)}
 				onBlur={() => setIsFocused(false)}
 				innerRef={contentEditableRef}
 				html={isFocused ? htmlValue : htmlString}

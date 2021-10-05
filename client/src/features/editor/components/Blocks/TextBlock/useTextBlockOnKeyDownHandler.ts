@@ -61,6 +61,16 @@ export function useTextBlockOnKeyDownHandler({
 				e.preventDefault();
 			}
 
+			if (e.key === 'u') {
+				togglePlugin(['u']);
+				e.preventDefault();
+			}
+
+			if (e.key === 's' && e.shiftKey) {
+				togglePlugin(['s']);
+				e.preventDefault();
+			}
+
 			if (e.key === 'v') {
 				e.preventDefault();
 			}

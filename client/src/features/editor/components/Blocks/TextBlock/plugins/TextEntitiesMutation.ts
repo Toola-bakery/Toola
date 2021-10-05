@@ -144,6 +144,41 @@ export function sliceEntities(
 	return [newText, newEntities] as [string, TextEntity[]];
 }
 
+function samePlugins(plugins1: TextEntityPlugins[], plugins2: TextEntityPlugins[]) {
+	const key1 = plugins1
+		.map((plugin) => plugin.join(','))
+		.sort()
+		.join(',');
+
+	const key2 = plugins2
+		.map((plugin) => plugin.join(','))
+		.sort()
+		.join(',');
+
+	return key1 === key2;
+}
+
+export function minifyEntities(entities: TextEntity[]): TextEntity[] {
+	return entities.reduce((state: TextEntity[], entity) => {
+		if (!state.length) return [...state, entity];
+
+		const [previousPosition, previousPlugins] = state[state.length - 1];
+		const [thisPosition, thisPlugins] = entity;
+
+		if (
+			!previousPlugins || //
+			!thisPlugins ||
+			previousPosition[1] + 1 !== thisPosition[0] ||
+			!samePlugins(previousPlugins, thisPlugins)
+		) {
+			return [...state, entity];
+		}
+
+		const newEntity: TextEntity = [[previousPosition[0], entity[0][1]], thisPlugins];
+		return [...state.slice(0, -1), newEntity];
+	}, []);
+}
+
 export function concatEntities(
 	text1: string,
 	entities1: TextEntity[],
@@ -151,12 +186,14 @@ export function concatEntities(
 	entities2: TextEntity[],
 ): [string, TextEntity[]] {
 	const newText = text1 + text2;
-	const newEntities = entities2.map<TextEntity>(([position, plugins]) => [
-		[text1.length + position[0], text1.length + position[1]],
-		plugins as TextEntityPlugins[],
-	]);
+	const newEntities = entities2
+		.map<TextEntity>(([position, plugins]) => [
+			[text1.length + position[0], text1.length + position[1]],
+			plugins as TextEntityPlugins[],
+		])
+		.filter((entity) => entity[1] && entity[1].length);
 
-	return [newText, [...entities1, ...newEntities]];
+	return [newText, minifyEntities([...entities1, ...newEntities])];
 }
 
 export function concatMultipleEntities(concat: [string, TextEntity[]][]): [string, TextEntity[]] {
@@ -201,8 +238,8 @@ export function removePlugin(
 
 	const newEntities = workWithEntities.map<TextEntity>((entity) => {
 		const [pos, plugins] = entity;
-		const newPlugins = plugins?.filter((p) => p[0] !== pluginName) || [];
-		return [pos, newPlugins];
+		const newPlugins = plugins?.filter((p) => p[0] !== pluginName);
+		return newPlugins ? [pos, newPlugins] : [pos];
 	});
 
 	return concatMultipleEntities([
