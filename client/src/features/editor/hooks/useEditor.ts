@@ -28,7 +28,7 @@ type UseEditorResponse = {
 	addChild: (parentId: string, blockId: string | string[], index?: number) => void;
 	addChildAfterId: (putAfterId: string, blockId: string | string[]) => void;
 	addBlocks: (blocks: (Optional<BasicBlock, 'id'> & Blocks)[]) => (BasicBlock & Blocks)[];
-	addBlockAfter: (putAfterId: string, block: Blocks) => void;
+	addBlockAfter: (putAfterId: string, block: Blocks, focus?: boolean | number) => void;
 	// TODO rename method
 	addChildInsteadOf: (blockId: string, replaceWithId: string) => void;
 	moveBlockAfterId: (blockId: string, putAfterId: string) => void;
@@ -138,7 +138,7 @@ export function useEditor(): UseEditorResponse {
 	);
 
 	const addBlockAfter = useCallback<UseEditorResponse['addBlockAfter']>(
-		(putAfterId, block) => {
+		(putAfterId, block, focus) => {
 			const blocks = getBlocks(pageId);
 			const { parentId } = blocks[putAfterId];
 
@@ -146,7 +146,8 @@ export function useEditor(): UseEditorResponse {
 
 			addChildAfterId(putAfterId, payload[0].id);
 
-			send(payload[0].id, { action: 'focus', waitListener: true });
+			if (focus || typeof focus === 'number')
+				send(payload[0].id, { action: 'focus', position: focus, waitListener: true });
 		},
 		[addBlocks, addChildAfterId, pageId, send],
 	);

@@ -1,5 +1,6 @@
 import { Button, NonIdealState } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
+import { Helmet } from 'react-helmet';
 import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
@@ -105,7 +106,7 @@ export function Page(): JSX.Element {
 		<DndProvider backend={HTML5Backend}>
 			<PageContext.Provider value={value}>
 				<WSHandler />
-
+				<Helmet title={page?.title} />
 				<div style={{ width: width - drawerWidth, overflowX: 'clip', height: '100%' }}>
 					{isError ? (
 						<NonIdealState

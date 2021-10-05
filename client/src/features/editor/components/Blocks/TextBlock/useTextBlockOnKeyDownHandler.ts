@@ -50,11 +50,15 @@ export function useTextBlockOnKeyDownHandler({
 			const newBlock = sliceEntities(valueRef.current, entitiesRef.current, index);
 			const thisBlock = sliceEntities(valueRef.current, entitiesRef.current, 0, index - 1);
 
-			addBlockAfterRef.current(id, {
-				type: 'text',
-				value: newBlock[0],
-				entities: newBlock[1],
-			});
+			addBlockAfterRef.current(
+				id,
+				{
+					type: 'text',
+					value: newBlock[0],
+					entities: newBlock[1],
+				},
+				0,
+			);
 			updateBlockProps({ id, value: thisBlock[0], entities: thisBlock[1] });
 			e.preventDefault();
 		}
