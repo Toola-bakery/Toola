@@ -42,7 +42,7 @@ async function main(){
 	JSONView: (anyBlock) => copyProps({ type: 'JSONView', value: '' }, anyBlock),
 	keyValue: (anyBlock) => copyProps({ type: 'keyValue', value: '' }, anyBlock),
 	table: (anyBlock) => copyProps({ type: 'table', value: '', manualPagination: false, connectedPage: '' }, anyBlock),
-	text: (anyBlock) => copyProps({ type: 'text', value: '' }, anyBlock),
+	text: (anyBlock) => copyProps({ type: 'text', value: '', entities: [] }, anyBlock),
 	image: (anyBlock) => copyProps({ type: 'image', value: '' }, anyBlock),
 	button: (anyBlock) => copyProps({ type: 'button', name: 'run', value: '' }, anyBlock),
 	input: (anyBlock) => copyProps({ type: 'input', initialValue: '', label: '' }, anyBlock),

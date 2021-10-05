@@ -48,6 +48,7 @@ export function useTextBlockOnKeyDownHandler({
 			addBlockAfterRef.current(id, {
 				type: 'text',
 				value: valueRef.current.slice(index),
+				entities: [],
 			});
 			updateBlockProps({ id, value: valueRef.current.slice(0, index) });
 			e.preventDefault();

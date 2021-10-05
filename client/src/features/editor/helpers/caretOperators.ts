@@ -35,3 +35,29 @@ export function getCaretGlobalPosition() {
 	const rect = (selection.anchorNode as Element).getBoundingClientRect?.();
 	return { left: rect.left, top: rect.bottom };
 }
+
+export function setCaretPosition(el: Node, from: number): number {
+	return Array.from(el.childNodes.values()).reduce<number>((state, node) => {
+		if (state === -1) return -1;
+
+		if (node.nodeName === '#text') {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const len = node.length;
+
+			if (len >= state) {
+				const range = document.createRange();
+				const sel = window.getSelection();
+				range.setStart(node, state);
+				// if (typeof len !== 'undefined') range.setEnd(node, state + selectionLen);
+				range.collapse(true);
+				sel?.removeAllRanges();
+				sel?.addRange(range);
+				return -1;
+			}
+
+			return state - len;
+		}
+		return setCaretPosition(node, state);
+	}, from);
+}

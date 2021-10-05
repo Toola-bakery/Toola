@@ -93,7 +93,7 @@ export function useEditor(): UseEditorResponse {
 		[addChildAfterId],
 	);
 
-	const updateBlockState = useCallback<UseEditorResponse['updateBlockProps']>(
+	const updateBlockState = useCallback<UseEditorResponse['updateBlockState']>(
 		(block, focus = false) => {
 			setBlockState((state) => {
 				return { ...state, [block.id]: { ...state[block.id], ...block } };

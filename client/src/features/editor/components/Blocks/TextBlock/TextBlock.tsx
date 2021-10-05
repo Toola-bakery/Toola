@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-import { decode } from 'html-entities';
+import { getCaretIndex, setCaretPosition } from '../../../helpers/caretOperators';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -8,6 +8,8 @@ import { useRefLatest } from '../../../../../hooks/useRefLatest';
 import { usePageContext, useReferences } from '../../../../executor/hooks/useReferences';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
+import { entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
+import { TextEntity } from './plugins/TextPlugins';
 import { useTextBlockOnKeyDownHandler } from './useTextBlockOnKeyDownHandler';
 
 export type TextBlockType = TextBlockProps;
@@ -21,29 +23,48 @@ const textBlockStyleTag = {
 	heading3: 'h3',
 };
 
-export type TextBlockProps = { type: 'text'; style?: TextBlockStyles; value: string };
+export type TextBlockProps = {
+	type: 'text';
+	style?: TextBlockStyles;
+	value: string;
+	entities: TextEntity[];
+};
 
 export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
-	const { id, value: realValue = '', style } = block;
-	const [value, setValue] = useState(realValue);
+	const { id, style, entities = [], value } = block;
+
 	const { editing } = usePageContext();
 	const { updateBlockProps } = useEditor();
 	const [isEditing, setEditing] = useState(false);
 	const isEditingRef = useRefLatest(isEditing);
 
-	useEffect(() => {
-		setValue(realValue);
-	}, [realValue]);
+	const [htmlValue, setHtmlValue] = useState<string>(() => entitiesToHTML(value, entities));
 
 	const contentEditableRef = useRef<HTMLElement>(null);
 
+	const setToPosRef = useRef<number | null>(null);
+
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
-			setValue(e.target.value);
-			updateBlockProps({ id, value: decode(e.currentTarget.textContent) });
+			if (contentEditableRef.current) {
+				const caretIndex = getCaretIndex(contentEditableRef.current);
+				setHtmlValue(e.target.value);
+				setToPosRef.current = caretIndex;
+
+				const [text, newEntities] = htmlToEntities(e.target.value);
+				updateBlockProps({ id, value: text, entities: newEntities });
+			}
 		},
 		[id, updateBlockProps],
 	);
+
+	useLayoutEffect(() => {
+		if (setToPosRef.current !== null && contentEditableRef.current) {
+			setCaretPosition(contentEditableRef.current, setToPosRef.current);
+			setToPosRef.current = null;
+		}
+	});
+
 	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
 
 	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({ contentEditableRef, inspectorProps });
@@ -56,7 +77,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 		[],
 	);
 
-	const html = useReferences(isEditing ? '' : realValue);
+	const html = useReferences(isEditing ? '' : htmlValue);
 
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
@@ -74,9 +95,9 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 				}}
 				onBlur={() => isEditingRef.current && setEditing(false)}
 				innerRef={contentEditableRef}
-				html={isEditing ? value : htmlString}
+				html={isEditing ? htmlValue : htmlString}
 				tagName={textBlockStyleTag[style || 'text']}
-				style={{ margin: 0, marginBottom: 10 }}
+				style={{ margin: 0, marginBottom: 10, whiteSpace: 'pre-wrap' }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
 			/>
