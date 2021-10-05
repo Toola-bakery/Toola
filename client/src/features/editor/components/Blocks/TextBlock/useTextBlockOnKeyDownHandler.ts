@@ -7,6 +7,7 @@ import { getCaretGlobalPosition, getCaretIndex } from '../../../helpers/caretOpe
 import { useBlock } from '../../../hooks/useBlock';
 import { useEditor } from '../../../hooks/useEditor';
 import { selectBlockNeighborsProps } from '../../../redux/editor';
+import { concatEntities, sliceEntities } from './plugins/TextEntitiesMutation';
 import { TextBlockProps } from './TextBlock';
 
 const CMD_KEY = '/';
@@ -18,16 +19,17 @@ export function useTextBlockOnKeyDownHandler({
 	contentEditableRef: RefObject<HTMLElement>;
 	inspectorProps: InspectorPropsType;
 }) {
-	const { id, value } = useBlock<TextBlockProps>();
+	const { id, value, entities } = useBlock<TextBlockProps>();
 	const { pageId } = usePageContext();
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
 	const { previous } = useAppSelector((state) => selectBlockNeighborsProps(state, pageId, id));
-	const { addBlockAfterRef, deleteBlockRef, previousRef, valueRef, inspectorPropsRef } = useRefsLatest({
+	const { addBlockAfterRef, deleteBlockRef, previousRef, valueRef, inspectorPropsRef, entitiesRef } = useRefsLatest({
 		previous,
 		addBlockAfter,
 		updateBlockType,
 		deleteBlock,
 		value,
+		entities,
 		inspectorProps,
 	});
 
@@ -45,12 +47,15 @@ export function useTextBlockOnKeyDownHandler({
 		if (e.key === 'Enter' && !e.shiftKey) {
 			if (!contentEditableRef.current) return;
 			const index = getCaretIndex(contentEditableRef.current);
+			const newBlock = sliceEntities(valueRef.current, entitiesRef.current, index);
+			const thisBlock = sliceEntities(valueRef.current, entitiesRef.current, 0, index - 1);
+
 			addBlockAfterRef.current(id, {
 				type: 'text',
-				value: valueRef.current.slice(index),
-				entities: [],
+				value: newBlock[0],
+				entities: newBlock[1],
 			});
-			updateBlockProps({ id, value: valueRef.current.slice(0, index) });
+			updateBlockProps({ id, value: thisBlock[0], entities: thisBlock[1] });
 			e.preventDefault();
 		}
 		if (e.key === 'Backspace') {
@@ -59,14 +64,19 @@ export function useTextBlockOnKeyDownHandler({
 			if (index === 0) {
 				e.preventDefault();
 				deleteBlockRef.current(id);
-				if (previousRef.current?.type === 'text')
-					updateBlockProps(
-						{
-							id: previousRef.current.id,
-							value: previousRef.current.value + valueRef.current,
-						},
-						true,
+				if (previousRef.current?.type === 'text') {
+					const newBlock = concatEntities(
+						previousRef.current.value,
+						previousRef.current.entities,
+						valueRef.current,
+						entitiesRef.current,
 					);
+
+					updateBlockProps(
+						{ id: previousRef.current.id, value: newBlock[0], entities: newBlock[1] },
+						previousRef.current.value.length,
+					);
+				}
 			}
 		}
 	};

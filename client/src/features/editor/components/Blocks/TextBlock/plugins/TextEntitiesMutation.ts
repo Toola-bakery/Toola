@@ -1,6 +1,6 @@
 import { EntityItem, TextEntity, TextEntityPlugins, TextPlugins, TextPluginsDecode } from './TextPlugins';
 
-export function splitByEntities(text: string, _entities: TextEntity[]) {
+export function fillEmptyEntities(text: string, _entities: TextEntity[]) {
 	const entities = [..._entities]; // TODO i did it to fix a bug, idk
 	const sortedEntities = entities.sort((e1, e2) => e1[0][0] - e2[0][0]);
 	const fullEntities: TextEntity[] = [];
@@ -37,7 +37,7 @@ export function splitByEntities(text: string, _entities: TextEntity[]) {
 }
 
 export function entitiesToHTML(text: string, entities: TextEntity[]) {
-	const fullEntities = splitByEntities(text, entities);
+	const fullEntities = fillEmptyEntities(text, entities);
 	const elements = fullEntities.map((entity) => {
 		const [position, plugins] = entity;
 		const textSlice = text.slice(position[0], position[1] + 1);
@@ -103,19 +103,51 @@ export function tokensToEntities(tokens: EntityHTMLTokens[]): [string, TextEntit
 		.map<TextEntity | undefined>((token) => {
 			fullText += token.text;
 			if (!token.tag) return;
+
 			const plugins = pluginList
 				.map((plugin) => TextPluginsDecode[plugin](token))
 				.filter((plugin): plugin is TextEntityPlugins => !!plugin);
-			const entity: TextEntity = plugins.length
-				? [[fullText.length - token.text.length, fullText.length - 1], plugins]
-				: [[fullText.length - token.text.length, fullText.length - 1]];
+
+			const entity: TextEntity = [[fullText.length - token.text.length, fullText.length - 1], plugins];
+
 			return entity;
 		})
 		.filter((entity): entity is TextEntity => !!entity);
-	return [fullText, entities];
+	return [fullText, entities] as [string, TextEntity[]];
 }
 
 export function htmlToEntities(htmlString: string) {
 	const tokens = htmlToTokens(htmlString);
 	return tokensToEntities(tokens);
+}
+
+export function sliceEntities(
+	text: string,
+	entities: TextEntity[],
+	startPosition: number,
+	endPosition = text.length - 1,
+) {
+	const newText = text.slice(startPosition, endPosition + 1);
+	const newEntities = entities
+		.filter(
+			(entity) =>
+				(entity[0][0] >= startPosition && entity[0][0] <= endPosition) ||
+				(entity[0][1] >= startPosition && entity[0][1] <= endPosition),
+		)
+		.map<TextEntity>(([position, plugins]) => [
+			[Math.max(startPosition, position[0]) - startPosition, Math.min(endPosition, position[1]) - startPosition],
+			plugins as TextEntityPlugins[],
+		]);
+
+	return [newText, newEntities] as [string, TextEntity[]];
+}
+
+export function concatEntities(text1: string, entities1: TextEntity[], text2: string, entities2: TextEntity[]) {
+	const newText = text1 + text2;
+	const newEntities = entities2.map<TextEntity>(([position, plugins]) => [
+		[text1.length + position[0], text1.length + position[1]],
+		plugins as TextEntityPlugins[],
+	]);
+
+	return [newText, [...entities1, ...newEntities]] as [string, TextEntity[]];
 }

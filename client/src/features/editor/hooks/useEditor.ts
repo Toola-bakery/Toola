@@ -37,12 +37,12 @@ type UseEditorResponse = {
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
 	updateBlockType: (blockId: string, type: Blocks['type'] | ({ type: Blocks['type'] } & Partial<BlockProps>)) => void;
-	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean) => void;
+	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean | number) => void;
 	immerBlockProps: <Block extends BlockProps = BlockProps, D = Draft<Block & BasicBlock>>(
 		blockId: string,
 		recipe: (draft: D) => undefined | void,
 	) => void;
-	updateBlockState: (block: Partial<Blocks> & Pick<BasicBlock, 'id'>, focus?: boolean) => void;
+	updateBlockState: (block: Partial<Blocks> & Pick<BasicBlock, 'id'>, focus?: boolean | number) => void;
 	getNextId: (name: Blocks['type']) => string;
 };
 
@@ -99,7 +99,7 @@ export function useEditor(): UseEditorResponse {
 				return { ...state, [block.id]: { ...state[block.id], ...block } };
 			});
 
-			if (focus) send(block.id, { action: 'focus', waitListener: true });
+			if (focus || typeof focus === 'number') send(block.id, { action: 'focus', position: focus, waitListener: true });
 		},
 		[send, setBlockState],
 	);
@@ -172,7 +172,7 @@ export function useEditor(): UseEditorResponse {
 	const updateBlockProps = useCallback<UseEditorResponse['updateBlockProps']>(
 		(block, focus = false) => {
 			dispatch(updateBlockPropsAction({ pageId, ...block }));
-			if (focus) send(block.id, { action: 'focus', waitListener: true });
+			if (focus) send(block.id, { action: 'focus', position: focus, waitListener: true });
 		},
 		[dispatch, pageId, send],
 	);

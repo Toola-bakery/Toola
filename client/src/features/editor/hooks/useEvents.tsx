@@ -9,7 +9,7 @@ export type EventListeners = {
 
 export type EventChannelStorage = Event[];
 
-export type Event = { action: string; waitListener?: boolean } & unknown;
+export type Event = { action: string; waitListener?: boolean } & { [key: string]: any };
 
 const events: EventStorage = {};
 const eventListeners: EventListeners = {};

@@ -1,14 +1,13 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { getCaretIndex, setCaretPosition } from '../../../helpers/caretOperators';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
-import { useRefLatest } from '../../../../../hooks/useRefLatest';
 import { usePageContext, useReferences } from '../../../../executor/hooks/useReferences';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
-import { entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
+import { concatEntities, entitiesToHTML, htmlToEntities, sliceEntities } from './plugins/TextEntitiesMutation';
 import { TextEntity } from './plugins/TextPlugins';
 import { useTextBlockOnKeyDownHandler } from './useTextBlockOnKeyDownHandler';
 
@@ -35,10 +34,9 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 
 	const { editing } = usePageContext();
 	const { updateBlockProps } = useEditor();
-	const [isEditing, setEditing] = useState(false);
-	const isEditingRef = useRefLatest(isEditing);
+	const [isFocused, setIsFocused] = useState(false);
 
-	const [htmlValue, setHtmlValue] = useState<string>(() => entitiesToHTML(value, entities));
+	const htmlValue = useMemo<string>(() => entitiesToHTML(value, entities), [value, entities]);
 
 	const contentEditableRef = useRef<HTMLElement>(null);
 
@@ -46,14 +44,10 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
-			if (contentEditableRef.current) {
-				const caretIndex = getCaretIndex(contentEditableRef.current);
-				setHtmlValue(e.target.value);
-				setToPosRef.current = caretIndex;
-
-				const [text, newEntities] = htmlToEntities(e.target.value);
-				updateBlockProps({ id, value: text, entities: newEntities });
-			}
+			if (!contentEditableRef.current) return;
+			setToPosRef.current = getCaretIndex(contentEditableRef.current);
+			const [text, newEntities] = htmlToEntities(e.target.value);
+			updateBlockProps({ id, value: text, entities: newEntities });
 		},
 		[id, updateBlockProps],
 	);
@@ -67,20 +61,22 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
 
-	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({ contentEditableRef, inspectorProps });
+	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
+		contentEditableRef,
+		inspectorProps,
+	});
 
-	useEventListener(
+	useEventListener<{ position?: number }>(
 		id,
 		(event) => {
 			if (event.action === 'focus') contentEditableRef?.current?.focus();
+			if (typeof event.position === 'number') setToPosRef.current = event.position;
 		},
 		[],
 	);
 
-	const html = useReferences(isEditing ? '' : htmlValue);
-
+	const html = useReferences(isFocused ? '' : htmlValue);
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
-
 	if (!block.show) return null;
 
 	return (
@@ -90,12 +86,12 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 				disabled={!editing}
 				onContextMenu={onContextMenu}
 				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
-				onFocus={() => {
-					if (!isEditingRef.current) setEditing(true);
+				onFocus={(e) => {
+					setIsFocused(true);
 				}}
-				onBlur={() => isEditingRef.current && setEditing(false)}
+				onBlur={() => setIsFocused(false)}
 				innerRef={contentEditableRef}
-				html={isEditing ? htmlValue : htmlString}
+				html={isFocused ? htmlValue : htmlString}
 				tagName={textBlockStyleTag[style || 'text']}
 				style={{ margin: 0, marginBottom: 10, whiteSpace: 'pre-wrap' }}
 				onChange={onChangeHandler}
