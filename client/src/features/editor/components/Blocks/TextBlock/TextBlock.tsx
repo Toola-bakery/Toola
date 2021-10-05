@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-import { getCaretIndex, setCaretPosition } from '../../../helpers/caretOperators';
+import { getCaretIndex, getRange, getSelection, setCaretPosition } from '../../../helpers/caretOperators';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext, useReferences } from '../../../../executor/hooks/useReferences';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
-import { concatEntities, entitiesToHTML, htmlToEntities, sliceEntities } from './plugins/TextEntitiesMutation';
+import { commonPlugins, entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
 import { TextEntity } from './plugins/TextPlugins';
 import { useTextBlockOnKeyDownHandler } from './useTextBlockOnKeyDownHandler';
 
@@ -40,7 +40,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 
 	const contentEditableRef = useRef<HTMLElement>(null);
 
-	const setToPosRef = useRef<number | null>(null);
+	const setToPosRef = useRef<[number, number] | number | null>(null);
 
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
@@ -54,7 +54,8 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 
 	useLayoutEffect(() => {
 		if (setToPosRef.current !== null && contentEditableRef.current) {
-			setCaretPosition(contentEditableRef.current, setToPosRef.current);
+			if (typeof setToPosRef.current === 'number') setCaretPosition(contentEditableRef.current, setToPosRef.current);
+			else setCaretPosition(contentEditableRef.current, setToPosRef.current[0], setToPosRef.current[1]);
 			setToPosRef.current = null;
 		}
 	});
@@ -64,6 +65,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
 		contentEditableRef,
 		inspectorProps,
+		setToPosRef,
 	});
 
 	useEventListener<{ position?: number }>(
