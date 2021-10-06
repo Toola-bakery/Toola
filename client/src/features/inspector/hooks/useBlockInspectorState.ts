@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useBlockWrapperController } from '../../editor/hooks/useBlockWrapperController';
 import { useInspectorState } from './useInspectorState';
 import { MenuItemProps } from '../components/InspectorItem';
 import { BlockProps, Blocks } from '../../editor/types/blocks';
@@ -37,12 +38,17 @@ export function useBlockInspectorState(
 	const { editing } = usePageContext();
 
 	const { id, display } = useBlock();
+	const { setOnDragClick } = useBlockWrapperController();
 	const { deleteBlock, immerBlockProps, updateBlockType } = useEditor();
 
 	const { onContextMenu, inspectorProps } = useInspectorState({
 		disabled: !editing,
 		menu: [],
 	});
+
+	useEffect(() => {
+		setOnDragClick(onContextMenu);
+	}, [onContextMenu, setOnDragClick]);
 
 	const defaultMenu: MenuItemProps[] = [
 		{

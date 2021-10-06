@@ -1,5 +1,5 @@
-import { Icon } from '@blueprintjs/core';
-import React from 'react';
+import { Button, Icon } from '@blueprintjs/core';
+import React, { useCallback, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
@@ -16,9 +16,14 @@ import { useHover } from '../../../hooks/useHover';
 import { ImageBlock, ImageBlockType } from './Blocks/ImageBlock';
 import { InputBlock, InputBlockType } from './Blocks/InputBlock';
 
-export type BlockContextType<T extends Blocks = Blocks> = null | (BasicBlock & T);
+type DragClickEventHandler = React.MouseEventHandler<HTMLDivElement>;
 
-export const BlockContext = React.createContext<BlockContextType>(null);
+export type BlockContextType<T extends Blocks = Blocks> = {
+	block: undefined | (BasicBlock & T);
+	setOnDragClick: (listener: DragClickEventHandler) => void;
+};
+
+export const BlockContext = React.createContext<BlockContextType>({ block: undefined, setOnDragClick: () => {} });
 
 function BlockSelector({ block }: { block: BasicBlock & Blocks }) {
 	if (block.type === 'text') return <TextBlock block={block as BasicBlock & TextBlockType} />;
@@ -51,8 +56,13 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 
 	const { hovered, eventHandlers } = useHover();
 
+	const [onDragClick, setOnDragClickPrivate] = useState<DragClickEventHandler>();
+	const setOnDragClick = useCallback((handler: DragClickEventHandler) => {
+		setOnDragClickPrivate(() => handler);
+	}, []);
+
 	return (
-		<BlockContext.Provider value={block}>
+		<BlockContext.Provider value={{ block, setOnDragClick }}>
 			{!block.show ? (
 				<BlockSelector block={block} />
 			) : (
@@ -67,8 +77,24 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 						// transform: 'translate3d(0, 0, 0)',
 					}}
 				>
-					<div ref={dragRef} style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
-						<Icon icon="drag-handle-vertical" />
+					<div
+						ref={dragRef}
+						onClick={(e) => {
+							onDragClick?.(e);
+						}}
+						style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}
+					>
+						<Button
+							style={{
+								padding: 0,
+								minHeight: 15,
+								minWidth: 10,
+								width: 18,
+								height: 25,
+							}}
+							icon="drag-handle-vertical"
+							minimal
+						/>
 					</div>
 					<div style={{ width: 'calc(100% - 25px)' }}>
 						<BlockSelector block={block} />

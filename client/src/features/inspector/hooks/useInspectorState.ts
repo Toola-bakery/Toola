@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { useRefLatest } from '../../../hooks/useRefLatest';
 import { MenuItemProps } from '../components/InspectorItem';
 
 type UseInspectorStateOptions = {
@@ -9,6 +10,7 @@ type UseInspectorStateOptions = {
 export function useInspectorState({ disabled = false, menu }: UseInspectorStateOptions) {
 	const [path, setPath] = useState<string[]>([]);
 	const [isOpen, setOpen] = useState<[number, number] | false>(false);
+	const isOpenRef = useRefLatest(isOpen);
 
 	const open = useCallback(
 		(x: number, y: number, _path: string[] = []) => {
@@ -25,10 +27,11 @@ export function useInspectorState({ disabled = false, menu }: UseInspectorStateO
 
 	const onContextMenu = useCallback(
 		(e: React.MouseEvent, _path: string[] = []) => {
+			if (isOpenRef.current) return;
 			open(e.pageX - window.scrollX, e.pageY - window.scrollY, _path);
 			e.preventDefault();
 		},
-		[open],
+		[isOpenRef, open],
 	);
 
 	return {

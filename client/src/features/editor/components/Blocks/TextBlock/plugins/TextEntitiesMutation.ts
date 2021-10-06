@@ -59,8 +59,8 @@ export function entitiesToHTML(text: string, entities: TextEntity[]) {
 	return elements.join('');
 }
 
-const ATTR_REGEXP = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/;
-const TAG_REGEXP = /<\s*(span|a)[^>]*>(.*?)<\s*\/\s*(span|a)>/;
+const ATTR_REGEXP = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/m;
+const TAG_REGEXP = /<\s*(span|a)[^>]*>(.*?)<\s*\/\s*(span|a)>/ms;
 
 function matchAll(pattern: string | RegExp, haystack: string) {
 	const regex = new RegExp(pattern, 'g');

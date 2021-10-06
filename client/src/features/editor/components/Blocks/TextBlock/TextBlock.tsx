@@ -29,6 +29,8 @@ export type TextBlockProps = {
 	entities: TextEntity[];
 };
 
+const BR_TAG = /<br\s*\/?>/ms;
+
 export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	const { id, style, entities = [], value } = block;
 
@@ -45,8 +47,13 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 	const onChangeHandler = useCallback(
 		(e: ContentEditableEvent) => {
 			if (!contentEditableRef.current) return;
-			setToPosRef.current = getCaretIndex(contentEditableRef.current);
-			const [text, newEntities] = htmlToEntities(e.target.value);
+
+			const withoutBrTag = e.target.value.replace(BR_TAG, '\n');
+			const [text, newEntities] = htmlToEntities(withoutBrTag);
+			if (withoutBrTag !== e.target.value) {
+				setToPosRef.current = getCaretIndex(contentEditableRef.current);
+				if (setToPosRef.current > text.length) setToPosRef.current = text.length;
+			}
 			updateBlockProps({ id, value: text, entities: newEntities });
 		},
 		[id, updateBlockProps],
@@ -86,14 +93,20 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 			<BlockInspector {...inspectorProps} />
 			<ContentEditable
 				disabled={!editing}
-				onContextMenu={onContextMenu}
+				onContextMenu={(e) => {
+					if (contentEditableRef.current) {
+						const [n1, n2] = getSelection(contentEditableRef.current);
+						if (n1 !== n2) return;
+					}
+					onContextMenu(e);
+				}}
 				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
 				onFocus={() => setIsFocused(true)}
 				onBlur={() => setIsFocused(false)}
 				innerRef={contentEditableRef}
 				html={isFocused ? htmlValue : htmlString}
 				tagName={textBlockStyleTag[style || 'text']}
-				style={{ margin: 0, marginBottom: 10, whiteSpace: 'pre-wrap' }}
+				style={{ margin: 0, paddingTop: 1, marginBottom: 9, whiteSpace: 'pre-wrap' }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
 			/>
