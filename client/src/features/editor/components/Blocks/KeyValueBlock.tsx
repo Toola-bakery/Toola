@@ -35,7 +35,7 @@ export function KeyValueBlock({ block }: { block: BasicBlock & KeyValueBlockType
 		<>
 			<BlockInspector {...inspectorProps} />
 			<div onContextMenu={onContextMenu}>
-				{Object.entries(state).map(([key, valueOfKey]) => (
+				{Object.entries(state || {}).map(([key, valueOfKey]) => (
 					<div key={key}>
 						<b>{key}</b>: {`${valueOfKey}`}
 					</div>

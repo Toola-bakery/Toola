@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { useProjects } from '../../user/hooks/useProjects';
 import { useUser } from '../../user/hooks/useUser';
 import { DrawerMenuItem } from './DrawerMenuItem';
+import { DrawerOmnibar } from './DrawerOmnibar';
 import { ProjectAvatar } from './ProjectAvatar';
 
 export function ProjectBar() {
@@ -26,6 +27,11 @@ export function ProjectBar() {
 					{currentProject?.name}
 				</DrawerMenuItem>
 			</Popover>
+			<DrawerOmnibar>
+				<DrawerMenuItem iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }} icon="search">
+					Quick find
+				</DrawerMenuItem>
+			</DrawerOmnibar>
 			<DrawerMenuItem
 				onClick={() => history.push('/resources')}
 				iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }}
