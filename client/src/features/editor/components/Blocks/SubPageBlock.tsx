@@ -9,7 +9,7 @@ import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
-import { PageBlockProps } from '../Page';
+import { PageBlockProps } from '../Page/Page';
 
 export type SubPageBlockType = SubPageBlockProps;
 export type SubPageBlockProps = {

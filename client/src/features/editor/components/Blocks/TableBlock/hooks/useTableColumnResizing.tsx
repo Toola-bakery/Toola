@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { UseResizeColumnsState } from 'react-table';
-import { usePrevious } from '../../../hooks/usePrevious';
-import { TableBlockProps } from '../components/Blocks/TableBlock/TableBlock';
-import { useBlock } from './useBlock';
-import { useEditor } from './useEditor';
+import { usePrevious } from '../../../../../../hooks/usePrevious';
+import { TableBlockProps } from '../TableBlock';
+import { useBlock } from '../../../../hooks/useBlock';
+import { useEditor } from '../../../../hooks/useEditor';
 
 export function useTableColumnResizing(
 	columnResizing: UseResizeColumnsState<Record<string, unknown>>['columnResizing'],

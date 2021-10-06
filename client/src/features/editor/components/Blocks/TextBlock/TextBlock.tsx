@@ -9,7 +9,7 @@ import { BlockInspector } from '../../../../inspector/components/BlockInspector'
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
 import { commonPlugins, entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
 import { TextEntity } from './plugins/TextPlugins';
-import { useTextBlockOnKeyDownHandler } from './useTextBlockOnKeyDownHandler';
+import { useTextBlockOnKeyDownHandler } from './hooks/useTextBlockOnKeyDownHandler';
 
 export type TextBlockType = TextBlockProps;
 

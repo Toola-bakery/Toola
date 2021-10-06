@@ -1,8 +1,8 @@
-import { ColumnTypes, TableBlockProps, TableBlockType } from '../components/Blocks/TableBlock/TableBlock';
-import { MenuItemProps } from '../../inspector/components/InspectorItem';
-import { BasicBlock } from '../types/basicBlock';
-import { useBlockInspectorState } from '../../inspector/hooks/useBlockInspectorState';
-import { useEditor } from './useEditor';
+import { ColumnTypes, TableBlockProps, TableBlockType } from '../TableBlock';
+import { MenuItemProps } from '../../../../../inspector/components/InspectorItem';
+import { BasicBlock } from '../../../../types/basicBlock';
+import { useBlockInspectorState } from '../../../../../inspector/hooks/useBlockInspectorState';
+import { useEditor } from '../../../../hooks/useEditor';
 
 export function useTableInspector(block: BasicBlock & TableBlockType) {
 	const { columns, value, id, connectedPage, manualPagination } = block;

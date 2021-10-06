@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
+import { usePagesMutations } from '../../editor/components/Page/hooks/usePagesMutations';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
-import { usePagesMutations } from '../../editor/hooks/usePagesMutations';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
 import { useTopLevelPages } from '../hooks/useTopLevelPages';
 

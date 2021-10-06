@@ -1,26 +1,13 @@
 import ky from 'ky';
 import { useCallback } from 'react';
-import { useQuery } from 'react-query';
 import { v4 } from 'uuid';
-import { Config } from '../../../Config';
-import { usePageNavigator } from '../../../hooks/usePageNavigator';
-import { useTopLevelPages } from '../../drawer/hooks/useTopLevelPages';
-import { useProjects } from '../../user/hooks/useProjects';
-import { useUser } from '../../user/hooks/useUser';
-import { PageBlockProps } from '../components/Page';
-import { BasicBlock } from '../types/basicBlock';
-
-export type Page = {
-	_id: string;
-	value: { page: BasicBlock & PageBlockProps };
-};
-
-export function usePages(search = '') {
-	const { currentProjectId } = useProjects();
-	return useQuery<Page[]>(['/pages/list', { projectId: currentProjectId, search }], {
-		initialData: [],
-	});
-}
+import { Config } from '../../../../../Config';
+import { usePageNavigator } from '../../../../../hooks/usePageNavigator';
+import { useTopLevelPages } from '../../../../drawer/hooks/useTopLevelPages';
+import { useProjects } from '../../../../user/hooks/useProjects';
+import { useUser } from '../../../../user/hooks/useUser';
+import { PageBlockProps } from '../Page';
+import { BasicBlock } from '../../../types/basicBlock';
 
 export function usePagesMutations() {
 	const { authToken } = useUser();

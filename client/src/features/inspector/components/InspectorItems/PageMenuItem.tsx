@@ -1,8 +1,8 @@
 import { MenuItem, Button, FormGroup } from '@blueprintjs/core';
 import { Select } from '@blueprintjs/select';
 import React, { useMemo, useState } from 'react';
-import { usePage } from '../../../editor/hooks/usePage';
-import { Page, usePages } from '../../../editor/hooks/usePagesMutations';
+import { usePage } from '../../../editor/components/Page/hooks/usePage';
+import { Page, usePages } from '../../../editor/components/Page/hooks/usePages';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type PageMenuItemProps = BasicItemProps & {

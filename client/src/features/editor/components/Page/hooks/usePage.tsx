@@ -1,14 +1,12 @@
 import debounce from 'just-debounce';
 import ky from 'ky';
 import { useEffect } from 'react';
-import { useMutation, useQuery } from 'react-query';
-import { Config } from '../../../Config';
-import { useAppDispatch } from '../../../redux/hooks';
-import { useUser } from '../../user/hooks/useUser';
-import { PageBlockProps, PageBlockType } from '../components/Page';
-import { setPage } from '../redux/editor';
-import { BasicBlock } from '../types/basicBlock';
-import { BlockProps, Blocks } from '../types/blocks';
+import { useQuery } from 'react-query';
+import { Config } from '../../../../../Config';
+import { useUser } from '../../../../user/hooks/useUser';
+import { PageBlockProps } from '../Page';
+import { BasicBlock } from '../../../types/basicBlock';
+import { BlockProps, Blocks } from '../../../types/blocks';
 
 const putPage = debounce((pageId: string, blocksProps: { [key: string]: BlockProps }, authToken: string) => {
 	return ky
@@ -30,12 +28,4 @@ export function usePage(pageId: string) {
 		enabled: !!authToken && !!pageId,
 	});
 	return { ...rest, isError: isError || !pageId };
-}
-
-export function usePageBlockPropsMutation(pageId: string, blockProps: { [key: string]: BlockProps }) {
-	const { authToken } = useUser();
-	const { isSuccess } = usePage(pageId);
-	useEffect(() => {
-		if (authToken && isSuccess) putPage(pageId, blockProps, authToken);
-	}, [authToken, blockProps, isSuccess, pageId]);
 }

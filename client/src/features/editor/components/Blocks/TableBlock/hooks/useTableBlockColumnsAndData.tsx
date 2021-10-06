@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import { Column } from 'react-table';
 import { v4 } from 'uuid';
-import { TableBlockType, TableColumnsProp } from '../components/Blocks/TableBlock/TableBlock';
-import { BasicBlock } from '../types/basicBlock';
-import { useEditor } from './useEditor';
-import { useReferenceEvaluator } from '../../executor/hooks/useReferences';
+import { TableBlockType, TableColumnsProp } from '../TableBlock';
+import { BasicBlock } from '../../../../types/basicBlock';
+import { useEditor } from '../../../../hooks/useEditor';
+import { useReferenceEvaluator } from '../../../../../executor/hooks/useReferences';
 
 export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType, isEditing: boolean) {
 	const { columns, value, id, pageId } = block;

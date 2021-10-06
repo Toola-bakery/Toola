@@ -1,15 +1,15 @@
 import { KeyboardEventHandler, MutableRefObject, RefObject } from 'react';
-import { useRefsLatest } from '../../../../../hooks/useRefLatest';
-import { useAppSelector } from '../../../../../redux/hooks';
-import { usePageContext } from '../../../../executor/hooks/useReferences';
-import { InspectorPropsType } from '../../../../inspector/hooks/useBlockInspectorState';
-import { getCaretGlobalPosition, getCaretIndex, getSelection } from '../../../helpers/caretOperators';
-import { useBlock } from '../../../hooks/useBlock';
-import { useEditor } from '../../../hooks/useEditor';
-import { selectBlockNeighborsProps } from '../../../redux/editor';
-import { addPlugin, commonPlugins, concatEntities, removePlugin, sliceEntities } from './plugins/TextEntitiesMutation';
-import { TextEntityPlugins } from './plugins/TextPlugins';
-import { TextBlockProps } from './TextBlock';
+import { useRefsLatest } from '../../../../../../hooks/useRefLatest';
+import { useAppSelector } from '../../../../../../redux/hooks';
+import { usePageContext } from '../../../../../executor/hooks/useReferences';
+import { InspectorPropsType } from '../../../../../inspector/hooks/useBlockInspectorState';
+import { getCaretGlobalPosition, getCaretIndex, getSelection } from '../../../../helpers/caretOperators';
+import { useBlock } from '../../../../hooks/useBlock';
+import { useEditor } from '../../../../hooks/useEditor';
+import { selectBlockNeighborsProps } from '../../../../redux/editor';
+import { addPlugin, commonPlugins, concatEntities, removePlugin, sliceEntities } from '../plugins/TextEntitiesMutation';
+import { TextEntityPlugins } from '../plugins/TextPlugins';
+import { TextBlockProps } from '../TextBlock';
 
 const CMD_KEY = '/';
 

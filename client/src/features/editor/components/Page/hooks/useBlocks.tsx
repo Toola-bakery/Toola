@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMap } from '../../../hooks/useMap';
-import { useAppSelector } from '../../../redux/hooks';
-import { selectBlocksProps } from '../redux/editor';
-import { BasicBlock } from '../types/basicBlock';
-import { BlockMethods, BlockProps, Blocks, BlockStates } from '../types/blocks';
+import { useMap } from '../../../../../hooks/useMap';
+import { useAppSelector } from '../../../../../redux/hooks';
+import { selectBlocksProps } from '../../../redux/editor';
+import { BasicBlock } from '../../../types/basicBlock';
+import { BlockMethods, BlockProps, Blocks, BlockStates } from '../../../types/blocks';
 
 declare global {
 	interface Window {
