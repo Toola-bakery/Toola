@@ -1,6 +1,6 @@
 import ky from 'ky';
 import { useCallback } from 'react';
-import { useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { v4 } from 'uuid';
 import { Config } from '../../../Config';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
@@ -10,7 +10,19 @@ import { useUser } from '../../user/hooks/useUser';
 import { PageBlockProps } from '../components/Page';
 import { BasicBlock } from '../types/basicBlock';
 
-export function usePages() {
+export type Page = {
+	_id: string;
+	value: { page: BasicBlock & PageBlockProps };
+};
+
+export function usePages(search = '') {
+	const { currentProjectId } = useProjects();
+	return useQuery<Page[]>(['/pages/list', { projectId: currentProjectId, search }], {
+		initialData: [],
+	});
+}
+
+export function usePagesMutations() {
 	const { authToken } = useUser();
 	const { currentProjectId } = useProjects();
 	const { navigate } = usePageNavigator();

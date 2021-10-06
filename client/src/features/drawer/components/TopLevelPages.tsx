@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
-import { usePages } from '../../editor/hooks/usePages';
+import { usePagesMutations } from '../../editor/hooks/usePagesMutations';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
 import { useTopLevelPages } from '../hooks/useTopLevelPages';
 
@@ -18,7 +18,7 @@ const StyledMenuDivider = styled(MenuDivider)`
 
 export function TopLevelPages() {
 	const { pages } = useTopLevelPages();
-	const { createPage, deletePage } = usePages();
+	const { createPage, deletePage } = usePagesMutations();
 	const { navigate } = usePageNavigator();
 	const { pageId } = useParams<{ pageId: string }>();
 

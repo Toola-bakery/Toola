@@ -1,15 +1,18 @@
 import { Button, NonIdealState } from '@blueprintjs/core';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
+import { usePrevious } from '../../../hooks/usePrevious';
+import { useAppDispatch } from '../../../redux/hooks';
 import { useDrawer } from '../../drawer/hooks/useDrawer';
 import { useBlocks } from '../hooks/useBlocks';
-import { usePage } from '../hooks/usePage';
+import { usePage, usePageBlockPropsMutation } from '../hooks/usePage';
 import { useIsEditing } from '../hooks/useIsEditing';
 import { useStateToWS } from '../hooks/useStateToWS';
+import { setPage } from '../redux/editor';
 import { Block } from './Block';
 import { CreateBlockAtTheEnd } from './CreateBlockAtTheEnd';
 import { BasicBlock } from '../types/basicBlock';
@@ -54,6 +57,7 @@ function WSHandler() {
 
 export function Page(): JSX.Element {
 	const { pageId } = useParams<{ pageId: string }>();
+	const dispatch = useAppDispatch();
 	const { state: pageParams } = useLocation();
 	const { editing, setEditing } = useIsEditing();
 	const { navigate } = usePageNavigator();
@@ -65,7 +69,13 @@ export function Page(): JSX.Element {
 
 	const page = blocks?.page as BasicBlock & PageBlockType;
 
-	const { isError } = usePage(pageId, blocksProps);
+	const { isError, isSuccess, data } = usePage(pageId);
+
+	useEffect(() => {
+		if (isSuccess && data) dispatch(setPage({ blocks: data.value, pageId }));
+	}, [data, dispatch, isSuccess, pageId]);
+
+	usePageBlockPropsMutation(pageId, blocksProps);
 
 	const hiddenBlocks = useMemo(() => {
 		return Object.values(blocks).filter((block) => !block.show);

@@ -51,6 +51,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 			const withoutBrTag = e.target.value.replace(BR_TAG, '\n');
 			const [text, newEntities] = htmlToEntities(withoutBrTag);
 			if (withoutBrTag !== e.target.value) {
+				// reset caret index if BR tag removed;
 				setToPosRef.current = getCaretIndex(contentEditableRef.current);
 				if (setToPosRef.current > text.length) setToPosRef.current = text.length;
 			}

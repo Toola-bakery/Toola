@@ -65,12 +65,12 @@ export function useTableInspector(block: BasicBlock & TableBlockType) {
 			next: [
 				{
 					label: 'Connected Page Id',
-					type: 'input',
+					type: 'pages',
 					onChange: (v) =>
 						immerBlockProps<TableBlockProps>(id, (draft) => {
 							draft.connectedPage = v;
 						}),
-					value: connectedPage,
+					value: connectedPage || '',
 				},
 				{
 					label: 'Data Source',

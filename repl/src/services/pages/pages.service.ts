@@ -21,6 +21,7 @@ export const PagesService: ServiceSchema<
 		get: { id: string; meta: AuthMeta };
 		post: { id: string; title?: string; value: any; meta: AuthMeta };
 		topLevelPages: { projectId: ObjectId; meta: AuthMeta };
+		list: { projectId: ObjectId; search: string; meta: AuthMeta };
 	}
 > = {
 	name: 'pages',
@@ -78,6 +79,33 @@ export const PagesService: ServiceSchema<
 
 				if (!resp || !resp.value || !resp.value.page) throw new Error('Cant find page');
 				return resp;
+			},
+		},
+		list: {
+			params: {
+				projectId: { type: 'objectID', ObjectID: ObjectId, convert: true },
+				search: { type: 'string', optional: true, default: '' },
+			},
+			async handler(ctx) {
+				const { projectId, search } = ctx.params;
+				const { userId, projectId: authProjectId } = ctx.meta;
+
+				if (userId) {
+					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+				} else if (authProjectId.toString() !== projectId.toString()) {
+					throw new Error('No access to project');
+				}
+				return pagesCollection
+					.find(
+						{
+							deleted: { $in: [null, false] },
+							projectId,
+							...(search ? { 'value.page.title': new RegExp(search, 'i') } : {}),
+						},
+						{ limit: 50, sort: { _id: 1 }, projection: { _id: 1, 'value.page': 1 } },
+					)
+					.toArray();
 			},
 		},
 		post: {

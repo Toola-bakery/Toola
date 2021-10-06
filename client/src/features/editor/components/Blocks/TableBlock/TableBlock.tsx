@@ -23,7 +23,7 @@ export type TableBlockProps = {
 	value: string;
 	columns?: TableColumnsProp;
 	manualPagination: boolean;
-	connectedPage: string;
+	connectedPage?: string;
 };
 
 export enum ColumnTypes {

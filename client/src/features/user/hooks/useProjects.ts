@@ -34,6 +34,7 @@ export function useProjects() {
 		enabled: !!authToken,
 		initialData: { projects: projectsCache },
 		retry: 1,
+		refetchOnWindowFocus: false,
 		onSuccess: () => {
 			immer((draft) => {
 				draft.projectsCache = projects;
