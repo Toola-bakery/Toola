@@ -1,4 +1,5 @@
 import { Menu, Popover, MenuItem, Position } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useProjects } from '../../user/hooks/useProjects';

@@ -16,7 +16,7 @@ import { Block } from '../Block';
 import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
 import { ColumnBlock, ColumnBlockType } from '../Blocks/Layout/ColumnBlock';
-import { PageBar } from '../PageBar';
+import { PageBar } from './PageBar';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
 import { usePageBlockPropsMutation } from './hooks/usePageBlockPropsMutation';
 

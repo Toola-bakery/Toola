@@ -13,7 +13,7 @@ export function usePagesMutations() {
 	const { authToken } = useUser();
 	const { currentProjectId } = useProjects();
 	const { navigate } = usePageNavigator();
-	const { refetch, appendPage } = useTopLevelPages();
+	const { appendPage, deletePage: deleteTopLevelPage } = useTopLevelPages();
 
 	const createPage = useCallback(() => {
 		const id = v4();
@@ -37,9 +37,9 @@ export function usePagesMutations() {
 				.json<{
 					value: { page: BasicBlock & PageBlockProps };
 				}>();
-			refetch();
+			deleteTopLevelPage(pageId);
 		},
-		[authToken, currentProjectId, refetch],
+		[deleteTopLevelPage, authToken, currentProjectId],
 	);
 
 	return { createPage, deletePage };

@@ -36,7 +36,6 @@ export function useTopLevelPages() {
 	const renamePage = useCallback(
 		({ title, id }: { title: string; id: string }) => {
 			const items = data.map((item) => (item.id !== id ? item : { title, id }));
-			console.log({ title, id }, { items });
 			queryClient.setQueryData<TopLevelPageItem[]>(
 				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
 				items,
@@ -45,5 +44,16 @@ export function useTopLevelPages() {
 		[currentProjectId, data, queryClient],
 	);
 
-	return { pages: sortedList, refetch, appendPage, renamePage };
+	const deletePage = useCallback(
+		(id: string) => {
+			const items = data.filter((item) => item.id !== id);
+			queryClient.setQueryData<TopLevelPageItem[]>(
+				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
+				items,
+			);
+		},
+		[currentProjectId, data, queryClient],
+	);
+
+	return { pages: sortedList, refetch, appendPage, renamePage, deletePage };
 }
