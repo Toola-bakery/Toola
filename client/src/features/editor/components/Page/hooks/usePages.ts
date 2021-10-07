@@ -1,11 +1,12 @@
 import { useQuery } from 'react-query';
 import { useProjects } from '../../../../user/hooks/useProjects';
+import { Blocks } from '../../../types/blocks';
 import { PageBlockProps } from '../Page';
 import { BasicBlock } from '../../../types/basicBlock';
 
 export type Page = {
 	_id: string;
-	value: { page: BasicBlock & PageBlockProps };
+	value: { page: BasicBlock & PageBlockProps } & { [key: string]: BasicBlock & Blocks };
 };
 
 export function usePages(search = '') {

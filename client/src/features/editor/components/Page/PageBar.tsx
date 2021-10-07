@@ -36,8 +36,6 @@ export function PageBar() {
 	return (
 		<div
 			style={{
-				position: 'sticky',
-				top: 0,
 				// backgroundColor: 'rgb(240 240 240)',
 				backgroundColor: 'rgb(255 255 255)',
 				zIndex: 20,
@@ -47,7 +45,7 @@ export function PageBar() {
 				alignItems: 'center',
 				flexDirection: 'row',
 				paddingLeft: 20,
-				paddingRight: 20,
+				paddingRight: 8,
 			}}
 		>
 			<div style={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>

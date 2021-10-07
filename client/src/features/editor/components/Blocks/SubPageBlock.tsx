@@ -1,14 +1,18 @@
 import { Button } from '@blueprintjs/core';
-import ky from 'ky';
+import { useEffect } from 'react';
 import * as React from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { Config } from '../../../../Config';
+import { useKy } from '../../../../hooks/useKy';
+import { useProjects } from '../../../user/hooks/useProjects';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
+import { usePage } from '../Page/hooks/usePage';
+import { Page } from '../Page/hooks/usePages';
 import { PageBlockProps } from '../Page/Page';
 
 export type SubPageBlockType = SubPageBlockProps;
@@ -22,6 +26,7 @@ export type SubPageBlockProps = {
 export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }) {
 	const { id, subpageId, pageId, state = '', isCreated = false } = block;
 	const { immerBlockProps, updateBlockProps } = useEditor();
+	const { currentProjectId } = useProjects();
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
@@ -36,24 +41,28 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 	]);
 
 	const { navigate } = usePageNavigator();
+	const ky = useKy();
 
-	const { isFetched } = useQuery(
+	const { mutate, isIdle } = useMutation(
 		['createPage', subpageId],
 		() =>
-			ky.get(`${Config.domain}/pages/create`, { searchParams: { id: subpageId, parentPageId: pageId } }).json<{
-				value: { page: BasicBlock & PageBlockProps };
-			}>(),
+			ky
+				.post(`${Config.domain}/pages/create`, {
+					json: { id: subpageId, parentPageId: pageId, projectId: currentProjectId },
+				})
+				.json<{ ok: boolean }>(),
 		{
-			enabled: !isCreated,
-			onSuccess() {
-				updateBlockProps({ id, isCreated: true });
+			onSuccess(resp) {
+				if (resp.ok) updateBlockProps({ id, isCreated: true });
 			},
 		},
 	);
 
-	const { data: { value: { page = null } = {} } = {} } = useQuery<{
-		value: { page: BasicBlock & PageBlockProps };
-	}>(['/pages/get', { id: subpageId }], { enabled: Boolean(isFetched || isCreated) });
+	useEffect(() => {
+		if (!isCreated && isIdle) mutate();
+	}, [isCreated, isIdle, mutate]);
+
+	const { data: { value: { page = null } = {} } = {} } = usePage((isCreated && subpageId) || '');
 
 	const { evaluate } = useReferenceEvaluator();
 
@@ -65,11 +74,11 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 			<div onContextMenu={onContextMenu}>
 				<Button
 					onClick={() => {
-						if (page && page.pageId) navigate(page.pageId, evaluate(state));
+						if (page) navigate(subpageId, evaluate(state));
 					}}
 					icon="document"
 					minimal
-					text={page?.title}
+					text={page?.title || 'Untitled'}
 				/>
 			</div>
 		</>

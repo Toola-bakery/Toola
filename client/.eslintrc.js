@@ -29,6 +29,10 @@ module.exports = {
 		'linebreak-style': 'off',
 		'consistent-return': 'off',
 		'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state', 'draft'] }],
+		'@typescript-eslint/naming-convention': [
+			'error',
+			{ selector: 'parameter', format: ['camelCase', 'PascalCase'], leadingUnderscore: 'allow' },
+		],
 		'react/jsx-uses-react': 'off',
 		'react/react-in-jsx-scope': 'off',
 		'jsx-a11y/alt-text': 'off',

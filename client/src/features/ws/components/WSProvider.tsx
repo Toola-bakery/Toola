@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { useWindowFocus } from '../../../hooks/useWindowFocus';
 import { useEventListener, useEvents } from '../../editor/hooks/useEvents';
 import { Config } from '../../../Config';
 import { useProjects } from '../../user/hooks/useProjects';
@@ -42,6 +43,17 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 			}),
 	);
 
+	const windowFocus = useWindowFocus();
+	useEffect(() => {
+		const closeListener = () => {
+			isWsReadyPromise = getNewPromise();
+		};
+
+		ws.addEventListener('close', closeListener);
+		if (windowFocus && ws.readyState !== ws.OPEN) ws.reconnect();
+		return () => ws.removeEventListener('close', closeListener);
+	}, [ws, windowFocus]);
+
 	const sendWS = useCallback(
 		async (data: unknown, skipReady = false) => {
 			if (!skipReady) await isWsReadyPromise;
@@ -60,15 +72,6 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 		ws.addEventListener('message', onMessage);
 		return () => ws.removeEventListener('message', onMessage);
 	}, [send, ws]);
-
-	useEffect(() => {
-		const closeListener = () => {
-			isWsReadyPromise = getNewPromise();
-		};
-
-		ws.addEventListener('close', closeListener);
-		return () => ws.removeEventListener('close', closeListener);
-	}, [ws]);
 
 	useEventListener(
 		'ws/init',

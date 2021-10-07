@@ -55,14 +55,10 @@ function WSHandler() {
 	return null;
 }
 
-export function Page(): JSX.Element {
-	const { pageId } = useParams<{ pageId: string }>();
+export function Page({ pageId, pageParams }: { pageId: string; pageParams: unknown }): JSX.Element {
 	const dispatch = useAppDispatch();
-	const { state: pageParams } = useLocation();
 	const { editing, setEditing } = useIsEditing();
 	const { navigate } = usePageNavigator();
-	const { width } = useWindowSize({ width: 1000 });
-	const { width: drawerWidth } = useDrawer();
 
 	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState, blocksProps } =
 		useBlocks(pageId, editing);
@@ -117,7 +113,7 @@ export function Page(): JSX.Element {
 			<PageContext.Provider value={value}>
 				<WSHandler />
 				<Helmet title={page?.title} />
-				<div style={{ width: width - drawerWidth, overflowX: 'clip', height: '100%' }}>
+				<div style={{ width: '100%', overflowX: 'clip', overflowY: 'hidden', height: '100%' }}>
 					{isError ? (
 						<NonIdealState
 							icon="search"
@@ -125,13 +121,11 @@ export function Page(): JSX.Element {
 							action={<Button text="Back home" onClick={() => navigate('')} />}
 						/>
 					) : null}
-					{!isError ? (
-						<>
-							<PageBar />
-							{page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
-						</>
-					) : null}
-					<CreateBlockAtTheEnd parentId="page" />
+					{!isError ? <PageBar /> : null}
+					<div style={{ width: '100%', overflowY: 'auto', height: '100%' }}>
+						{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
+						<CreateBlockAtTheEnd parentId="page" />
+					</div>
 				</div>
 				<div>
 					{hiddenBlocks.map((block) => (

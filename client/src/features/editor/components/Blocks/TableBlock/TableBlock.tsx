@@ -4,6 +4,7 @@ import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable
 import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
+import { usePageModal } from '../../../../pageModal/hooks/usePageModal';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { usePageNavigator } from '../../../../../hooks/usePageNavigator';
 import { usePage } from '../../Page/hooks/usePage';
@@ -53,7 +54,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { updateBlockState, immerBlockProps } = useEditor();
 	const { navigate } = usePageNavigator();
 	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData(block, editing);
-
+	const { push } = usePageModal();
 	const {
 		getTableProps,
 		getTableBodyProps,
@@ -143,7 +144,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 											}}
 											onDoubleClick={() => {
 												if (connectedPage) {
-													navigate(connectedPage, row.original);
+													push(connectedPage, row.original);
 												}
 											}}
 											className="tr"
