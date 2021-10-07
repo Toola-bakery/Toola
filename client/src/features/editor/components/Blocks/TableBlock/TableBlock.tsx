@@ -50,9 +50,11 @@ export type TableBlockState = {
 
 export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	const { id, manualPagination, connectedPage } = block;
-	const { editing } = usePageContext();
+	const {
+		editing,
+		page: { style },
+	} = usePageContext();
 	const { updateBlockState, immerBlockProps } = useEditor();
-	const { navigate } = usePageNavigator();
 	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData(block, editing);
 	const { push } = usePageModal();
 	const {
@@ -100,7 +102,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
 				<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
-					<div style={{ overflow: 'scroll', maxHeight: 500 }}>
+					<div style={{ overflow: 'scroll', maxHeight: style === 'a4' ? 'none' : 500 }}>
 						<HTMLTable
 							bordered
 							striped

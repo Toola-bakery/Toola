@@ -24,6 +24,7 @@ export type PageBlockType = PageBlockProps;
 export type PageBlockProps = {
 	type: 'page';
 	title: string;
+	style: 'app' | 'a4';
 	blocks: string[];
 };
 
@@ -44,7 +45,7 @@ export const PageContext = React.createContext<PageContextType>({
 	pageId: '',
 	setBlockState: () => {},
 	blocksState: {},
-	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', blocks: [] },
+	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', style: 'app', blocks: [] },
 	editing: true,
 	setEditing: () => {},
 	blocksProps: {},
@@ -122,9 +123,17 @@ export function Page({ pageId, pageParams }: { pageId: string; pageParams: unkno
 						/>
 					) : null}
 					{!isError ? <PageBar /> : null}
-					<div style={{ width: '100%', overflowY: 'auto', height: '100%' }}>
-						{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
-						<CreateBlockAtTheEnd parentId="page" />
+					<div style={{ overflowY: 'auto', width: '100%', height: '100%', backgroundColor: 'rgb(229 230 231)' }}>
+						<div
+							style={
+								page?.style === 'a4'
+									? { backgroundColor: 'white', width: '21cm', margin: 'auto', marginTop: 20, marginBottom: 20 }
+									: { width: '100%', height: '100%', backgroundColor: 'white' }
+							}
+						>
+							{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
+							<CreateBlockAtTheEnd parentId="page" />
+						</div>
 					</div>
 				</div>
 				<div>

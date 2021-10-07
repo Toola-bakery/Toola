@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import styled from 'styled-components';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
+import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/SwitchMenuItem';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { usePagesMutations } from './hooks/usePagesMutations';
@@ -19,7 +20,7 @@ const StyledEditableText = styled.div`
 `;
 
 export function PageBar() {
-	const { editing, setEditing, page: { id, title, parentId } = {}, pageId } = usePageContext();
+	const { editing, setEditing, page: { id, title, parentId, style } = {}, pageId } = usePageContext();
 	const { renamePage } = useTopLevelPages();
 	const { deletePage } = usePagesMutations();
 	const { updateBlockProps } = useEditor();
@@ -81,6 +82,15 @@ export function PageBar() {
 					minimal
 					content={
 						<Menu>
+							<SwitchMenuItem
+								item={{
+									icon: 'print',
+									label: 'Use A4 layout',
+									value: style === 'a4',
+									onChange: (v) => id && updateBlockProps({ id, style: v ? 'a4' : 'app' }),
+									type: 'switch',
+								}}
+							/>
 							<MenuItem onClick={() => deletePage(pageId)} icon="trash" text="Delete page" />
 						</Menu>
 					}
