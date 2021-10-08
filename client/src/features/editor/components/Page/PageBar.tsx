@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import styled from 'styled-components';
+import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
 import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/SwitchMenuItem';
 import { useEditor } from '../../hooks/useEditor';
@@ -19,11 +20,19 @@ const StyledEditableText = styled.div`
 	}
 `;
 
-export function PageBar() {
-	const { editing, setEditing, page: { id, title, parentId, style } = {}, pageId } = usePageContext();
+const FullscreenButton = styled(Button)`
+	color: rgba(0, 0, 0, 0.27) !important;
+	.bp4-icon {
+		color: rgba(0, 0, 0, 0.27);
+	}
+`;
+
+export function PageBar({ isModal }: { isModal: boolean }) {
+	const { editing, setEditing, page: { id, title, parentId, style } = {}, pageId, globals } = usePageContext();
 	const { renamePage } = useTopLevelPages();
 	const { deletePage } = usePagesMutations();
 	const { updateBlockProps } = useEditor();
+	const { navigate } = usePageNavigator();
 	const onChangeHandler = useCallback(
 		(text: string) => {
 			if (id) {
@@ -45,43 +54,58 @@ export function PageBar() {
 				justifyContent: 'center',
 				alignItems: 'center',
 				flexDirection: 'row',
-				paddingLeft: 20,
+				paddingLeft: isModal ? 8 : 30,
 				paddingRight: 8,
 			}}
 		>
 			<div style={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
-				<H4 style={{ fontWeight: 400, margin: 0 }}>
-					<StyledEditableText>
-						<EditableText
-							alwaysRenderInput
-							disabled={!editing || !id}
-							placeholder="Untitled"
-							value={(title === 'Untitled' ? '' : title) || ''}
-							onChange={(e) => onChangeHandler(e)}
-						/>
-					</StyledEditableText>
-					{/*<ContentEditable*/}
-					{/*	disabled={!editing || !id}*/}
-					{/*	html={title || ''}*/}
-					{/*	tagName="span"*/}
-					{/*	style={{ margin: 0, marginBottom: 10 }}*/}
-					{/*	onChange={onChangeHandler}*/}
-					{/*/>*/}
-				</H4>
+				{isModal ? (
+					<FullscreenButton
+						minimal
+						icon="fullscreen"
+						text="Fullscreen"
+						onClick={() => navigate(pageId, globals.pageParams)}
+					/>
+				) : (
+					<H4 style={{ fontWeight: 400, margin: 0 }}>
+						<StyledEditableText>
+							<EditableText
+								alwaysRenderInput
+								disabled={!editing || !id}
+								placeholder="Untitled"
+								value={(title === 'Untitled' ? '' : title) || ''}
+								onChange={(e) => onChangeHandler(e)}
+							/>
+						</StyledEditableText>
+					</H4>
+				)}
 			</div>
 			<div style={{ flexShrink: 1, flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-				<Switch
-					style={{ margin: 0, marginRight: 8 }}
-					label="Editing"
-					alignIndicator="right"
-					large
-					checked={editing}
-					onChange={() => setEditing(!editing)}
-				/>
+				{!isModal ? (
+					<Switch
+						style={{ margin: 0, marginRight: 8 }}
+						label="Editing"
+						alignIndicator="right"
+						large
+						checked={editing}
+						onChange={() => setEditing(!editing)}
+					/>
+				) : null}
 				<Popover
 					minimal
 					content={
 						<Menu>
+							{isModal ? (
+								<SwitchMenuItem
+									item={{
+										icon: 'edit',
+										label: 'Editing mode',
+										value: editing,
+										onChange: () => setEditing(!editing),
+										type: 'switch',
+									}}
+								/>
+							) : null}
 							<SwitchMenuItem
 								item={{
 									icon: 'print',

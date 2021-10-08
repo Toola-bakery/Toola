@@ -29,7 +29,7 @@ export type PageBlockProps = {
 };
 
 export type PageContextType = {
-	globals: { pageId: string };
+	globals: { pageId: string; pageParams?: unknown };
 	page: BasicBlock & PageBlockType;
 	pageId: string;
 	editing: boolean;
@@ -56,7 +56,15 @@ function WSHandler() {
 	return null;
 }
 
-export function Page({ pageId, pageParams }: { pageId: string; pageParams: unknown }): JSX.Element {
+export function Page({
+	pageId,
+	pageParams,
+	isModal = false,
+}: {
+	pageId: string;
+	pageParams: unknown;
+	isModal?: boolean;
+}): JSX.Element {
 	const dispatch = useAppDispatch();
 	const { editing, setEditing } = useIsEditing();
 	const { navigate } = usePageNavigator();
@@ -132,7 +140,7 @@ export function Page({ pageId, pageParams }: { pageId: string; pageParams: unkno
 							action={<Button text="Back home" onClick={() => navigate('')} />}
 						/>
 					) : null}
-					{!isError ? <PageBar /> : null}
+					{!isError ? <PageBar isModal={isModal} /> : null}
 					<div
 						style={{
 							overflowY: 'auto',
@@ -150,7 +158,6 @@ export function Page({ pageId, pageParams }: { pageId: string; pageParams: unkno
 									? {
 											backgroundColor: 'white',
 											width: '21cm',
-											minHeight: '29.7cm',
 											marginTop: 20,
 											marginBottom: 20,
 											paddingRight: 25,

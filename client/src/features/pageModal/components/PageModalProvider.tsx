@@ -71,7 +71,7 @@ export function PageModalProvider({ disabled, children }: PropsWithChildren<{ di
 							borderRadius: 4,
 						}}
 					>
-						<Page pageId={modalHistory.location.pathname.slice(1)} pageParams={modalHistory.location.state} />
+						<Page isModal pageId={modalHistory.location.pathname.slice(1)} pageParams={modalHistory.location.state} />
 					</div>
 				) : null}
 			</Overlay>
