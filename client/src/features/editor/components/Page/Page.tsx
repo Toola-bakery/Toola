@@ -145,10 +145,8 @@ export function Page({
 						style={{
 							overflowY: 'auto',
 							width: '100%',
+							height: 'calc(100% - 40px)',
 							backgroundColor: 'rgb(229 230 231)',
-							display: 'flex',
-							flex: 1,
-							flexDirection: 'column',
 							alignItems: 'center',
 						}}
 					>
@@ -158,12 +156,14 @@ export function Page({
 									? {
 											backgroundColor: 'white',
 											width: '21cm',
-											marginTop: 20,
-											marginBottom: 20,
 											paddingRight: 25,
 											paddingTop: 15,
+											minHeight: '29.7cm',
+											margin: 'auto',
+											marginTop: 20,
+											marginBottom: 20,
 									  }
-									: { width: '100%', backgroundColor: 'white', paddingRight: 25 }
+									: { width: '100%', minHeight: '100%', backgroundColor: 'white', paddingRight: 25 }
 							}
 						>
 							{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
