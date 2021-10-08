@@ -1,47 +1,65 @@
 import { Overlay } from '@blueprintjs/core';
-import React, { PropsWithChildren, useCallback, useMemo, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { createMemoryHistory, MemoryHistory } from 'history';
 import { Page } from '../../editor/components/Page/Page';
 
-export type PageModalContextType<T = unknown> = {
+export type PageModalContextType = {
 	push(pageId: string, params?: unknown): void;
+	back(): void;
 	replace(pageId: string, params?: unknown): void; // replaces last page in history
-	reset(pageId: string, params?: unknown): void; // removes all history
-	params?: T;
-	pageId?: string;
 	close(): void;
 };
 export const PageModalContext = React.createContext<PageModalContextType>({
 	close() {},
+	back() {},
 	push() {},
 	replace() {},
-	reset() {},
 });
 
 export function PageModalProvider({ disabled, children }: PropsWithChildren<{ disabled?: boolean }>) {
-	const [history, setHistory] = useState<[pageId: string, params?: unknown][]>([]);
+	const [modalHistory, setModalHistory] = useState<MemoryHistory>(() => createMemoryHistory());
+	const [key, setKey] = useState(() => modalHistory.location.key);
 
-	const currentPage = useMemo(() => (history?.length ? history[history?.length - 1] : null), [history]);
+	const close = useCallback(() => setModalHistory(() => createMemoryHistory()), []);
 
-	const close = useCallback(() => setHistory([]), []);
+	const isModalOpen = modalHistory.location.pathname !== '/' && !disabled;
+
+	useEffect(() => {
+		return modalHistory.listen((e) => setKey(e.key));
+	}, [modalHistory]);
+
 	const push = useCallback(
-		(pageId: string, params: unknown) => setHistory((currentHistory) => [...currentHistory, [pageId, params]]),
-		[],
+		(pageId: string, params: unknown) => modalHistory.push(`/${pageId}`, params),
+		[modalHistory],
 	);
-
-	const reset = useCallback((pageId: string, params: unknown) => setHistory(() => [[pageId, params]]), []);
-
 	const replace = useCallback(
-		(pageId: string, params: unknown) =>
-			setHistory((currentHistory) => [...currentHistory.slice(0, -1), [pageId, params]]),
-		[],
+		(pageId: string, params: unknown) => modalHistory.replace(`/${pageId}`, params),
+		[modalHistory],
 	);
+	const back = useCallback(() => modalHistory.goBack(), [modalHistory]);
+
+	const routerHistory = useHistory();
+
+	useEffect(() => {
+		return routerHistory.block((tx, action) => {
+			if (!isModalOpen) {
+				return;
+			}
+
+			// if (action === 'POP') {
+			// 	modalHistory.goBack();
+			// 	return false;
+			// }
+
+			close();
+		});
+	}, [close, isModalOpen, modalHistory, routerHistory]);
 
 	return (
-		<PageModalContext.Provider
-			value={{ close, pageId: currentPage?.[0], params: currentPage?.[1], reset, replace, push }}
-		>
-			<Overlay isOpen={!!currentPage && !disabled} onClose={close}>
-				{currentPage ? (
+		<PageModalContext.Provider value={{ close, back, push, replace }}>
+			<Overlay isOpen={isModalOpen} onClose={close}>
+				{isModalOpen ? (
 					<div
 						style={{
 							overflow: 'scroll',
@@ -53,7 +71,7 @@ export function PageModalProvider({ disabled, children }: PropsWithChildren<{ di
 							borderRadius: 4,
 						}}
 					>
-						<Page pageId={currentPage[0]} pageParams={currentPage[1]} />
+						<Page pageId={modalHistory.location.pathname.slice(1)} pageParams={modalHistory.location.state} />
 					</div>
 				) : null}
 			</Overlay>

@@ -107,7 +107,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 				innerRef={contentEditableRef}
 				html={isFocused ? htmlValue : htmlString}
 				tagName={textBlockStyleTag[style || 'text']}
-				style={{ margin: 0, paddingTop: 1, marginBottom: 9, whiteSpace: 'pre-wrap' }}
+				style={{ margin: 0, paddingTop: 1, marginBottom: 9, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
 			/>

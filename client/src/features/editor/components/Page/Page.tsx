@@ -114,7 +114,17 @@ export function Page({ pageId, pageParams }: { pageId: string; pageParams: unkno
 			<PageContext.Provider value={value}>
 				<WSHandler />
 				<Helmet title={page?.title} />
-				<div style={{ width: '100%', overflowX: 'clip', overflowY: 'hidden', height: '100%' }}>
+				<div
+					style={{
+						width: '100%',
+						height: '100%',
+						overflowX: 'clip',
+						overflowY: 'hidden',
+						display: 'flex',
+						flex: 1,
+						flexDirection: 'column',
+					}}
+				>
 					{isError ? (
 						<NonIdealState
 							icon="search"
@@ -123,12 +133,30 @@ export function Page({ pageId, pageParams }: { pageId: string; pageParams: unkno
 						/>
 					) : null}
 					{!isError ? <PageBar /> : null}
-					<div style={{ overflowY: 'auto', width: '100%', height: '100%', backgroundColor: 'rgb(229 230 231)' }}>
+					<div
+						style={{
+							overflowY: 'auto',
+							width: '100%',
+							backgroundColor: 'rgb(229 230 231)',
+							display: 'flex',
+							flex: 1,
+							flexDirection: 'column',
+							alignItems: 'center',
+						}}
+					>
 						<div
 							style={
 								page?.style === 'a4'
-									? { backgroundColor: 'white', width: '21cm', margin: 'auto', marginTop: 20, marginBottom: 20 }
-									: { width: '100%', height: '100%', backgroundColor: 'white' }
+									? {
+											backgroundColor: 'white',
+											width: '21cm',
+											minHeight: '29.7cm',
+											marginTop: 20,
+											marginBottom: 20,
+											paddingRight: 25,
+											paddingTop: 15,
+									  }
+									: { width: '100%', backgroundColor: 'white', paddingRight: 25 }
 							}
 						>
 							{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}

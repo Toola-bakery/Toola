@@ -56,7 +56,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 	} = usePageContext();
 	const { updateBlockState, immerBlockProps } = useEditor();
 	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData(block, editing);
-	const { push } = usePageModal();
+	const modalHistory = usePageModal();
 	const {
 		getTableProps,
 		getTableBodyProps,
@@ -146,7 +146,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 											}}
 											onDoubleClick={() => {
 												if (connectedPage) {
-													push(connectedPage, row.original);
+													modalHistory.push(connectedPage, row.original);
 												}
 											}}
 											className="tr"
