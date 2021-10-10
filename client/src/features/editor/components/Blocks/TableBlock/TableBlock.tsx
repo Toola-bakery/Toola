@@ -3,6 +3,7 @@ import JSONTree from 'react-json-tree';
 import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
+import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { usePageModal } from '../../../../pageModal/hooks/usePageModal';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
@@ -73,7 +74,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 			columns: calculatedColumns,
 			data,
 			manualPagination,
-			pageCount: manualPagination ? -1 : undefined,
+			...(manualPagination ? { pageCount: -1 } : {}),
 		},
 		useBlockLayout,
 		useResizeColumns,
