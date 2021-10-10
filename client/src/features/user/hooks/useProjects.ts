@@ -14,15 +14,14 @@ export type ProjectSchema = {
 export function useProjectsState() {
 	const [data, immer] = useImmerState<{
 		currentProjectId?: string;
-		projectsCache?: ProjectSchema[];
 	}>('projects');
 
-	const { currentProjectId, projectsCache } = data || {};
-	return { currentProjectId, projectsCache, immer };
+	const { currentProjectId } = data || {};
+	return { currentProjectId, immer };
 }
 
 export function useProjects() {
-	const { currentProjectId, projectsCache, immer } = useProjectsState();
+	const { currentProjectId, immer } = useProjectsState();
 	const { authToken } = useUser();
 	const {
 		isLoading,
@@ -32,14 +31,8 @@ export function useProjects() {
 		remove,
 	} = useQuery<{ projects: ProjectSchema[] }>('/projects/get', {
 		enabled: !!authToken,
-		initialData: { projects: projectsCache },
 		retry: 1,
 		refetchOnWindowFocus: false,
-		onSuccess: () => {
-			immer((draft) => {
-				draft.projectsCache = projects;
-			});
-		},
 	});
 
 	const selectProject = useCallback(

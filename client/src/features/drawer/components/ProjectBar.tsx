@@ -1,5 +1,4 @@
-import { Menu, Popover, MenuItem, Position } from '@blueprintjs/core';
-import { Popover2 } from '@blueprintjs/popover2';
+import { Menu, Divider, Popover, MenuItem, Position } from '@blueprintjs/core';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useProjects } from '../../user/hooks/useProjects';
@@ -9,7 +8,7 @@ import { DrawerOmnibar } from './DrawerOmnibar';
 import { ProjectAvatar } from './ProjectAvatar';
 
 export function ProjectBar() {
-	const { currentProject } = useProjects();
+	const { currentProject, projects, selectProject } = useProjects();
 	const history = useHistory();
 	const { logOut } = useUser();
 
@@ -19,6 +18,17 @@ export function ProjectBar() {
 				minimal
 				content={
 					<Menu>
+						{projects?.map((project) => (
+							<MenuItem
+								key={project._id}
+								text={project.name}
+								onClick={() => {
+									selectProject(project._id);
+									history.push('/');
+								}}
+							/>
+						))}
+						<Divider />
 						<MenuItem text="Log out" onClick={logOut} />
 					</Menu>
 				}

@@ -19,7 +19,6 @@ export function useBlocks(pageId: string, editing: boolean) {
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 
 	const [blocksMethods, setMethods] = useState<{ [blockId: string]: BlockMethods }>({});
-
 	useEffect(() => {
 		return () => {
 			setBlockState({});

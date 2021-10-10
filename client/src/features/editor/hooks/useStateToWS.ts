@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { evalGet } from '../../executor/hooks/useWatchList';
 import { useWS } from '../../ws/hooks/useWS';
@@ -22,7 +23,7 @@ export type PageCallEvent = {
 
 export function useStateToWS() {
 	const { sendWS } = useWS();
-	const { blocks, globals, pageId } = usePageContext();
+	const { blocks, blocksMethods, globals, pageId } = usePageContext();
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
 		(event) => {
@@ -43,14 +44,13 @@ export function useStateToWS() {
 		[blocks, globals, pageId, sendWS],
 	);
 
-	useEventListener<PageCallEvent>(
-		`ws/page.call`,
+	const pageCallCallback = useCallback(
 		(event) => {
 			const { method, pageId: pageIdReq, callArgs = [], blockId, redirectedFrom, messageId } = event;
 			if (method && pageId && blockId && redirectedFrom) {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				const resp = blockMethods?.[blockId]?.[method]?.(...callArgs);
+				const resp = blocksMethods?.[blockId]?.[method]?.(...callArgs);
 				sendWS({
 					action: 'state.callResponse',
 					destinationId: redirectedFrom,
@@ -59,6 +59,7 @@ export function useStateToWS() {
 				});
 			}
 		},
-		[],
+		[blocksMethods, pageId, sendWS],
 	);
+	useEventListener<PageCallEvent>(`ws/page.call`, pageCallCallback, [pageCallCallback]);
 }
