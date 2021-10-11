@@ -1,5 +1,6 @@
 import { Button, H3, HTMLTable, Tag } from '@blueprintjs/core';
 import { useHistory } from 'react-router-dom';
+import { Dayjs } from '../../features/ui/components/Dayjs';
 import { useMembers } from '../../features/usersAndProjects/hooks/useMembers';
 import { useProjects } from '../../features/usersAndProjects/hooks/useProjects';
 import { useOnMountedEffect } from '../../hooks/useOnMounted';
@@ -16,7 +17,9 @@ export function MembersListRoute() {
 		<div style={{ padding: 30, flex: 1 }}>
 			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 				<H3>Members</H3>
-				<Button intent="primary" onClick={() => history.push('/resources/mongodb')} text="Create new" />
+				<div style={{ display: 'flex', flexDirection: 'row' }}>
+					<Button style={{ marginLeft: 5 }} intent="primary" text="Invite users" />
+				</div>
 			</div>
 			<div style={{ display: 'flex', flex: 1 }}>
 				<HTMLTable striped style={{ width: '100%' }}>
@@ -34,7 +37,9 @@ export function MembersListRoute() {
 								<tr key={user._id}>
 									<td>{user.displayName}</td>
 									<td>{user.email}</td>
-									<td>{user.createdAt}</td>
+									<td>
+										<Dayjs timeAgo time={user.createdAt} />
+									</td>
 									<td>
 										{currentProject?.owner === user._id ? (
 											<Tag intent="danger" style={{ marginRight: 4 }} round>
