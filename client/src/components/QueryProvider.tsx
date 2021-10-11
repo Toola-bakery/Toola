@@ -2,7 +2,7 @@ import ky from 'ky';
 import { PropsWithChildren, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Config } from '../Config';
-import { useProjectsState } from '../features/user/hooks/useProjects';
+import { useProjectsState } from '../features/usersAndProjects/hooks/useProjects';
 import { useAppSelector } from '../redux/hooks';
 
 export function QueryProvider({ children }: PropsWithChildren<{ a?: string }>) {

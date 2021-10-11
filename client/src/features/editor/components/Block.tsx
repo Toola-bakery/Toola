@@ -1,7 +1,9 @@
-import { Button, Icon } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import React, { useCallback, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import { usePageContext } from '../../executor/hooks/useReferences';
+import { BlockCreators } from '../helpers/BlockCreators';
+import { useEditor } from '../hooks/useEditor';
 import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
 import { KeyValueBlock, KeyValueBlockType } from './Blocks/KeyValueBlock';
 import { QueryBlock, QueryBlockType } from './Blocks/QueryBlock/QueryBlock';
@@ -16,7 +18,7 @@ import { useHover } from '../../../hooks/useHover';
 import { ImageBlock, ImageBlockType } from './Blocks/ImageBlock';
 import { InputBlock, InputBlockType } from './Blocks/InputBlock';
 
-type DragClickEventHandler = React.MouseEventHandler<HTMLDivElement>;
+type DragClickEventHandler = React.MouseEventHandler<HTMLElement>;
 
 export type BlockContextType<T extends Blocks = Blocks> = {
 	block: undefined | (BasicBlock & T);
@@ -61,6 +63,11 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 		setOnDragClickPrivate(() => handler);
 	}, []);
 
+	const { addBlockAfter } = useEditor();
+	const addBlock = useCallback(() => {
+		if (editing) addBlockAfter(block.id, BlockCreators.text(), true);
+	}, [editing, addBlockAfter, block.id]);
+
 	return (
 		<BlockContext.Provider value={{ block, setOnDragClick }}>
 			{!block.show ? (
@@ -77,14 +84,10 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 						// transform: 'translate3d(0, 0, 0)',
 					}}
 				>
-					<div
-						ref={dragRef}
-						onClick={(e) => {
-							onDragClick?.(e);
-						}}
-						style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}
-					>
+					<div style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
 						<Button
+							ref={dragRef}
+							onClick={(e) => onDragClick?.(e)}
 							style={{
 								padding: 0,
 								minHeight: 15,
@@ -93,6 +96,19 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 								height: 25,
 							}}
 							icon="drag-handle-vertical"
+							minimal
+						/>
+						<Button
+							onClick={addBlock}
+							style={{
+								padding: 0,
+								minHeight: 15,
+								minWidth: 10,
+								width: 18,
+								height: 25,
+								opacity: 0.6,
+							}}
+							icon="plus"
 							minimal
 						/>
 					</div>

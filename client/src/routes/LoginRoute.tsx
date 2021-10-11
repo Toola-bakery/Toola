@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { GoogleLoginButton } from 'react-social-login-buttons';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { useUser } from '../features/user/hooks/useUser';
+import { useUser } from '../features/usersAndProjects/hooks/useUser';
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');

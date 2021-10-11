@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { useProjects } from '../../../../user/hooks/useProjects';
+import { useProjects } from '../../../../usersAndProjects/hooks/useProjects';
 import { Blocks } from '../../../types/blocks';
 import { PageBlockProps } from '../Page';
 import { BasicBlock } from '../../../types/basicBlock';

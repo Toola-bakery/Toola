@@ -4,7 +4,7 @@ import { AuthMeta, UserSchema } from '../../types/users.types';
 import { mongoDB } from '../../utils/mongo';
 
 const EDITABLE_KEYS: (keyof UserSchema)[] = ['profileSrc', 'displayName'];
-const PUBLIC_KEYS: (keyof UserSchema)[] = ['_id', 'profileSrc', 'createdAt', 'displayName'];
+const PUBLIC_KEYS: (keyof UserSchema)[] = ['_id', 'profileSrc', 'email', 'createdAt', 'displayName'];
 const PUBLIC_PROJECTION = PUBLIC_KEYS.reduce((acc, v) => ({ ...acc, [v]: 1 }), {});
 
 export const usersCollection = mongoDB.collection<UserSchema>('users');

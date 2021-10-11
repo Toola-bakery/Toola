@@ -4,8 +4,8 @@ import { v4 } from 'uuid';
 import { Config } from '../../../../../Config';
 import { usePageNavigator } from '../../../../../hooks/usePageNavigator';
 import { useTopLevelPages } from '../../../../drawer/hooks/useTopLevelPages';
-import { useProjects } from '../../../../user/hooks/useProjects';
-import { useUser } from '../../../../user/hooks/useUser';
+import { useProjects } from '../../../../usersAndProjects/hooks/useProjects';
+import { useUser } from '../../../../usersAndProjects/hooks/useUser';
 import { PageBlockProps } from '../Page';
 import { BasicBlock } from '../../../types/basicBlock';
 

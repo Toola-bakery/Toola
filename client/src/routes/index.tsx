@@ -3,6 +3,7 @@ import CreateProjectRoute from './CreateProjectRoute';
 import EditorRoute from './EditorRoute';
 import LoginRoute from './LoginRoute';
 import { ResourcesRoute } from './Resources/ResourcesRoute';
+import { SettingsAndMembersRoute } from './SettingsAndMembers/SettingsAndMembersRoute';
 import { PrivateRoute } from './wrappers/PrivateRoute';
 import { RouteWithDrawer } from './wrappers/RouteWithDrawer';
 
@@ -21,6 +22,12 @@ export function AppRouters() {
 				<PrivateRoute path="/resources">
 					<RouteWithDrawer>
 						<ResourcesRoute />
+					</RouteWithDrawer>
+				</PrivateRoute>
+
+				<PrivateRoute path="/settings">
+					<RouteWithDrawer>
+						<SettingsAndMembersRoute />
 					</RouteWithDrawer>
 				</PrivateRoute>
 

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { Config } from '../Config';
-import { useProjects } from '../features/user/hooks/useProjects';
+import { useProjects } from '../features/usersAndProjects/hooks/useProjects';
 import { useKy } from '../hooks/useKy';
 
 export default function CreateProjectRoute() {

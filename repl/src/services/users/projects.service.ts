@@ -13,6 +13,7 @@ export const ProjectsService: ServiceSchema<
 	{
 		create: { name: string; meta: AuthMeta };
 		get: { projection?: string[]; meta: AuthMeta };
+		members: { projectId: ObjectId; populate: boolean; meta: AuthMeta };
 		hasAccess: { userId: ObjectId; projectId: ObjectId };
 	}
 > = {
@@ -54,10 +55,24 @@ export const ProjectsService: ServiceSchema<
 			},
 			async handler(ctx) {
 				const { userId, projectId } = ctx.params;
+				const project = await projectsCollection.findOne({ _id: projectId, users: userId }, { projection: { _id: 1 } });
+				return { hasAccess: !!project };
+			},
+		},
+		members: {
+			params: {
+				projectId: { type: 'objectID', ObjectID: ObjectId, convert: true },
+				populate: { type: 'boolean', optional: true, convert: true, default: false },
+			},
+			async handler(ctx) {
+				const { projectId, populate } = ctx.params;
 				const project = await projectsCollection.findOne({ _id: projectId }, { projection: { users: 1 } });
 				if (!project) throw new Error('Project not exists');
-				const hasAccess = project.users.some(a => a.equals(userId));
-				return { hasAccess };
+				if (!populate) return { users: project.users.map(_id => ({ _id })) };
+				return ctx.call('users.get', {
+					userIds: project.users.map(user => user.toHexString()),
+					publicData: true,
+				});
 			},
 		},
 	},

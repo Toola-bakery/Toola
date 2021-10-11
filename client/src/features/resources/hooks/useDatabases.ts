@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { useProjects } from '../../user/hooks/useProjects';
+import { useProjects } from '../../usersAndProjects/hooks/useProjects';
 import { QueryProperty } from '../../inspector/hooks/useQueryConstructor';
 
 export type Database = {

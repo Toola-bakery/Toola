@@ -3,7 +3,7 @@ import ky from 'ky';
 import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Config } from '../../../../../Config';
-import { useUser } from '../../../../user/hooks/useUser';
+import { useUser } from '../../../../usersAndProjects/hooks/useUser';
 import { PageBlockProps } from '../Page';
 import { BasicBlock } from '../../../types/basicBlock';
 import { BlockProps, Blocks } from '../../../types/blocks';

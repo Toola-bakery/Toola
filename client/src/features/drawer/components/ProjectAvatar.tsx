@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import * as React from 'react';
-import { useProjects } from '../../user/hooks/useProjects';
+import { useProjects } from '../../usersAndProjects/hooks/useProjects';
 
 type ProjectAvatarProps = {
 	id?: string;

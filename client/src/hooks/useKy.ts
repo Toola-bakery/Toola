@@ -1,6 +1,6 @@
 import ky from 'ky';
 import { useMemo } from 'react';
-import { useUser } from '../features/user/hooks/useUser';
+import { useUser } from '../features/usersAndProjects/hooks/useUser';
 
 export function useKy() {
 	const { authToken } = useUser(true);

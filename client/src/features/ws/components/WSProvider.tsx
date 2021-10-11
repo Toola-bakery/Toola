@@ -3,8 +3,8 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useWindowFocus } from '../../../hooks/useWindowFocus';
 import { useEventListener, useEvents } from '../../editor/hooks/useEvents';
 import { Config } from '../../../Config';
-import { useProjects } from '../../user/hooks/useProjects';
-import { useUser } from '../../user/hooks/useUser';
+import { useProjects } from '../../usersAndProjects/hooks/useProjects';
+import { useUser } from '../../usersAndProjects/hooks/useUser';
 
 export type WSProviderContextType = {
 	ws?: WebSocket;

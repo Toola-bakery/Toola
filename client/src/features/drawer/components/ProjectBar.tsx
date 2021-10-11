@@ -1,8 +1,8 @@
 import { Menu, Divider, Popover, MenuItem, Position } from '@blueprintjs/core';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useProjects } from '../../user/hooks/useProjects';
-import { useUser } from '../../user/hooks/useUser';
+import { useProjects } from '../../usersAndProjects/hooks/useProjects';
+import { useUser } from '../../usersAndProjects/hooks/useUser';
 import { DrawerMenuItem } from './DrawerMenuItem';
 import { DrawerOmnibar } from './DrawerOmnibar';
 import { ProjectAvatar } from './ProjectAvatar';
@@ -50,7 +50,11 @@ export function ProjectBar() {
 			>
 				Resources
 			</DrawerMenuItem>
-			<DrawerMenuItem iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }} icon="cog">
+			<DrawerMenuItem
+				onClick={() => history.push('/settings/members')}
+				iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }}
+				icon="cog"
+			>
 				Settings & Members
 			</DrawerMenuItem>
 		</div>

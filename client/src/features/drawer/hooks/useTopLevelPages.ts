@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
-import { useProjects } from '../../user/hooks/useProjects';
+import { useProjects } from '../../usersAndProjects/hooks/useProjects';
 
 type TopLevelPageItem = { title: string; id: string };
 

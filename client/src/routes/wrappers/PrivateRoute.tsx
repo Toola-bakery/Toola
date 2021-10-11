@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect } from 'react';
 import { Route, RouteProps, useHistory } from 'react-router-dom';
-import { useProjects } from '../../features/user/hooks/useProjects';
-import { useUser } from '../../features/user/hooks/useUser';
+import { useProjects } from '../../features/usersAndProjects/hooks/useProjects';
+import { useUser } from '../../features/usersAndProjects/hooks/useUser';
 
 export function PrivateRoute({
 	children,

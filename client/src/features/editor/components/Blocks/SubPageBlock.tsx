@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Config } from '../../../../Config';
 import { useKy } from '../../../../hooks/useKy';
-import { useProjects } from '../../../user/hooks/useProjects';
+import { useProjects } from '../../../usersAndProjects/hooks/useProjects';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';

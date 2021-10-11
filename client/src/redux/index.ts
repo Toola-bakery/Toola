@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { editorReducer } from '../features/editor/redux/editor';
-import { userSlice } from '../features/user/redux/user';
+import { userSlice } from '../features/usersAndProjects/redux/user';
 import { immerSlice } from './immerSlice';
 
 const appReducer = combineReducers({

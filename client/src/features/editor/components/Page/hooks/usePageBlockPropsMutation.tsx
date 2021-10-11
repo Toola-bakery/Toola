@@ -2,7 +2,7 @@ import debounce from 'just-debounce';
 import ky from 'ky';
 import { useEffect } from 'react';
 import { Config } from '../../../../../Config';
-import { useUser } from '../../../../user/hooks/useUser';
+import { useUser } from '../../../../usersAndProjects/hooks/useUser';
 import { BlockProps } from '../../../types/blocks';
 import { usePage } from './usePage';
 
