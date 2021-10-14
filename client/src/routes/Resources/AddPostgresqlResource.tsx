@@ -1,31 +1,21 @@
-import {
-	Button,
-	Card,
-	Checkbox,
-	FormGroup,
-	H3,
-	InputGroup,
-	NumericInput,
-	Radio,
-	RadioGroup,
-	TextArea,
-} from '@blueprintjs/core';
-import { useEffect, useState } from 'react';
+import { Button, Checkbox, FormGroup, H3, InputGroup, NumericInput, TextArea } from '@blueprintjs/core';
+import { useState } from 'react';
 import { useForm } from '../../features/form/hooks/useForm';
 import { useMutateResource } from '../../features/resources/hooks/useMutateResource';
 
-export function AddMongoResource() {
+export function AddPostgresqlResource() {
 	const [isConnectionString, setIsConnectionString] = useState(true);
+
 	const form = useForm({
 		connectionString: { type: 'input' },
 		name: { type: 'input' },
 		host: { type: 'input' },
 		port: { type: 'input' },
-		connectionFormat: { type: 'input' },
 		dbName: { type: 'input' },
 		username: { type: 'input' },
 		password: { type: 'input' },
-		certAndKey: { type: 'input' },
+		clientKey: { type: 'input' },
+		clientCert: { type: 'input' },
 		CA: { type: 'input' },
 		ssl: { type: 'input' },
 	});
@@ -34,7 +24,7 @@ export function AddMongoResource() {
 
 	return (
 		<div style={{ padding: 30, flex: 1, maxWidth: 600 }}>
-			<H3>Configure Mongo</H3>
+			<H3>Configure PostgreSQL</H3>
 			<FormGroup label="Database label" inline>
 				<InputGroup
 					placeholder="Production database (readonly)"
@@ -50,7 +40,7 @@ export function AddMongoResource() {
 					text={isConnectionString ? 'Fill in connection fields individually' : 'Use a database connection string'}
 					onClick={() => {
 						setIsConnectionString(!isConnectionString);
-						form.set({ connectionFormat: !isConnectionString ? undefined : 'standard' });
+						form.set({});
 					}}
 					style={{ marginBottom: 15, fontWeight: 600 }}
 				/>
@@ -66,36 +56,16 @@ export function AddMongoResource() {
 						<InputGroup value={form.host.value as string} onChange={form.host.onChange} />
 					</FormGroup>
 
-					<FormGroup label="Connection format" inline>
-						<RadioGroup
-							inline
-							onChange={(event) => {
-								const { value } = event.target as HTMLInputElement;
-								if (value === 'dns') {
-									form.set({ ...form.values, connectionFormat: value, port: '' });
-								} else {
-									form.connectionFormat.setValue(value);
-								}
-							}}
-							selectedValue={form.connectionFormat.value as string}
-						>
-							<Radio label="Standard connection" value="standard" />
-							<Radio label="DNS seed list connection" value="dns" />
-						</RadioGroup>
+					<FormGroup label="Port" inline>
+						<NumericInput
+							allowNumericCharactersOnly
+							buttonPosition="none"
+							fill
+							value={form.port.value as number}
+							onValueChange={(value) => form.port.setValue(value)}
+							placeholder="5432"
+						/>
 					</FormGroup>
-					{form.connectionFormat.value === 'standard' ? (
-						<FormGroup label="Port" inline>
-							<NumericInput
-								allowNumericCharactersOnly
-								buttonPosition="none"
-								fill
-								value={form.port.value as number}
-								onValueChange={(value) => form.port.setValue(value)}
-								placeholder="27017"
-							/>
-						</FormGroup>
-					) : null}
-
 					<FormGroup label="Name" inline>
 						<InputGroup value={form.dbName.value as string} onChange={form.dbName.onChange} />
 					</FormGroup>
@@ -120,12 +90,20 @@ export function AddMongoResource() {
 					<FormGroup label="CA" inline>
 						<TextArea fill style={{ resize: 'vertical' }} value={form.CA.value as string} onChange={form.CA.onChange} />
 					</FormGroup>
-					<FormGroup label="Client Cert and Key" inline>
+					<FormGroup label="Client Cert" inline>
 						<TextArea
 							fill
 							style={{ resize: 'vertical' }}
-							value={form.certAndKey.value as string}
-							onChange={form.certAndKey.onChange}
+							value={form.clientCert.value as string}
+							onChange={form.clientCert.onChange}
+						/>
+					</FormGroup>
+					<FormGroup label="Client Key" inline>
+						<TextArea
+							fill
+							style={{ resize: 'vertical' }}
+							value={form.clientKey.value as string}
+							onChange={form.clientKey.onChange}
 						/>
 					</FormGroup>
 				</>
@@ -135,7 +113,7 @@ export function AddMongoResource() {
 				<Button style={{ marginRight: 8 }} minimal intent="primary" text="Test connection" />
 				<Button
 					intent="primary"
-					onClick={() => mutation.mutate(form.values)}
+					onClick={() => mutation.mutate({ ...form.values, type: 'postgresql' })}
 					loading={mutation.isLoading}
 					text="Create resource"
 				/>

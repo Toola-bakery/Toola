@@ -47,7 +47,7 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 		['createPage', subpageId],
 		() =>
 			ky
-				.post(`${Config.domain}/pages/create`, {
+				.post(`pages/create`, {
 					json: { id: subpageId, parentPageId: pageId, projectId: currentProjectId },
 				})
 				.json<{ ok: boolean }>(),

@@ -5,6 +5,7 @@ import { DatabaseMenuItem, DatabaseMenuItemProps } from './InspectorItems/Databa
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
 import { PageMenuItem, PageMenuItemProps } from './InspectorItems/PageMenuItem';
+import { PgSQLMenuItem, PgSQLMenuItemProps } from './InspectorItems/PgSQLMenuItem';
 import { QueryActionMenuItem, QueryActionMenuItemProps } from './InspectorItems/QueryActionMenuItem';
 import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
 import { SimpleMenuItem, SimpleMenuItemProps } from './InspectorItems/SimpleMenuItem';
@@ -25,6 +26,7 @@ export type MenuItemProps =
 	| DatabaseMenuItemProps
 	| QueryActionMenuItemProps
 	| PageMenuItemProps
+	| PgSQLMenuItemProps
 	| SwitchMenuItemProps;
 
 export type InspectorItemProps<Item = MenuItemProps> = {
@@ -41,6 +43,7 @@ export function InspectorItem(props: InspectorItemProps) {
 	if (item.type === 'switch') return <SwitchMenuItem {...(props as InspectorItemProps<SwitchMenuItemProps>)} />;
 	if (item.type === 'nested') return <NestedMenuItem {...(props as InspectorItemProps<NestedMenuItemProps>)} />;
 	if (item.type === 'view') return <ViewMenuItem {...(props as InspectorItemProps<ViewMenuItemProps>)} />;
+	if (item.type === 'pgSQL') return <PgSQLMenuItem {...(props as InspectorItemProps<PgSQLMenuItemProps>)} />;
 	if (item.type === 'input') return <InputMenuItem {...(props as InspectorItemProps<InputMenuItemProps>)} />;
 	if (item.type === 'pages') return <PageMenuItem {...(props as InspectorItemProps<PageMenuItemProps>)} />;
 	if (item.type === 'database') return <DatabaseMenuItem {...(props as InspectorItemProps<DatabaseMenuItemProps>)} />;

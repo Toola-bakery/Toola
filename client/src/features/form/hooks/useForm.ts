@@ -9,7 +9,7 @@ type Values<T> = { [key in keyof T]?: ValueType };
 
 export function useForm<T extends FormDescription>(form: T) {
 	const [values, immer] = useImmer<Values<T>>(
-		Object.fromEntries(Object.keys(form).map((key) => [key, ''])) as Values<T>,
+		Object.fromEntries(Object.keys(form).map((key) => [key, undefined])) as Values<T>,
 	);
 
 	type FormParams = {

@@ -2,15 +2,20 @@ import { Button, H3 } from '@blueprintjs/core';
 import { useHistory } from 'react-router-dom';
 import { ResourcesList } from '../../features/resources/components/ResourcesList';
 
-export function ResourcesListRoute() {
+const RESOURCE_LIST = [
+	{ name: 'mongo', label: 'Mongodb' },
+	{ name: 'postgresql', label: 'PostgreSQL' },
+];
+export function AddResource() {
 	const history = useHistory();
 	return (
 		<div style={{ padding: 30, flex: 1 }}>
 			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-				<H3>Resources</H3>
-				<Button intent="primary" onClick={() => history.push('/resources/add')} text="Create new" />
+				<H3>Select Resource</H3>
 			</div>
-			<ResourcesList />
+			{RESOURCE_LIST.map((resource) => (
+				<Button intent="primary" onClick={() => history.push(`/resources/${resource.name}`)} text={resource.label} />
+			))}
 		</div>
 	);
 }

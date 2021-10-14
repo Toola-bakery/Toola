@@ -15,13 +15,14 @@ export const ProjectsService: ServiceSchema<
 		get: { projection?: string[]; meta: AuthMeta };
 		members: { projectId: ObjectId; populate: boolean; meta: AuthMeta };
 		hasAccess: { userId: ObjectId; projectId: ObjectId };
+		update: { projectId: ObjectId; name: string; meta: AuthMeta };
 	}
 > = {
 	name: 'projects',
 	actions: {
 		create: {
 			params: {
-				name: { type: 'string', min: '1' },
+				name: { type: 'string', min: 1, max: 30 },
 			},
 			async handler(ctx) {
 				const { name } = ctx.params;
@@ -66,6 +67,11 @@ export const ProjectsService: ServiceSchema<
 			},
 			async handler(ctx) {
 				const { projectId, populate } = ctx.params;
+				const { userId } = ctx.meta;
+
+				const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
+				if (!hasAccess) throw new Error('No access to project');
+
 				const project = await projectsCollection.findOne({ _id: projectId }, { projection: { users: 1 } });
 				if (!project) throw new Error('Project not exists');
 				if (!populate) return { users: project.users.map(_id => ({ _id })) };
@@ -73,6 +79,20 @@ export const ProjectsService: ServiceSchema<
 					userIds: project.users.map(user => user.toHexString()),
 					publicData: true,
 				});
+			},
+		},
+		update: {
+			params: {
+				projectId: { type: 'objectID', ObjectID: ObjectId, convert: true },
+				name: { type: 'string', optional: true, convert: true, min: 3, max: 30, trim: true },
+			},
+			async handler(ctx) {
+				const { projectId, name } = ctx.params;
+				const { userId } = ctx.meta;
+				const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
+				if (!hasAccess) throw new Error('No access to project');
+				await projectsCollection.updateOne({ _id: projectId }, { $set: { name } });
+				return { ok: true };
 			},
 		},
 	},

@@ -17,46 +17,45 @@ export function useQueryConstructor<T = any>(properties: QueryProperties, initia
 
 	const { evaluate, setOnUpdate } = useReferenceEvaluator();
 
-	const menu = properties.map<MenuItemProps>((queryProperty) => {
-		const { label, id, type, databaseId } = queryProperty;
-		const onChange = (v: unknown) =>
-			valueResult((draft) => {
-				draft[id] = v;
-			});
+	const menu = properties
+		.map<MenuItemProps | null>((queryProperty) => {
+			const { label, id, type, databaseId } = queryProperty;
+			const onChange = (v: unknown) =>
+				valueResult((draft) => {
+					draft[id] = v;
+				});
 
-		const value = values[id];
+			const value = values[id];
 
-		if (type === 'string' || type === 'code' || type === 'object' || type === 'number')
-			return {
-				type: 'input',
-				label,
-				value,
-				multiline: type === 'object',
-				codeType: type === 'object' ? 'object' : 'string',
-				onChange,
-			};
-		if (type === 'database')
-			return {
-				type: 'database',
-				label,
-				value,
-				onChange,
-			};
-		if (type === 'queryAction')
-			return {
-				type: 'queryAction',
-				label,
-				databaseId,
-				value,
-				onChange,
-			};
-		return {
-			type: 'switch',
-			label,
-			value,
-			onChange,
-		};
-	});
+			if (type === 'string' || type === 'code' || type === 'object' || type === 'number')
+				return {
+					type: 'input',
+					label,
+					value,
+					multiline: type === 'object',
+					codeType: type === 'object' ? 'object' : 'string',
+					onChange,
+				};
+			if (type === 'queryAction')
+				return {
+					type: 'queryAction',
+					label,
+					databaseId,
+					value,
+					onChange,
+				};
+
+			console.log({ type });
+			if (['pgSQL', 'database', 'switch'].includes(type))
+				return {
+					type,
+					label,
+					value,
+					onChange,
+				};
+			return null;
+		})
+		.filter((e): e is MenuItemProps => !!e);
 
 	const result = useMemo(
 		() =>

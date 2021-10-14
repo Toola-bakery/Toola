@@ -9,7 +9,8 @@ const DrawerMenuItemWrapper = styled.div`
 	padding-left: 14px;
 	padding-right: 14px;
 
-	&:hover {
+	&:hover,
+	&.active {
 		background-color: rgba(0, 0, 0, 0.1);
 	}
 	&:active {
@@ -29,14 +30,16 @@ export function DrawerMenuItem({
 	iconStyle,
 	height = 30,
 	onClick,
+	active,
 }: PropsWithChildren<{
 	onClick?: React.MouseEventHandler<HTMLDivElement>;
 	height?: number;
+	active?: boolean;
 	iconStyle?: CSSProperties;
 	icon?: ReactNode | IconName;
 }>) {
 	return (
-		<DrawerMenuItemWrapper onClick={onClick} style={{ height, maxHeight: height }}>
+		<DrawerMenuItemWrapper onClick={onClick} className={active ? 'active' : ''} style={{ height, maxHeight: height }}>
 			<div style={{ marginRight: 8, minWidth: 18, width: 18, textAlign: 'center' }}>
 				{typeof icon === 'string' ? <Icon style={iconStyle} icon={icon as IconName} /> : null}
 				{typeof icon === 'object' ? icon : null}

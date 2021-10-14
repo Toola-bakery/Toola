@@ -1,9 +1,11 @@
-import { ServiceSchema } from 'moleculer';
+import Moleculer, { ServiceSchema } from 'moleculer';
 import { ObjectId } from 'mongodb';
 import { v4 } from 'uuid';
 import { DatabaseSchema } from '../../types/database.types';
 import { AuthMeta } from '../../types/users.types';
 import { mongoDB } from '../../utils/mongo';
+import { allValidators } from './allValidators';
+import ValidationError = Moleculer.Errors.ValidationError;
 
 const databaseCollection = mongoDB.collection<DatabaseSchema>('databases');
 
@@ -14,6 +16,20 @@ function convertActionsToArray(actions: any) {
 	}));
 }
 
+function evalValidation(type: DatabaseSchema['type'], database: DatabaseSchema) {
+	if (!(database.type in allValidators)) throw new Error();
+	const results = allValidators[database.type].map(check => {
+		try {
+			const result = check({ ...database }); // To fix strict remove bug
+			if (result !== true) return result;
+			return check(database);
+		} catch (e) {
+			return e;
+		}
+	});
+	if (results.includes(true)) return true;
+	throw new ValidationError('Database validation error', '402', { results });
+}
 export const DatabasesService: ServiceSchema<
 	'databases',
 	{
@@ -38,43 +54,27 @@ export const DatabasesService: ServiceSchema<
 		post: {
 			params: {
 				projectId: { type: 'objectID', ObjectID: ObjectId, convert: true },
-				database: [
-					{
-						type: 'object',
-						strict: 'remove',
-						props: {
-							_id: { type: 'uuid', version: 4, optional: true },
-							type: { type: 'equal', value: 'mongodb' },
-							name: { type: 'string', min: 5, max: 50 },
-							host: { type: 'string', max: 200 },
-							port: { type: 'string', max: 5, optional: true },
-							connectionFormat: { type: 'enum', values: ['dns', 'standard'] },
-							dbName: { type: 'string', max: 50 },
-							username: { type: 'string', max: 50 },
-							password: { type: 'string', max: 50 },
-							ssl: { type: 'boolean', convert: true },
-							CA: { type: 'string', optional: true },
-							clientKeyAndCert: { type: 'string', optional: true },
-						},
-					},
-				],
+				database: { type: 'object', props: { type: 'string' } },
 			},
 			async handler(ctx) {
-				const { database, projectId } = ctx.params;
+				const { database: databaseOriginal, projectId } = ctx.params;
 				const { userId, projectId: authProjectId } = ctx.meta;
+				console.log({ userId });
 
 				if (userId) {
 					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
+					console.log({ hasAccess });
 					if (!hasAccess) throw new Error('No access to project');
-				} else if (authProjectId.toString() !== projectId.toString()) {
-					throw new Error('No access to project');
-				}
+				} else throw new Error('No access to project');
+
+				const database = { ...databaseOriginal };
+				evalValidation(database.type, database);
 
 				const newId = database._id || v4();
 
 				await databaseCollection.updateOne(
 					{ _id: newId, projectId },
-					{ $setOnInsert: { _id: newId }, $set: { ...database, projectId } },
+					{ $setOnInsert: { _id: newId, projectId }, $set: database },
 					{ upsert: true },
 				);
 
@@ -108,7 +108,6 @@ export const DatabasesService: ServiceSchema<
 			async handler(ctx) {
 				const { projectId } = ctx.params;
 				const { userId, projectId: authProjectId } = ctx.meta;
-
 				if (userId) {
 					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId, userId });
 					if (!hasAccess) throw new Error('No access to project');

@@ -14,7 +14,7 @@ export default function CreateProjectRoute() {
 	const ky = useKy();
 
 	const { data, isLoading, isError, mutate } = useMutation((name: string) => {
-		return ky.post(`${Config.domain}/projects/create`, { json: { name } }).json<{ projectId: string }>();
+		return ky.post(`projects/create`, { json: { name } }).json<{ projectId: string }>();
 	});
 
 	useEffect(() => {

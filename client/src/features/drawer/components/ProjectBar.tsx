@@ -1,6 +1,6 @@
 import { Menu, Divider, Popover, MenuItem, Position } from '@blueprintjs/core';
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useProjects } from '../../usersAndProjects/hooks/useProjects';
 import { useUser } from '../../usersAndProjects/hooks/useUser';
 import { DrawerMenuItem } from './DrawerMenuItem';
@@ -10,6 +10,7 @@ import { ProjectAvatar } from './ProjectAvatar';
 export function ProjectBar() {
 	const { currentProject, projects, selectProject } = useProjects();
 	const history = useHistory();
+	const location = useLocation();
 	const { logOut } = useUser();
 
 	return (
@@ -44,6 +45,7 @@ export function ProjectBar() {
 				</DrawerMenuItem>
 			</DrawerOmnibar>
 			<DrawerMenuItem
+				active={location.pathname.startsWith('/resources')}
 				onClick={() => history.push('/resources')}
 				iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }}
 				icon="database"
@@ -51,6 +53,7 @@ export function ProjectBar() {
 				Resources
 			</DrawerMenuItem>
 			<DrawerMenuItem
+				active={location.pathname.startsWith('/settings')}
 				onClick={() => history.push('/settings/members')}
 				iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }}
 				icon="cog"

@@ -2,11 +2,14 @@ import { MongoClient } from 'mongodb';
 import { MongoDatabaseSchema } from '../../../types/database.types';
 
 export async function getMongoClient(mongoProps: MongoDatabaseSchema) {
-	const { host, clientKeyAndCert, CA, connectionFormat, port, dbName, ssl, username, password } = mongoProps;
+	const { host, connectionString, clientKeyAndCert, CA, connectionFormat, port, dbName, ssl, username, password } =
+		mongoProps;
 
-	const url = `${connectionFormat === 'dns' ? 'mongodb+srv' : 'mongodb'}://${host}${
-		connectionFormat !== 'dns' ? `:${port}` : ''
-	}`;
+	const url =
+		connectionString || connectionFormat === 'dns' //
+			? `mongodb+srv://${host}`
+			: `mongodb://${host}:${port}`;
+
 	const mongoConnection = await MongoClient.connect(url, {
 		auth: { username, password },
 		ssl: !!ssl,
