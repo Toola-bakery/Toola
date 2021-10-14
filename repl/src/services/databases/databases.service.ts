@@ -46,6 +46,10 @@ export const DatabasesService: ServiceSchema<
 			projectId: ObjectId;
 			meta: AuthMeta;
 		};
+		schema: {
+			id: string;
+			meta: AuthMeta;
+		};
 	}
 > = {
 	name: 'databases',
@@ -124,6 +128,29 @@ export const DatabasesService: ServiceSchema<
 					})),
 				);
 				return databases.map((db, index) => ({ ...db, actions: convertActionsToArray(result[index]) }));
+			},
+		},
+		schema: {
+			params: {
+				id: { type: 'uuid', version: 4 },
+			},
+			async handler(ctx) {
+				const { id } = ctx.params;
+				const { userId, projectId: authProjectId } = ctx.meta;
+
+				const database = await databaseCollection.findOne(
+					{ _id: id },
+					{ projection: { _id: 1, projectId: 1, type: 1 } },
+				);
+
+				if (userId) {
+					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId: database.projectId, userId });
+					if (!hasAccess) throw new Error('No access to project');
+				} else {
+					throw new Error('No access to project');
+				}
+
+				return ctx.call(`${database.type}Manager.schema`, { id: database._id });
 			},
 		},
 	},
