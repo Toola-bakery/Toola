@@ -1,24 +1,75 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { useWindowSize } from '../../../hooks/useWindowSize';
 import { useImmerState } from '../../../redux/hooks';
 
-const MIN_DRAWER_WIDTH = 150;
-const MAX_DRAWER_WIDTH = 300;
+const MIN_DRAWER_SIZE = 150;
+const MAX_DRAWER_SIZE = 300;
 
-export function useDrawer() {
+export function useDrawer({
+	name,
+	defaultSize = 240,
+	maxSize = MAX_DRAWER_SIZE,
+	minSize = MIN_DRAWER_SIZE,
+}: {
+	name: string;
+	defaultSize?: number;
+	minSize?: number;
+	maxSize?: number;
+}) {
 	const [data = {}, immer] = useImmerState<{
-		width: number;
-		show: boolean;
-	}>('projects');
+		size?: number;
+		show?: boolean;
+	}>(`drawer:${name}`);
 
-	const { show = true, width = 240 } = data;
+	const { show = true, size = defaultSize } = data;
 
-	const setWidth = useCallback(
+	const setSize = useCallback(
 		(newWidth: number) =>
 			immer((draft) => {
-				draft.width = Math.min(Math.max(newWidth, MIN_DRAWER_WIDTH), MAX_DRAWER_WIDTH);
+				draft.size = Math.min(Math.max(newWidth, minSize), maxSize);
 			}),
-		[immer],
+		[immer, maxSize, minSize],
 	);
 
-	return { show, width, setWidth };
+	return { show, size, setSize };
+}
+
+export function useDrawerResizable({
+	axis = 'x',
+	reverse = false,
+	setSize,
+}: {
+	axis?: 'x' | 'y';
+	reverse?: boolean;
+	setSize: (newWidth: number) => void;
+}) {
+	const { height, width } = useWindowSize({ height: 1000, width: 1000 });
+
+	const isMovingRef = useRef(false);
+	const resizableRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		function handleCursor(event: MouseEvent) {
+			if (!isMovingRef.current) return;
+			resizableRef.current?.classList.add('move');
+			const position = axis === 'x' ? event.pageX + 1 : event.pageY + 1;
+			const windowSize = axis === 'x' ? width : height;
+			setSize(reverse ? windowSize - position : position);
+			event.preventDefault();
+		}
+		function handleMouseUp() {
+			resizableRef.current?.classList.remove('move');
+			isMovingRef.current = false;
+		}
+
+		document.addEventListener('mousemove', handleCursor);
+		document.addEventListener('mouseup', handleMouseUp);
+
+		return () => {
+			document.removeEventListener('mousemove', handleCursor);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+	});
+
+	return { isMovingRef, resizableRef };
 }

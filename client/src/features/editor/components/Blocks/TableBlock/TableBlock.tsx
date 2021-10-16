@@ -49,7 +49,7 @@ export type TableBlockState = {
 	pageSize: number;
 };
 
-export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
+export function TableBlock({ block, hide }: { block: BasicBlock & TableBlockType; hide: boolean }) {
 	const { id, manualPagination, connectedPage } = block;
 	const {
 		editing,
@@ -96,7 +96,7 @@ export function TableBlock({ block }: { block: BasicBlock & TableBlockType }) {
 		});
 	}, [id, immerBlockProps]);
 
-	if (!block.show) return null;
+	if (hide || !block.show) return null;
 
 	return (
 		<>

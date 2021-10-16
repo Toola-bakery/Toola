@@ -32,9 +32,10 @@ export type QueryBlockMethods = { trigger: () => void };
 
 export type QueryBlockComponentProps = {
 	block: BasicBlock & QueryBlockType;
+	hide: boolean;
 };
 
-export function QueryBlock({ block }: QueryBlockComponentProps) {
+export function QueryBlock({ block, hide }: QueryBlockComponentProps) {
 	const { id, manualControl, values } = block;
 	const { updateBlockProps, updateBlockState } = useEditor();
 
@@ -113,7 +114,7 @@ async function main () {
 		},
 	]);
 
-	if (!block.show) return null;
+	if (hide || !block.show) return null;
 
 	return (
 		<Card>

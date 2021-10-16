@@ -11,7 +11,7 @@ export type KeyValueBlockProps = {
 	value: string;
 };
 
-export function KeyValueBlock({ block }: { block: BasicBlock & KeyValueBlockType }): JSX.Element {
+export function KeyValueBlock({ block, hide }: { block: BasicBlock & KeyValueBlockType; hide: boolean }) {
 	const { id, value } = block;
 
 	const state = useReferences(value);
@@ -29,7 +29,7 @@ export function KeyValueBlock({ block }: { block: BasicBlock & KeyValueBlockType
 		},
 	]);
 
-	if (!block.show) return <></>;
+	if (hide || !block.show) return null;
 
 	return (
 		<>

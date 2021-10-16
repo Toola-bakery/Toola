@@ -38,7 +38,7 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 		});
 	}, [block.blocks, block.id, blocks, fake, moveBlockAfterId, pageId]);
 
-	if (!block.show) return <></>;
+	if (!block.show) return null;
 
 	return (
 		<>

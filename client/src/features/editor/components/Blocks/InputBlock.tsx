@@ -19,7 +19,7 @@ export type InputBlockState = {
 };
 export type InputBlockMethods = { setValue: (value: string) => void };
 
-export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): JSX.Element {
+export function InputBlock({ block, hide }: { block: BasicBlock & InputBlockType; hide: boolean }) {
 	const { id, value, pageId, label, initialValue } = block;
 
 	const { updateBlockState, updateBlockProps } = useEditor();
@@ -53,7 +53,7 @@ export function InputBlock({ block }: { block: BasicBlock & InputBlockType }): J
 		},
 	]);
 
-	if (!block.show) return <></>;
+	if (hide || !block.show) return <></>;
 
 	// TODO "helperText" Helper text with details...
 	return (

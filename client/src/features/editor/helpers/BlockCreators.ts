@@ -13,7 +13,7 @@ function copyProps<P extends Blocks['type']>(joinWith: { type: P } & BlockProps,
 }
 
 export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: BlockProps) => { type: P } & BlockProps } = {
-	page: (anyBlock) => copyProps({ type: 'page', style: 'app', title: 'Untitled', blocks: [] }, anyBlock),
+	page: (anyBlock) => copyProps({ type: 'page', style: 'app', title: 'Untitled', blocks: [], queries: [] }, anyBlock),
 	column: (anyBlock) => copyProps({ type: 'column', blocks: [] }, anyBlock),
 	row: (anyBlock) => copyProps({ type: 'row', blocks: [] }, anyBlock),
 	code: (anyBlock) => {
@@ -48,3 +48,5 @@ async function main(){
 	input: (anyBlock) => copyProps({ type: 'input', initialValue: '', label: '' }, anyBlock),
 	subpage: (anyBlock) => copyProps({ type: 'subpage', subpageId: v4(), isCreated: false, state: '' }, anyBlock),
 };
+
+export const BlockTypes = Object.keys(BlockCreators);

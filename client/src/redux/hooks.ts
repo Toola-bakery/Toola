@@ -1,5 +1,5 @@
 import { produceWithPatches } from 'immer';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Draft } from 'immer/dist/types/types-external';
 import { immerPatch } from './immerSlice';
@@ -24,5 +24,5 @@ export function useImmerState<D>(key: string) {
 		[data, dispatch, key],
 	);
 
-	return [data, immer] as const;
+	return [data, immer] as [D | undefined, typeof immer];
 }

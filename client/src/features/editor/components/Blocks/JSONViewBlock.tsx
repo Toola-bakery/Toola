@@ -12,7 +12,7 @@ export type JSONViewBlockProps = {
 	value: string;
 };
 
-export function JSONViewBlock({ block }: { block: BasicBlock & JSONViewBlockType }): JSX.Element {
+export function JSONViewBlock({ block, hide }: { block: BasicBlock & JSONViewBlockType; hide: boolean }) {
 	const { id, value } = block;
 
 	const state = useReferences(value);
@@ -30,7 +30,7 @@ export function JSONViewBlock({ block }: { block: BasicBlock & JSONViewBlockType
 		},
 	]);
 
-	if (!block.show) return <></>;
+	if (hide || !block.show) return null;
 
 	return (
 		<>

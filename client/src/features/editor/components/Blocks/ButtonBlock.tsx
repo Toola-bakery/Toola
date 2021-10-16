@@ -13,7 +13,7 @@ export type ButtonBlockProps = {
 	name: string;
 };
 
-export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }): JSX.Element {
+export function ButtonBlock({ block, hide }: { block: BasicBlock & ButtonBlockType; hide: boolean }) {
 	const { id, value, name } = block;
 	const { updateBlockProps } = useEditor();
 	const { evaluate } = useReferenceEvaluator();
@@ -34,7 +34,7 @@ export function ButtonBlock({ block }: { block: BasicBlock & ButtonBlockType }):
 		},
 	]);
 
-	if (!block.show) return <></>;
+	if (hide || !block.show) return <></>;
 
 	return (
 		<>

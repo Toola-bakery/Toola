@@ -31,7 +31,7 @@ export type TextBlockProps = {
 
 const BR_TAG = /<br\s*\/?>/ms;
 
-export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
+export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; hide: boolean }) {
 	const { id, style, entities = [], value } = block;
 
 	const { editing } = usePageContext();
@@ -87,7 +87,7 @@ export function TextBlock({ block }: { block: BasicBlock & TextBlockType }) {
 
 	const html = useReferences(isFocused ? '' : htmlValue);
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
-	if (!block.show) return null;
+	if (hide || !block.show) return null;
 
 	return (
 		<>

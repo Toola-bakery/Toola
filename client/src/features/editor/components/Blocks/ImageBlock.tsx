@@ -11,7 +11,7 @@ export type ImageBlockProps = {
 	value: string;
 };
 
-export function ImageBlock({ block }: { block: BasicBlock & ImageBlockType }): JSX.Element {
+export function ImageBlock({ block, hide }: { block: BasicBlock & ImageBlockType; hide: boolean }) {
 	const { id, value } = block;
 
 	const state = useReferences(value);
@@ -25,7 +25,7 @@ export function ImageBlock({ block }: { block: BasicBlock & ImageBlockType }): J
 		},
 	]);
 
-	if (!block.show) return <></>;
+	if (hide || !block.show) return null;
 
 	return (
 		<>

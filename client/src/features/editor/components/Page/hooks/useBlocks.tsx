@@ -11,7 +11,7 @@ declare global {
 	}
 }
 
-export function useBlocks(pageId: string, editing: boolean) {
+export function useBlocks(pageId: string, options: { editing: boolean; isDevtoolsOpen: boolean }) {
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
 
@@ -47,7 +47,9 @@ export function useBlocks(pageId: string, editing: boolean) {
 			const newProps = blocksProps[blockId];
 			const newState = blocksState[blockId] || null;
 			const newMethods = blocksMethods[blockId] || null;
-			const newShow = editing || !newProps.display?.hide;
+
+			const newShow =
+				newProps.parentId === 'queries' ? options.isDevtoolsOpen : options.editing || !newProps.display?.hide;
 
 			if (particles) {
 				const [oldProps, oldState, oldMethods] = particles;
@@ -69,7 +71,7 @@ export function useBlocks(pageId: string, editing: boolean) {
 			blockParticles.set(blockId, [newProps, newState, newMethods]);
 		});
 		return response;
-	}, [blockParticles, blocksMethods, blocksProps, blocksState, editing, joinedBlock]);
+	}, [blockParticles, blocksMethods, blocksProps, blocksState, options.editing, options.isDevtoolsOpen, joinedBlock]);
 
 	useEffect(() => {
 		window.blocks = blocks;

@@ -27,26 +27,34 @@ export type BlockContextType<T extends Blocks = Blocks> = {
 
 export const BlockContext = React.createContext<BlockContextType>({ block: undefined, setOnDragClick: () => {} });
 
-function BlockSelector({ block }: { block: BasicBlock & Blocks }) {
-	if (block.type === 'text') return <TextBlock block={block as BasicBlock & TextBlockType} />;
-	if (block.type === 'code') return <CodeBlock block={block as BasicBlock & CodeBlockType} />;
-	if (block.type === 'query') return <QueryBlock block={block as BasicBlock & QueryBlockType} />;
-	if (block.type === 'JSONView') return <JSONViewBlock block={block as BasicBlock & JSONViewBlockType} />;
-	if (block.type === 'keyValue') return <KeyValueBlock block={block as BasicBlock & KeyValueBlockType} />;
-	if (block.type === 'table') return <TableBlock block={block as BasicBlock & TableBlockType} />;
-	if (block.type === 'image') return <ImageBlock block={block as BasicBlock & ImageBlockType} />;
-	if (block.type === 'input') return <InputBlock block={block as BasicBlock & InputBlockType} />;
-	if (block.type === 'button') return <ButtonBlock block={block as BasicBlock & ButtonBlockType} />;
-	if (block.type === 'subpage') return <SubPageBlock block={block as BasicBlock & SubPageBlockType} />;
+export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
+	if (block.type === 'text') return <TextBlock hide={hide} block={block as BasicBlock & TextBlockType} />;
+	if (block.type === 'code') return <CodeBlock hide={hide} block={block as BasicBlock & CodeBlockType} />;
+	if (block.type === 'query') return <QueryBlock hide={hide} block={block as BasicBlock & QueryBlockType} />;
+	if (block.type === 'JSONView') return <JSONViewBlock hide={hide} block={block as BasicBlock & JSONViewBlockType} />;
+	if (block.type === 'keyValue') return <KeyValueBlock hide={hide} block={block as BasicBlock & KeyValueBlockType} />;
+	if (block.type === 'table') return <TableBlock hide={hide} block={block as BasicBlock & TableBlockType} />;
+	if (block.type === 'image') return <ImageBlock hide={hide} block={block as BasicBlock & ImageBlockType} />;
+	if (block.type === 'input') return <InputBlock hide={hide} block={block as BasicBlock & InputBlockType} />;
+	if (block.type === 'button') return <ButtonBlock hide={hide} block={block as BasicBlock & ButtonBlockType} />;
+	if (block.type === 'subpage') return <SubPageBlock hide={hide} block={block as BasicBlock & SubPageBlockType} />;
 	return null;
 }
 
-export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
+export function Block({
+	block,
+	hide = false,
+	minimize = false,
+}: {
+	block: BasicBlock & Blocks;
+	hide?: boolean;
+	minimize?: boolean;
+}): JSX.Element {
 	const { editing } = usePageContext();
 
 	const [{ opacity }, dragRef, dragPreview] = useDrag(
 		() => ({
-			type: 'Block',
+			type: `Block:${block.type}`,
 			canDrag: editing,
 			item: { id: block.id },
 			collect: (monitor) => ({
@@ -70,8 +78,8 @@ export function Block({ block }: { block: BasicBlock & Blocks }): JSX.Element {
 
 	return (
 		<BlockContext.Provider value={{ block, setOnDragClick }}>
-			{!block.show ? (
-				<BlockSelector block={block} />
+			{!block.show || hide || minimize ? (
+				<BlockSelector block={block} hide={hide} />
 			) : (
 				<div
 					ref={dragPreview}

@@ -23,7 +23,7 @@ export type SubPageBlockProps = {
 	isCreated: boolean;
 };
 
-export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }) {
+export function SubPageBlock({ block, hide }: { block: BasicBlock & SubPageBlockType; hide: boolean }) {
 	const { id, subpageId, pageId, state = '', isCreated = false } = block;
 	const { immerBlockProps, updateBlockProps } = useEditor();
 	const { currentProjectId } = useProjects();
@@ -66,7 +66,7 @@ export function SubPageBlock({ block }: { block: BasicBlock & SubPageBlockType }
 
 	const { evaluate } = useReferenceEvaluator();
 
-	if (!block.show) return null;
+	if (hide || !block.show) return null;
 
 	return (
 		<>

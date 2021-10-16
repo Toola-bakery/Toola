@@ -34,9 +34,10 @@ export type CodeBlockMethods = { trigger: () => void };
 
 export type CodeBlockComponentProps = {
 	block: BasicBlock & CodeBlockType;
+	hide: boolean;
 };
 
-export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
+export function CodeBlock({ block, hide }: CodeBlockComponentProps): JSX.Element {
 	const { id, value, manualControl, watchList: watchListProp } = block;
 	const { updateBlockProps } = useEditor();
 	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -102,7 +103,7 @@ export function CodeBlock({ block }: CodeBlockComponentProps): JSX.Element {
 		},
 	]);
 
-	if (!block.show) return <></>;
+	if (hide || !block.show) return <></>;
 
 	return (
 		<Card>

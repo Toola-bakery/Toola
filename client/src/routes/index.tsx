@@ -5,7 +5,7 @@ import LoginRoute from './LoginRoute';
 import { ResourcesRoute } from './Resources/ResourcesRoute';
 import { SettingsAndMembersRoute } from './SettingsAndMembers/SettingsAndMembersRoute';
 import { PrivateRoute } from './wrappers/PrivateRoute';
-import { RouteWithDrawer } from './wrappers/RouteWithDrawer';
+import { LeftDrawerWrapper } from '../features/drawer/components/LeftDrawerWrapper';
 
 export function AppRouters() {
 	return (
@@ -20,21 +20,19 @@ export function AppRouters() {
 				</PrivateRoute>
 
 				<PrivateRoute path="/resources">
-					<RouteWithDrawer>
+					<LeftDrawerWrapper>
 						<ResourcesRoute />
-					</RouteWithDrawer>
+					</LeftDrawerWrapper>
 				</PrivateRoute>
 
 				<PrivateRoute path="/settings">
-					<RouteWithDrawer>
+					<LeftDrawerWrapper>
 						<SettingsAndMembersRoute />
-					</RouteWithDrawer>
+					</LeftDrawerWrapper>
 				</PrivateRoute>
 
 				<PrivateRoute path={['/:pageId', '/']}>
-					<RouteWithDrawer>
-						<EditorRoute />
-					</RouteWithDrawer>
+					<EditorRoute />
 				</PrivateRoute>
 			</Switch>
 		</Router>

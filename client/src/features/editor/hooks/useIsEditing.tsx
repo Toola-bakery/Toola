@@ -1,9 +1,18 @@
 import { useHotkeys } from '@blueprintjs/core';
-import { useMemo } from 'react';
-import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { useCallback, useMemo } from 'react';
+import { useImmerState } from '../../../redux/hooks';
 
 export function useIsEditing() {
-	const [editing, setEditing] = useLocalStorage('editing', true);
+	const [{ state: editing = true } = {}, immer] = useImmerState<{ state?: boolean }>('editingState');
+
+	const setEditing = useCallback(
+		(newEditing) => {
+			immer((draft) => {
+				draft.state = newEditing;
+			});
+		},
+		[immer],
+	);
 
 	useHotkeys(
 		useMemo(
@@ -12,10 +21,10 @@ export function useIsEditing() {
 					combo: 'cmd+e',
 					global: true,
 					label: 'Toggle editing mode',
-					onKeyDown: () => setEditing((v) => !v),
+					onKeyDown: () => setEditing(!editing),
 				},
 			],
-			[setEditing],
+			[editing, setEditing],
 		),
 	);
 

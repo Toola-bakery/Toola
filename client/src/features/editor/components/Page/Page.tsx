@@ -1,12 +1,13 @@
 import { Button, NonIdealState } from '@blueprintjs/core';
 import React, { useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
-import { useLocation, useParams } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useAppDispatch } from '../../../../redux/hooks';
-import { useDrawer } from '../../../drawer/hooks/useDrawer';
+import { DevtoolsWrapper } from '../../../devtools/components/DevtoolsWrapper';
+import { LeftDrawerWrapper } from '../../../drawer/components/LeftDrawerWrapper';
+import { useIsDevtoolsOpen } from '../../hooks/useIsDevtoolsOpen';
 import { useBlocks } from './hooks/useBlocks';
 import { usePage } from './hooks/usePage';
 import { useIsEditing } from '../../hooks/useIsEditing';
@@ -17,8 +18,8 @@ import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
 import { ColumnBlock, ColumnBlockType } from '../Blocks/Layout/ColumnBlock';
 import { PageBar } from './PageBar';
-import { useWindowSize } from '../../../../hooks/useWindowSize';
 import { usePageBlockPropsMutation } from './hooks/usePageBlockPropsMutation';
+import { PageWrapper } from './PageWrapper';
 
 export type PageBlockType = PageBlockProps;
 export type PageBlockProps = {
@@ -26,6 +27,7 @@ export type PageBlockProps = {
 	title: string;
 	style: 'app' | 'a4';
 	blocks: string[];
+	queries: string[];
 };
 
 export type PageContextType = {
@@ -34,6 +36,7 @@ export type PageContextType = {
 	pageId: string;
 	editing: boolean;
 	setEditing: (value: boolean) => void;
+	isDevtoolsOpen: boolean;
 } & ReturnType<typeof useBlocks>;
 
 export const PageContext = React.createContext<PageContextType>({
@@ -45,10 +48,11 @@ export const PageContext = React.createContext<PageContextType>({
 	pageId: '',
 	setBlockState: () => {},
 	blocksState: {},
-	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', style: 'app', blocks: [] },
+	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', style: 'app', blocks: [], queries: [] },
 	editing: true,
 	setEditing: () => {},
 	blocksProps: {},
+	isDevtoolsOpen: false,
 });
 
 function WSHandler() {
@@ -67,10 +71,11 @@ export function Page({
 }): JSX.Element {
 	const dispatch = useAppDispatch();
 	const { editing, setEditing } = useIsEditing();
+	const { isDevtoolsOpen, setDevtoolsOpen } = useIsDevtoolsOpen();
 	const { navigate } = usePageNavigator();
 
 	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState, blocksProps } =
-		useBlocks(pageId, editing);
+		useBlocks(pageId, { editing, isDevtoolsOpen });
 
 	const page = blocks?.page as BasicBlock & PageBlockType;
 
@@ -100,9 +105,11 @@ export function Page({
 			editing,
 			setEditing,
 			blocksProps,
+			isDevtoolsOpen,
 		}),
 		[
 			blocks,
+			isDevtoolsOpen,
 			editing,
 			setEditing,
 			pageId,
@@ -122,55 +129,34 @@ export function Page({
 			<PageContext.Provider value={value}>
 				<WSHandler />
 				<Helmet title={page?.title} />
-				<div
-					style={{
-						width: '100%',
-						height: '100%',
-						overflowX: 'clip',
-						overflowY: 'hidden',
-						display: 'flex',
-						flex: 1,
-						flexDirection: 'column',
-					}}
-				>
-					{isError ? (
-						<NonIdealState
-							icon="search"
-							title="Page not found"
-							action={<Button text="Back home" onClick={() => navigate('')} />}
-						/>
-					) : null}
-					{!isError ? <PageBar isModal={isModal} /> : null}
-					<div
-						style={{
-							overflowY: 'auto',
-							width: '100%',
-							height: 'calc(100% - 40px)',
-							backgroundColor: 'rgb(229 230 231)',
-							alignItems: 'center',
-						}}
-					>
+				<DevtoolsWrapper>
+					<LeftDrawerWrapper>
 						<div
-							style={
-								page?.style === 'a4'
-									? {
-											backgroundColor: 'white',
-											width: '21cm',
-											paddingRight: 25,
-											paddingTop: 15,
-											minHeight: '29.7cm',
-											margin: 'auto',
-											marginTop: 20,
-											marginBottom: 20,
-									  }
-									: { width: '100%', minHeight: '100%', backgroundColor: 'white', paddingRight: 25 }
-							}
+							style={{
+								width: '100%',
+								height: '100%',
+								overflowX: 'clip',
+								overflowY: 'hidden',
+								display: 'flex',
+								flex: 1,
+								flexDirection: 'column',
+							}}
 						>
-							{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
-							<CreateBlockAtTheEnd parentId="page" />
+							{isError ? (
+								<NonIdealState
+									icon="search"
+									title="Page not found"
+									action={<Button text="Back home" onClick={() => navigate('')} />}
+								/>
+							) : null}
+							{!isError ? <PageBar isModal={isModal} /> : null}
+							<PageWrapper page={page}>
+								{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
+								<CreateBlockAtTheEnd parentId="page" />
+							</PageWrapper>
 						</div>
-					</div>
-				</div>
+					</LeftDrawerWrapper>
+				</DevtoolsWrapper>
 				<div>
 					{hiddenBlocks.map((block) => (
 						<Block key={block.id} block={block} />
