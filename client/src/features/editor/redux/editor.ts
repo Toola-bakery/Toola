@@ -3,6 +3,7 @@ import { applyPatches, Patch } from 'immer';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
+import { PageBlockProps } from '../components/Page/Page';
 import { BasicBlock } from '../types/basicBlock';
 import { BlockProps, Blocks, LayoutBlocks } from '../types/blocks';
 
@@ -52,12 +53,18 @@ function deleteBlockHelper(state: EditorState, pageId: string, blockId: string) 
 }
 
 function deleteChildFromParentHelper(state: EditorState, pageId: string, blockId: string) {
-	const parent = getParentHelper(state, pageId, blockId);
-	if (!parent) return;
-	parent.blocks = parent.blocks.filter((id) => id !== blockId);
+	const block = getBlockHelper(state, pageId, blockId);
+	if (block.parentId === 'queries') {
+		const page = getBlockHelper(state, pageId, 'page') as PageBlockProps;
+		page.queries = page.queries.filter((id) => id !== blockId);
+	} else {
+		const parent = getParentHelper(state, pageId, blockId);
+		if (!parent) return;
+		parent.blocks = parent.blocks.filter((id) => id !== blockId);
 
-	if ((parent.type === 'column' || parent.type === 'row') && parent.blocks.length === 0)
-		deleteBlockHelper(state, pageId, parent.id);
+		if ((parent.type === 'column' || parent.type === 'row') && parent.blocks.length === 0)
+			deleteBlockHelper(state, pageId, parent.id);
+	}
 }
 
 function updateParentIdHelper(state: EditorState, pageId: string, blockId: string, newParentId: null | string) {

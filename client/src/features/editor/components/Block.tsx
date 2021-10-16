@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { BlockCreators } from '../helpers/BlockCreators';
+import { useBlockDrag } from '../hooks/useBlockDrag';
 import { useEditor } from '../hooks/useEditor';
 import { ButtonBlock, ButtonBlockType } from './Blocks/ButtonBlock';
 import { KeyValueBlock, KeyValueBlockType } from './Blocks/KeyValueBlock';
@@ -44,26 +45,15 @@ export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blo
 export function Block({
 	block,
 	hide = false,
-	minimize = false,
+	minimal = false,
 }: {
 	block: BasicBlock & Blocks;
 	hide?: boolean;
-	minimize?: boolean;
+	minimal?: boolean;
 }): JSX.Element {
 	const { editing } = usePageContext();
 
-	const [{ opacity }, dragRef, dragPreview] = useDrag(
-		() => ({
-			type: `Block:${block.type}`,
-			canDrag: editing,
-			item: { id: block.id },
-			collect: (monitor) => ({
-				opacity: monitor.isDragging() ? 0.5 : 1,
-			}),
-		}),
-		[block.id, editing],
-	);
-
+	const [{ opacity }, dragRef, dragPreview] = useBlockDrag(block);
 	const { hovered, eventHandlers } = useHover();
 
 	const [onDragClick, setOnDragClickPrivate] = useState<DragClickEventHandler>();
@@ -78,7 +68,7 @@ export function Block({
 
 	return (
 		<BlockContext.Provider value={{ block, setOnDragClick }}>
-			{!block.show || hide || minimize ? (
+			{!block.show || hide || minimal ? (
 				<BlockSelector block={block} hide={hide} />
 			) : (
 				<div

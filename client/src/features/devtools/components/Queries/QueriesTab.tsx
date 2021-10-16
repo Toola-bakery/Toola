@@ -19,12 +19,19 @@ export function QueriesTab() {
 
 	return (
 		<div style={{ display: 'flex', flex: 1, height: '100%' }}>
-			<div style={{ height: '100%' }}>
+			<div
+				style={{
+					height: '100%',
+					borderRightWidth: 1,
+					borderRightColor: 'rgb(237, 237, 237)',
+					borderRightStyle: 'solid',
+				}}
+			>
 				<QueryList activeBlockId={activeBlockId} setActiveBlock={setActiveBlockId} />
 			</div>
-			<div style={{ height: '100%', width: 900, overflowY: 'scroll' }}>
+			<div style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
 				{queries.map((blockId) => (
-					<Block block={blocks[blockId]} hide={activeBlockId !== blockId} minimize />
+					<Block key={blockId} block={blocks[blockId]} hide={activeBlockId !== blockId} minimal />
 				))}
 			</div>
 		</div>

@@ -1,9 +1,34 @@
 import { Menu, MenuItem } from '@blueprintjs/core';
-import { useCallback, useEffect } from 'react';
+import { LegacyRef, useCallback, useEffect } from 'react';
 import { DropTarget } from '../../../editor/components/Blocks/Layout/DropTarget';
 import { PageBlockProps } from '../../../editor/components/Page/Page';
+import { useBlockDrag } from '../../../editor/hooks/useBlockDrag';
 import { useEditor } from '../../../editor/hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
+
+function QueryMenuItem({
+	blockId,
+	activeBlockId,
+	setActiveBlock,
+}: {
+	blockId: string;
+	activeBlockId: string | undefined;
+	setActiveBlock: (blockId: string) => void;
+}) {
+	const { blocks } = usePageContext();
+	const [{ opacity }, dragRef] = useBlockDrag(blocks[blockId]);
+	return (
+		<div ref={dragRef}>
+			<MenuItem
+				style={{ opacity }}
+				active={activeBlockId === blockId}
+				onClick={() => setActiveBlock(blockId)}
+				key={blockId}
+				text={blockId}
+			/>
+		</div>
+	);
+}
 
 export function QueryList({
 	setActiveBlock,
@@ -33,13 +58,17 @@ export function QueryList({
 			<DropTarget onDrop={(d) => onDrop(null, d)} dropIds={['Block:code', 'Block:query']} />
 			{page.queries?.map((blockId) => (
 				<>
-					<MenuItem
-						active={activeBlockId === blockId}
-						onClick={() => setActiveBlock(blockId)}
-						key={blockId}
-						text={blockId}
+					<QueryMenuItem
+						key={`QueryMenuItem:${blockId}`}
+						blockId={blockId}
+						activeBlockId={activeBlockId}
+						setActiveBlock={setActiveBlock}
 					/>
-					<DropTarget onDrop={(d) => onDrop(blockId, d)} />
+					<DropTarget
+						key={`DropTarget:${blockId}`}
+						dropIds={['Block:code', 'Block:query']}
+						onDrop={(d) => onDrop(blockId, d)}
+					/>
 				</>
 			))}
 		</Menu>

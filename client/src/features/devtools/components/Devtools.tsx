@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@blueprintjs/core';
+import { Button, Tab, Tabs } from '@blueprintjs/core';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useWindowSize } from '../../../hooks/useWindowSize';
@@ -26,10 +26,18 @@ const DevtoolsStyles = styled.div`
 
 	.bp4-tab-panel {
 		margin-top: 0;
-		height: calc(100% - 30px);
+		height: calc(100% - 32px);
 	}
+
 	.bp4-tabs {
 		height: 100%;
+	}
+
+	.bp4-tab-list {
+		padding: 0 8px;
+		border: 0 solid rgb(237, 237, 237);
+		border-bottom-width: 1px;
+		border-top-width: 1px;
 	}
 `;
 
@@ -56,7 +64,7 @@ export function Devtools() {
 				<Tab style={{ marginTop: 0 }} id="queries" title="Queries" panel={<QueriesTab />} />
 				<Tab id="globals" title="Globals" panel={<GlobalsTab />} />
 				<Tabs.Expander />
-				<input className="bp4-input" type="text" placeholder="Search..." />
+				<Button icon="cross" small minimal />
 			</Tabs>
 			<DevtoolsResizable
 				ref={resizableRef}
