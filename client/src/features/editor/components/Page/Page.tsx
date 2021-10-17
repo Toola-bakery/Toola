@@ -152,7 +152,7 @@ export function Page({
 							{!isError ? <PageBar isModal={isModal} /> : null}
 							<PageWrapper page={page}>
 								{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
-								<CreateBlockAtTheEnd parentId="page" />
+								{editing ? <CreateBlockAtTheEnd parentId="page" /> : null}
 							</PageWrapper>
 						</div>
 					</LeftDrawerWrapper>
