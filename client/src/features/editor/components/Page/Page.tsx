@@ -130,7 +130,7 @@ export function Page({
 				<WSHandler />
 				<Helmet title={page?.title} />
 				<DevtoolsWrapper>
-					<LeftDrawerWrapper>
+					<LeftDrawerWrapper hide={isModal}>
 						<div
 							style={{
 								width: '100%',
