@@ -11,8 +11,8 @@ export function DevtoolsWrapper({ children }: { children: ReactNode }) {
 	const { size } = useDrawer({ name: 'devtools', maxSize: Math.floor(height * 0.75), defaultSize: 300 });
 
 	return (
-		<div style={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
-			<div style={{ width: '100%', height: isDevtoolsOpen ? height - size : height }}>{children}</div>
+		<div style={{ display: 'flex', width: '100%', flexDirection: 'column', height: '100%' }}>
+			<div style={{ width: '100%', height: isDevtoolsOpen ? `calc(100% - ${size}px)` : '100%' }}>{children}</div>
 			{isDevtoolsOpen ? <Devtools /> : null}
 		</div>
 	);
