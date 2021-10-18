@@ -7,13 +7,15 @@ interface Size {
 	height: number;
 }
 
-export function useElementSize<T extends HTMLElement = HTMLDivElement>(elementRef: RefObject<T>): Size {
+/** @deprecated Use useResizeDetector instead */
+export function useElementSize<T extends HTMLElement = HTMLDivElement>(
+	elementRef: RefObject<T>,
+): { updateSize: () => void } & Size {
 	const [size, setSize] = useState<Size>({
 		width: 0,
 		height: 0,
 	});
 
-	// Prevent too many rendering using useCallback
 	const updateSize = useCallback(() => {
 		const node = elementRef?.current;
 		if (node) {
@@ -28,7 +30,7 @@ export function useElementSize<T extends HTMLElement = HTMLDivElement>(elementRe
 		updateSize();
 	});
 
-	useDOMEventListener('resize', updateSize);
+	useDOMEventListener('resize', updateSize, elementRef);
 
-	return size;
+	return { ...size, updateSize };
 }

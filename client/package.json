@@ -40,6 +40,7 @@
 		"react-merge-refs": "^1.1.0",
 		"react-query": "^3.21.0",
 		"react-redux": "^7.2.4",
+		"react-resize-detector": "^6.7.6",
 		"react-router-dom": "^5.3.0",
 		"react-scripts": "latest",
 		"react-social-login-buttons": "^3.5.1",

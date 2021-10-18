@@ -3,7 +3,9 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 import { useDrawer, useDrawerResizable } from '../../drawer/hooks/useDrawer';
-import { GlobalsTab } from './GlobalsTab';
+import { useIsDevtoolsOpen } from '../../editor/hooks/useIsDevtoolsOpen';
+import { usePageContext } from '../../executor/hooks/useReferences';
+import { GlobalsTab } from './Globals/GlobalsTab';
 import { QueriesTab } from './Queries/QueriesTab';
 
 const RESIZABLE_WIDTH = 2;
@@ -42,6 +44,7 @@ const DevtoolsStyles = styled.div`
 `;
 
 export function Devtools() {
+	const { setDevtoolsOpen, isDevtoolsOpen } = useIsDevtoolsOpen();
 	const { height } = useWindowSize({ height: 1000 });
 	const { size, setSize } = useDrawer({ name: 'devtools', maxSize: Math.floor(height * 0.75), defaultSize: 300 });
 
@@ -51,20 +54,22 @@ export function Devtools() {
 		setSize,
 	});
 
-	const [selectedTab, setSelectedTab] = useState('queries');
+	if (!isDevtoolsOpen) return null;
 
 	return (
 		<DevtoolsStyles style={{ height: size }}>
 			<Tabs
 				id="DevtoolsTabs"
 				animate={false}
-				onChange={(newTabId) => setSelectedTab(newTabId as string)}
-				selectedTabId={selectedTab}
+				onChange={(newTabId) => setDevtoolsOpen(newTabId as string)}
+				selectedTabId={isDevtoolsOpen}
 			>
 				<Tab style={{ marginTop: 0 }} id="queries" title="Queries" panel={<QueriesTab />} />
 				<Tab id="globals" title="Globals" panel={<GlobalsTab />} />
 				<Tabs.Expander />
-				<Button icon="cross" small minimal />
+				<div style={{ display: 'flex', alignContent: 'center' }}>
+					<Button icon="cross" small minimal onClick={() => setDevtoolsOpen(false)} />
+				</div>
 			</Tabs>
 			<DevtoolsResizable
 				ref={resizableRef}

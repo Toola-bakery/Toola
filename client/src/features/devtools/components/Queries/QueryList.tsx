@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from '@blueprintjs/core';
-import { LegacyRef, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { DropTarget } from '../../../editor/components/Blocks/Layout/DropTarget';
 import { PageBlockProps } from '../../../editor/components/Page/Page';
 import { useBlockDrag } from '../../../editor/hooks/useBlockDrag';
@@ -10,23 +10,32 @@ function QueryMenuItem({
 	blockId,
 	activeBlockId,
 	setActiveBlock,
+	onDrop,
 }: {
 	blockId: string;
 	activeBlockId: string | undefined;
 	setActiveBlock: (blockId: string) => void;
+	onDrop: (afterBlockId: string | null, event: { id: string }) => void;
 }) {
 	const { blocks } = usePageContext();
 	const [{ opacity }, dragRef] = useBlockDrag(blocks[blockId]);
 	return (
-		<div ref={dragRef}>
-			<MenuItem
-				style={{ opacity }}
-				active={activeBlockId === blockId}
-				onClick={() => setActiveBlock(blockId)}
-				key={blockId}
-				text={blockId}
+		<>
+			<div ref={dragRef}>
+				<MenuItem
+					style={{ opacity }}
+					active={activeBlockId === blockId}
+					onClick={() => setActiveBlock(blockId)}
+					key={blockId}
+					text={blockId}
+				/>
+			</div>
+			<DropTarget
+				key={`DropTarget:${blockId}`}
+				dropIds={['Block:code', 'Block:query']}
+				onDrop={(d) => onDrop(blockId, d)}
 			/>
-		</div>
+		</>
 	);
 }
 
@@ -57,19 +66,13 @@ export function QueryList({
 		<Menu>
 			<DropTarget onDrop={(d) => onDrop(null, d)} dropIds={['Block:code', 'Block:query']} />
 			{page.queries?.map((blockId) => (
-				<>
-					<QueryMenuItem
-						key={`QueryMenuItem:${blockId}`}
-						blockId={blockId}
-						activeBlockId={activeBlockId}
-						setActiveBlock={setActiveBlock}
-					/>
-					<DropTarget
-						key={`DropTarget:${blockId}`}
-						dropIds={['Block:code', 'Block:query']}
-						onDrop={(d) => onDrop(blockId, d)}
-					/>
-				</>
+				<QueryMenuItem
+					key={`QueryMenuItem:${blockId}`}
+					blockId={blockId}
+					activeBlockId={activeBlockId}
+					setActiveBlock={setActiveBlock}
+					onDrop={onDrop}
+				/>
 			))}
 		</Menu>
 	);

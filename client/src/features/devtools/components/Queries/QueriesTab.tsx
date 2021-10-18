@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useDrawer } from '../../../drawer/hooks/useDrawer';
-import { Block, BlockSelector } from '../../../editor/components/Block';
+import { usePrevious } from '../../../../hooks/usePrevious';
+import { Block } from '../../../editor/components/Block';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { QueryList } from './QueryList';
 
 export function QueriesTab() {
-	const { blocks, page } = usePageContext();
-	const [activeBlockId, setActiveBlockId] = useState<string | undefined>();
-
+	const { blocks, page, pageId } = usePageContext();
+	const [activeBlockId, setActiveBlockId] = useState<string | undefined>(page?.queries?.[0]);
 	const queries = page?.queries || [];
 	const defaultQuery = queries[0];
 
+	const previousPageId = usePrevious(pageId);
+
 	useEffect(() => {
-		if (typeof activeBlockId === 'undefined' && defaultQuery) setActiveBlockId(defaultQuery);
-	}, [activeBlockId, defaultQuery]);
+		if ((typeof activeBlockId === 'undefined' && defaultQuery) || pageId !== previousPageId)
+			setActiveBlockId(defaultQuery);
+	}, [activeBlockId, defaultQuery, pageId, previousPageId]);
+
+	const currentActive = activeBlockId || defaultQuery;
 
 	if (!page) return null;
 
@@ -30,8 +34,8 @@ export function QueriesTab() {
 				<QueryList activeBlockId={activeBlockId} setActiveBlock={setActiveBlockId} />
 			</div>
 			<div style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-				{queries.map((blockId) => (
-					<Block key={blockId} block={blocks[blockId]} hide={activeBlockId !== blockId} minimal />
+				{queries.map((blockId, index) => (
+					<Block key={blockId} block={blocks[blockId]} hide={currentActive !== blockId} minimal />
 				))}
 			</div>
 		</div>

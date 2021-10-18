@@ -11,7 +11,7 @@ declare global {
 	}
 }
 
-export function useBlocks(pageId: string, options: { editing: boolean; isDevtoolsOpen: boolean }) {
+export function useBlocks(pageId: string, options: { editing: boolean; isDevtoolsOpen: string | boolean }) {
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
 
@@ -49,7 +49,7 @@ export function useBlocks(pageId: string, options: { editing: boolean; isDevtool
 			const newMethods = blocksMethods[blockId] || null;
 
 			const newShow =
-				newProps.parentId === 'queries' ? options.isDevtoolsOpen : options.editing || !newProps.display?.hide;
+				newProps.parentId === 'queries' ? !!options.isDevtoolsOpen : options.editing || !newProps.display?.hide;
 
 			if (particles) {
 				const [oldProps, oldState, oldMethods] = particles;

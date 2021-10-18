@@ -1,20 +1,20 @@
-import { Button, Card, Spinner } from '@blueprintjs/core';
+import { Button, Card, Spinner, Tab, Tabs } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
 import { stringify, parse } from 'flatted';
 import React, { useRef, useCallback, useState, useMemo } from 'react';
-import Editor, { OnChange } from '@monaco-editor/react';
 import safeStringify from 'json-stringify-safe';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
+import { GlobalsTab } from '../../../../devtools/components/Globals/GlobalsTab';
+import { QueriesTab } from '../../../../devtools/components/Queries/QueriesTab';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
-import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { setupMonaco } from './setupMonaco';
+import { MonacoEditor } from './MonacoEditor';
 
 export type CodeBlockType = CodeBlockProps & CodeBlockState & CodeBlockMethods;
 export type CodeBlockProps = {
@@ -37,32 +37,10 @@ export type CodeBlockComponentProps = {
 	hide: boolean;
 };
 
-export function CodeBlock({ block, hide }: CodeBlockComponentProps): JSX.Element {
+export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	const { id, value, manualControl, watchList: watchListProp } = block;
 	const { updateBlockProps } = useEditor();
 	const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
-
-	const { blocks, globals } = usePageContext();
-
-	const blocksType = useMemo(
-		() =>
-			Object.keys(blocks)
-				.map((v) => `'${v}'`)
-				.join(' | '),
-		[blocks],
-	);
-
-	const globalsType = useMemo(
-		() =>
-			Object.keys(globals)
-				.map((v) => `'${v}'`)
-				.join(' | '),
-		[globals],
-	);
-
-	const [showLogs, setShowLogs] = useState(false);
-
-	const { editing } = usePageContext();
 
 	const { trigger, loading, logs, result } = useFunctionExecutor({
 		value,
@@ -88,7 +66,6 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps): JSX.Element
 		},
 		[editorRef, manualControl, trigger],
 	);
-	const onEditorChange = useCallback<OnChange>((v) => updateBlockProps({ id, value: v }), [id, updateBlockProps]);
 
 	useOnMountedEffect(() => {
 		if (!block.show) onEditorMount();
@@ -103,70 +80,44 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps): JSX.Element
 		},
 	]);
 
-	if (hide || !block.show) return <></>;
+	const isHide = hide || !block.show;
+	if (isHide) return null;
 
-	return (
-		<Card>
+	const content = (
+		<>
 			<BlockInspector {...inspectorProps} />
-			<div>
-				<Editor
-					height="50vh"
-					wrapperClassName=""
-					onMount={onEditorMount}
-					defaultValue={value}
-					onChange={onEditorChange}
-					beforeMount={(monaco) => {
-						setupMonaco(monaco);
-						monaco.languages.typescript.javascriptDefaults.addExtraLib(
-							[
-								'declare module "@levankvirkvelia/page-state" {',
-								`export function mongo(databaseId: string): {
-  find<T = any>(options: {
-    collection: string;
-    filter?: any;
-    project?: any;
-    sort?: any;
-    limit?: number;
-    skip?: number;
-  }): T[];
 
-  findOne<T = any>(options: {
-    collection: string;
-    filter?: any;
-    project?: any;
-    sort?: any;
-    skip?: number;
-  }): T;
-};
-
-export const pageState: {
-  callMethod(blockId: any, method: any, callArgs?: any[]): Promise<any>;
-  getProperty(...keys: string[]): Promise<any>;
-};`,
-								'};',
-							].join('\n'),
-							'ts:@levankvirkvelia/page-state',
-						);
-					}}
-					language="javascript"
+			<Tabs id={`CodeBlock:${id}`} animate={false}>
+				<Tab style={{ marginTop: 0 }} id="code" title="Code" panel={<MonacoEditor onEditorMount={onEditorMount} />} />
+				<Tab
+					id="logs"
+					title="Logs"
+					panel={
+						<div>
+							<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
+								{logs.join('')}
+								{safeStringify(result, null, '\t')}
+							</pre>
+						</div>
+					}
 				/>
-				<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+				<Tabs.Expander />
+				<div style={{ display: 'flex', alignContent: 'center' }}>
+					{loading ? <Spinner size={20} /> : null}
 					<Button
-						style={{ marginRight: 8 }}
-						onClick={() => setShowLogs((v) => !v)}
-						text={showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}
+						intent="primary"
+						style={{ marginRight: 8, marginLeft: 8 }}
+						onClick={() => trigger()}
+						text="Run CODE"
 					/>
-					<Button style={{ marginRight: 8 }} onClick={() => trigger()} text="Run CODE" />
-					<div>{loading ? <Spinner size={20} /> : null}</div>
 				</div>
+			</Tabs>
+		</>
+	);
 
-				{showLogs ? (
-					<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
-						{logs.join('')}
-						{safeStringify(result, null, '\t')}
-					</pre>
-				) : null}
-			</div>
-		</Card>
+	return block.parentId === 'queries' ? (
+		<div style={{ height: '100%' }}>{content}</div>
+	) : (
+		<Card style={{ height: '100%' }}>{content}</Card>
 	);
 }

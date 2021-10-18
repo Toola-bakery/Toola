@@ -36,7 +36,7 @@ export type PageContextType = {
 	pageId: string;
 	editing: boolean;
 	setEditing: (value: boolean) => void;
-	isDevtoolsOpen: boolean;
+	isDevtoolsOpen: string | false;
 } & ReturnType<typeof useBlocks>;
 
 export const PageContext = React.createContext<PageContextType>({
