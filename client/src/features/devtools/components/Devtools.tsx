@@ -23,12 +23,15 @@ const DevtoolsResizable = styled.div`
 
 const DevtoolsStyles = styled.div`
 	width: 100%;
-	overflow-y: scroll;
 	position: relative;
+
+	padding: 0 8px;
+	border: 0 solid rgb(237, 237, 237);
+	border-top-width: 1px;
 
 	.bp4-tab-panel {
 		margin-top: 0;
-		height: calc(100% - 32px);
+		height: calc(100% - 31px);
 	}
 
 	.bp4-tabs {
@@ -39,7 +42,6 @@ const DevtoolsStyles = styled.div`
 		padding: 0 8px;
 		border: 0 solid rgb(237, 237, 237);
 		border-bottom-width: 1px;
-		border-top-width: 1px;
 	}
 `;
 
@@ -59,6 +61,7 @@ export function Devtools() {
 	return (
 		<DevtoolsStyles style={{ height: size }}>
 			<Tabs
+				className="devtools-tabs"
 				id="DevtoolsTabs"
 				animate={false}
 				onChange={(newTabId) => setDevtoolsOpen(newTabId as string)}

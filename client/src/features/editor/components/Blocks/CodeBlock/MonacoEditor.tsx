@@ -2,10 +2,17 @@ import Editor, { OnChange } from '@monaco-editor/react';
 import Monaco from 'monaco-editor';
 import React, { useCallback, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
+import styled from 'styled-components';
 import { useBlock } from '../../../hooks/useBlock';
 import { useEditor } from '../../../hooks/useEditor';
 import { CodeBlockType } from './CodeBlock';
 import { setupMonaco } from './setupMonaco';
+
+const MonacoEditorStyled = styled.div`
+	.monaco-editor.rename-box {
+		top: 0;
+	}
+`;
 
 export function MonacoEditor({
 	onEditorMount,
@@ -35,7 +42,7 @@ export function MonacoEditor({
 	// );
 
 	return (
-		<div style={{ height: parentId === 'queries' ? 'calc(100%)' : undefined }} ref={blockRef}>
+		<MonacoEditorStyled style={{ height: parentId === 'queries' ? 'calc(100%)' : undefined }} ref={blockRef}>
 			<Editor
 				height={parentId === 'queries' ? height || 20 : 250}
 				options={{
@@ -82,6 +89,6 @@ export const pageState: {
 				}}
 				language="javascript"
 			/>
-		</div>
+		</MonacoEditorStyled>
 	);
 }

@@ -33,7 +33,7 @@ export function QueriesTab() {
 			>
 				<QueryList activeBlockId={activeBlockId} setActiveBlock={setActiveBlockId} />
 			</div>
-			<div style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
+			<div style={{ height: '100%', width: '100%' }}>
 				{queries.map((blockId, index) => (
 					<Block key={blockId} block={blocks[blockId]} hide={currentActive !== blockId} minimal />
 				))}

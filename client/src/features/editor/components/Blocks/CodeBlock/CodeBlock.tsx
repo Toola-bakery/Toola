@@ -86,14 +86,13 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	const content = (
 		<>
 			<BlockInspector {...inspectorProps} />
-
 			<Tabs id={`CodeBlock:${id}`} animate={false}>
 				<Tab style={{ marginTop: 0 }} id="code" title="Code" panel={<MonacoEditor onEditorMount={onEditorMount} />} />
 				<Tab
 					id="logs"
 					title="Logs"
 					panel={
-						<div>
+						<div style={{ height: '100%', overflowY: 'scroll' }}>
 							<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
 								{logs.join('')}
 								{safeStringify(result, null, '\t')}
