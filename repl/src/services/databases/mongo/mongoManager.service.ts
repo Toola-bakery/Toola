@@ -92,7 +92,6 @@ export const MongoManagerService: ServiceSchema<
 
 				return Object.fromEntries(
 					result.map(colData => {
-						console.log({ colData });
 						return [
 							colData[0],
 							Object.fromEntries(
