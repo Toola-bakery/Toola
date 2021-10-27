@@ -52,7 +52,11 @@ export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInsp
 			positioningStrategy="fixed"
 			content={
 				Array.isArray(state) ? (
-					<Menu>
+					<Menu
+						style={{
+							boxShadow: '0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%), 0 8px 24px rgb(17 20 24 / 20%)',
+						}}
+					>
 						{state.map((item) => (
 							<InspectorItem key={item.label} close={close} item={item} setPath={setPath} />
 						))}
