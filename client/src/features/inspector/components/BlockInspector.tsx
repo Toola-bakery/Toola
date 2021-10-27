@@ -1,4 +1,5 @@
-import { Classes, Menu, Popover, PopoverTargetProps } from '@blueprintjs/core';
+import { Classes, Menu } from '@blueprintjs/core';
+import { Popover2, Popover2TargetProps } from '@blueprintjs/popover2';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { InspectorItem, MenuItemProps } from './InspectorItem';
@@ -27,7 +28,7 @@ export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInsp
 		return () => el.remove();
 	});
 	const renderTarget = useCallback(
-		(props: PopoverTargetProps) =>
+		(props: Popover2TargetProps) =>
 			isOpen ? (
 				<>
 					{ReactDOM.createPortal(
@@ -47,7 +48,7 @@ export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInsp
 
 	if (!isOpen || !state) return null;
 	return (
-		<Popover
+		<Popover2
 			positioningStrategy="fixed"
 			content={
 				Array.isArray(state) ? (

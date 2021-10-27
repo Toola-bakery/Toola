@@ -23,7 +23,7 @@ export function SimpleSelect({
 }: SimpleSelectProps & Omit<SelectHTMLAttributes<HTMLSelectElement>, keyof SimpleSelectProps | 'multiple'>) {
 	return (
 		<FormGroup style={formGroupStyle} label={label} inline={inline}>
-			<HTMLSelect {...rest} value={value} fill={fill} ref={inputRef} options={options} />
+			<HTMLSelect {...rest} value={value} fill={fill} elementRef={inputRef} options={options} />
 		</FormGroup>
 	);
 }

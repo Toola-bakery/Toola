@@ -84,7 +84,7 @@ export function Block({
 				>
 					<div style={{ width: 25, flexShrink: 1, opacity: hovered && editing ? 1 : 0 }}>
 						<Button
-							ref={dragRef}
+							elementRef={dragRef}
 							onClick={(e) => onDragClick?.(e)}
 							style={{
 								padding: 0,
