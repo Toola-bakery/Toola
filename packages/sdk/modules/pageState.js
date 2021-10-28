@@ -68,8 +68,9 @@ async function sendToUser(message, awaitResp) {
   return awaitResp ? awaitMessageResponse(messageId) : true;
 }
 
-async function getProperty(...keys) {
+async function getProperty(...keysArg) {
   await isWsReadyPromise;
+  const keys = keysArg[0]?.includes(".") ? keysArg[0].split(".") : keysArg;
   const value = getPreloadedState(
     ALLOWED_TOP_LEVEL_KEYS.includes(keys[0]) ? keys : ["blocks", ...keys]
   );

@@ -315,10 +315,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@toola/sdk@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@toola/sdk/-/sdk-0.0.17.tgz#8230751d26149c6f2ec0e3416ab43dbced6688aa"
-  integrity sha512-zn5go393cD6hDBVDVKMl0e+VVjR/OAhcl3ZxIcoe2OF9r05ZgKcZuelinDKrpYbUE3plNBKylhr25clNoyc/sg==
+"@toola/sdk@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@toola/sdk/-/sdk-0.0.19.tgz#14d8e2e41209f82833316be0e922246f39cd9047"
+  integrity sha512-1sz4OrYHVpQQ2ry/ErDvprCZ9Oy8EYZTYSrXkmcXzee0zfeWEnwujB6PLbxhDuFe6WVKoHx3d+q66BdYjXt/Vg==
   dependencies:
     axios "^0.21.1"
     uuid "^8.3.2"

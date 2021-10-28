@@ -32,10 +32,15 @@ const genericModuleProxy = (module, databaseId) =>
     }
   );
 
-const SDK = new Proxy(customModules, {
+const SDK = new Proxy(function () {}, {
   get: (target, module) => {
-    if (module in target) return target[module];
+    if (module in customModules) return customModules[module];
     return (id) => genericModuleProxy(module, id);
+  },
+  apply: function (target, thisArg, argumentsList) {
+    return pageState.getProperty(
+      ...(Array.isArray(argumentsList[0]) ? argumentsList[0] : argumentsList)
+    );
   },
 });
 

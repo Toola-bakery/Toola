@@ -11,7 +11,7 @@
 		"postinstall": "patch-package"
 	},
 	"dependencies": {
-		"@toola/sdk": "^0.0.17",
+		"@toola/sdk": "^0.0.19",
 		"@types/pg": "^8.6.1",
 		"@types/uuid": "^8.3.1",
 		"@types/ws": "^7.4.6",

@@ -25,7 +25,6 @@ const DevtoolsStyles = styled.div`
 	width: 100%;
 	position: relative;
 
-	padding: 0 8px;
 	border: 0 solid rgb(237, 237, 237);
 	border-top-width: 1px;
 
