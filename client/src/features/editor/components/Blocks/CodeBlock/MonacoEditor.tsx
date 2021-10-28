@@ -58,7 +58,7 @@ export function MonacoEditor({
 					setupMonaco(monaco);
 					monaco.languages.typescript.javascriptDefaults.addExtraLib(
 						[
-							'declare module "@levankvirkvelia/page-state" {',
+							'declare module "@toola/sdk" {',
 							`export function mongo(databaseId: string): {
   find<T = any>(options: {
     collection: string;
@@ -84,7 +84,7 @@ export const pageState: {
 };`,
 							'};',
 						].join('\n'),
-						'ts:@levankvirkvelia/page-state',
+						'ts:@toola/sdk',
 					);
 				}}
 				language="javascript"

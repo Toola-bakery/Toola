@@ -9,7 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="repl" />
-    <orderEntry type="module" module-name="page-state" />
+    <orderEntry type="module" module-name="sdk" />
     <orderEntry type="module" module-name="serverless" />
   </component>
 </module>

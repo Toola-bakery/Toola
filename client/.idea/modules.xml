@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../packages/page-state/.idea/page-state.iml" filepath="$PROJECT_DIR$/../packages/page-state/.idea/page-state.iml" />
       <module fileurl="file://$PROJECT_DIR$/../repl/.idea/repl.iml" filepath="$PROJECT_DIR$/../repl/.idea/repl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../packages/sdk/.idea/sdk.iml" filepath="$PROJECT_DIR$/../packages/sdk/.idea/sdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/../serverless/.idea/serverless.iml" filepath="$PROJECT_DIR$/../serverless/.idea/serverless.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/workspace.iml" filepath="$PROJECT_DIR$/.idea/workspace.iml" />
     </modules>

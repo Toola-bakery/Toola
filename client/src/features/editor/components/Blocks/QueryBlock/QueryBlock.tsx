@@ -73,7 +73,7 @@ export function QueryBlock({ block, hide }: QueryBlockComponentProps) {
 
 	const { editing } = usePageContext();
 
-	const code = `const SDK = require('@levankvirkvelia/page-state');
+	const code = `const SDK = require('@toola/sdk');
 
 async function main () {
   const resp = await SDK

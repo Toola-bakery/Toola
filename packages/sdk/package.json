@@ -1,8 +1,9 @@
 {
-	"name": "@levankvirkvelia/page-state",
-	"version": "0.0.11",
-	"description": "My awesome module",
+	"name": "@toola/sdk",
+	"version": "0.0.17",
+	"description": "My module",
 	"license": "MIT",
+	"private": false,
 	"repository": "YOUR-GITHUB-USERNAME/unicorn-fun",
 	"author": {
 		"name": "YOUR NAME",
@@ -15,7 +16,7 @@
 		"node": ">=12"
 	},
 	"scripts": {
-		"publ": "yarn publish --patch --no-git-tag-version",
+		"publ": "yarn publish --patch --no-git-tag-version --access public",
 		"test": "xo && ava"
 	},
 	"files": [

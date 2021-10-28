@@ -25,7 +25,7 @@ export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: BlockProps) => 
 			{
 				type: 'code',
 				language: 'javascript',
-				value: `const SDK = require("@levankvirkvelia/page-state");
+				value: `const SDK = require("@toola/sdk");
 
 async function main(){
     console.log('press show logs to see this message');
