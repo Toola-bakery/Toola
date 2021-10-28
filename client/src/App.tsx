@@ -15,7 +15,7 @@ export default function App(): JSX.Element {
 	return (
 		<>
 			<Helmet>
-				<title>internal tool app</title>
+				<title>Toola</title>
 			</Helmet>
 			<Provider store={store}>
 				<PersistGate loading={null} persistor={persistor}>
