@@ -13,7 +13,7 @@ import { usePage } from './hooks/usePage';
 import { useIsEditing } from '../../hooks/useIsEditing';
 import { useStateToWS } from '../../hooks/useStateToWS';
 import { setPage } from '../../redux/editor';
-import { Block } from '../Block';
+import { Block } from '../Block/Block';
 import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
 import { ColumnBlock, ColumnBlockType } from '../Blocks/Layout/ColumnBlock';

@@ -82,7 +82,7 @@ export function CodeInput({
 	return (
 		<div ref={ref}>
 			<TextInput
-				formGroupStyle={{ marginBottom: 0, padding: 3 }}
+				formGroupStyle={{ marginBottom: 0 }}
 				inline={inline}
 				label={label}
 				inputRef={inputRef}

@@ -88,6 +88,7 @@ export function useBlockInspectorState(
 	];
 
 	const menu: MenuItemProps[] = [
+		{ type: 'blockName', label: id },
 		...(typeof menuConfig === 'function' ? menuConfig(defaultMenu) : menuConfig),
 		...(typeof menuConfig === 'function' ? [] : defaultMenu),
 	];

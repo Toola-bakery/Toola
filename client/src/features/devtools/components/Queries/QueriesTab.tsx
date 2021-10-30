@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { usePrevious } from '../../../../hooks/usePrevious';
-import { Block } from '../../../editor/components/Block';
+import { Block } from '../../../editor/components/Block/Block';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { QueryList } from './QueryList';
 

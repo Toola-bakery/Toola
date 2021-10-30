@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Block } from '../../Block';
+import { Block } from '../../Block/Block';
 import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { useEditor } from '../../../hooks/useEditor';

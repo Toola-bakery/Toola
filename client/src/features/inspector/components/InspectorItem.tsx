@@ -1,6 +1,7 @@
 import { IconName } from '@blueprintjs/core';
 import React from 'react';
 import { BlockInspectorProps } from './BlockInspector';
+import { BlockNameMenuItem, BlockNameMenuItemProps } from './InspectorItems/BlockNameMenuItem';
 import { DatabaseMenuItem, DatabaseMenuItemProps } from './InspectorItems/DatabaseMenuItem';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
@@ -26,6 +27,7 @@ export type MenuItemProps =
 	| DatabaseMenuItemProps
 	| QueryActionMenuItemProps
 	| PageMenuItemProps
+	| BlockNameMenuItemProps
 	| PgSQLMenuItemProps
 	| SwitchMenuItemProps;
 
@@ -39,6 +41,8 @@ export type InspectorItemProps<Item = MenuItemProps> = {
 
 export function InspectorItem(props: InspectorItemProps) {
 	const { item } = props;
+	if (item.type === 'blockName')
+		return <BlockNameMenuItem {...(props as InspectorItemProps<BlockNameMenuItemProps>)} />;
 	if (item.type === 'item') return <SimpleMenuItem {...(props as InspectorItemProps<SimpleMenuItemProps>)} />;
 	if (item.type === 'switch') return <SwitchMenuItem {...(props as InspectorItemProps<SwitchMenuItemProps>)} />;
 	if (item.type === 'nested') return <NestedMenuItem {...(props as InspectorItemProps<NestedMenuItemProps>)} />;

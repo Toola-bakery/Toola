@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { BlockContext, BlockContextType } from '../components/Block';
+import { BlockContext, BlockContextType } from '../components/Block/Block';
 import { Blocks } from '../types/blocks';
 
 type BlockContextWithGuarantee<T extends Blocks = Blocks> = Omit<BlockContextType<T>, 'block'> & {
