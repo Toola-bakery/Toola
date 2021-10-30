@@ -23,13 +23,7 @@ export function useProjectsState() {
 export function useProjects() {
 	const { currentProjectId, immer } = useProjectsState();
 	const { authToken } = useUser();
-	const {
-		isLoading,
-		isFetched,
-		data: { projects } = {},
-		refetch,
-		remove,
-	} = useQuery<{ projects: ProjectSchema[] }>('/projects/get', {
+	const { data: { projects } = {}, ...rest } = useQuery<{ projects: ProjectSchema[] }>('/projects/get', {
 		enabled: !!authToken,
 		retry: 1,
 		refetchOnWindowFocus: false,
@@ -52,10 +46,7 @@ export function useProjects() {
 		currentProjectId,
 		currentProject,
 		selectProject,
-		remove,
-		isLoading,
-		isFetched,
 		projects,
-		refetch,
+		...rest,
 	};
 }

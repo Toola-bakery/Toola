@@ -9,15 +9,15 @@ export function PrivateRoute({
 	...rest
 }: PropsWithChildren<{ allowWithoutProject?: boolean } & RouteProps>) {
 	const { userId } = useUser();
-	const { currentProjectId, projects, isFetched, selectProject } = useProjects();
+	const { currentProjectId, projects, isSuccess, selectProject } = useProjects();
 	const history = useHistory();
 
 	useEffect(() => {
 		if (!userId) return history.replace('/login');
 		if (allowWithoutProject) return;
-		if (!projects?.length && isFetched) return history.replace('/createProject');
+		if (!projects?.length && isSuccess) return history.replace('/createProject');
 		if (projects?.length && !currentProjectId) selectProject(projects[0]._id);
-	}, [allowWithoutProject, isFetched, currentProjectId, history, userId, projects, selectProject]);
+	}, [allowWithoutProject, isSuccess, currentProjectId, history, userId, projects, selectProject]);
 
 	return <Route {...rest} render={() => (userId && (currentProjectId || allowWithoutProject) ? children : null)} />;
 }
