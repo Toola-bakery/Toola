@@ -1,6 +1,7 @@
 import { produceWithPatches } from 'immer';
 import { Draft } from 'immer/dist/types/types-external';
 import { useCallback } from 'react';
+import { AppToaster } from '../../../components/Toaster';
 import { store } from '../../../redux';
 import { DeleteBlockEvent } from './useDeleteBlockHook';
 import { useEvents, Event } from './useEvents';
@@ -37,6 +38,7 @@ type UseEditorResponse = {
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
 	updateBlockType: (blockId: string, type: Blocks['type'] | ({ type: Blocks['type'] } & Partial<BlockProps>)) => void;
+	updateBlockId: (blockId: string, newBlockId: string) => void;
 	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean | number) => void;
 	immerBlockProps: <Block extends BlockProps = BlockProps, D = Draft<Block & BasicBlock>>(
 		blockId: string,
@@ -207,6 +209,47 @@ export function useEditor(): UseEditorResponse {
 		[addBlocks, pageId, addChildInsteadOf, deleteBlock],
 	);
 
+	const updateBlockId = useCallback<UseEditorResponse['updateBlockId']>(
+		(blockId, newBlockId) => {
+			if (blockId === newBlockId) return;
+			const blocks = getBlocks(pageId);
+
+			if (/^(row|page|column)/i.test(newBlockId)) {
+				AppToaster.show({ message: `Block ID cannot start with "row", "page" or "column"` });
+				return;
+			}
+			if (!/^[a-z_]/i.test(newBlockId)) {
+				AppToaster.show({ message: `"${newBlockId}" can only start with letters and "_"` });
+				return;
+			}
+
+			if (newBlockId.length < 1) {
+				AppToaster.show({ message: `Block ID must be at least 1 character` });
+				return;
+			}
+
+			if (!/^[a-z0-9_$]+$/i.test(newBlockId)) {
+				AppToaster.show({ message: `"${newBlockId}" can only contain letters, numbers, "_", or "$"` });
+				return;
+			}
+
+			if (blocks[newBlockId]) {
+				AppToaster.show({ message: `"${newBlockId}" already exists` });
+				return;
+			}
+
+			const block = blocks[blockId];
+			const { parentId } = block;
+
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			addBlocks([{ ...block, id: newBlockId }]);
+
+			if (parentId) addChildInsteadOf(blockId, newBlockId);
+			deleteBlock(blockId);
+		},
+		[addBlocks, pageId, addChildInsteadOf, deleteBlock],
+	);
 	return {
 		immerBlockProps,
 		addChild,
@@ -223,5 +266,6 @@ export function useEditor(): UseEditorResponse {
 		moveBlockAfterId,
 		addChildInsteadOf,
 		addBlocks,
+		updateBlockId,
 	};
 }

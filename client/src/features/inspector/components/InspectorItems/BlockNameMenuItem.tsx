@@ -2,10 +2,13 @@ import { InputGroup } from '@blueprintjs/core';
 import React, { useEffect, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import styled from 'styled-components';
+import { usePrevious } from '../../../../hooks/usePrevious';
+import { useRefLatest } from '../../../../hooks/useRefLatest';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type BlockNameMenuItemProps = BasicItemProps & {
 	type: 'blockName';
+	onChange: (v: string) => void;
 };
 
 const StyledBlockNameEditor = styled.div`
@@ -24,8 +27,16 @@ const StyledBlockNameEditor = styled.div`
 export function BlockNameMenuItem({ item }: InspectorItemProps<BlockNameMenuItemProps>) {
 	const [isInput, setIsInput] = useState<string | false>(false);
 	const { width, ref } = useResizeDetector();
+	const isInputRef = useRefLatest(isInput);
+	const onChangeRef = useRefLatest(item.onChange);
 
-	useEffect(() => {}, [isInput]);
+	useEffect(() => {
+		return () => {
+			if (isInputRef.current && item.label !== isInputRef.current)
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				onChangeRef.current(isInputRef.current);
+		};
+	}, [isInputRef, onChangeRef, item.label]);
 
 	return (
 		<StyledBlockNameEditor ref={ref}>

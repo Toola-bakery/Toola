@@ -39,7 +39,7 @@ export function useBlockInspectorState(
 
 	const { id, display } = useBlock();
 	const { setOnDragClick } = useBlockWrapperController();
-	const { deleteBlock, immerBlockProps, updateBlockType } = useEditor();
+	const { deleteBlock, immerBlockProps, updateBlockType, updateBlockId } = useEditor();
 
 	const { onContextMenu, inspectorProps } = useInspectorState({
 		disabled: !editing,
@@ -88,7 +88,13 @@ export function useBlockInspectorState(
 	];
 
 	const menu: MenuItemProps[] = [
-		{ type: 'blockName', label: id },
+		{
+			type: 'blockName',
+			label: id,
+			onChange: (v) => {
+				updateBlockId(id, v);
+			},
+		},
 		...(typeof menuConfig === 'function' ? menuConfig(defaultMenu) : menuConfig),
 		...(typeof menuConfig === 'function' ? [] : defaultMenu),
 	];
