@@ -1,4 +1,6 @@
+import { isMobile } from 'react-device-detect';
 import * as React from 'react';
+import { push as BurgerMenu } from 'react-burger-menu';
 import styled from 'styled-components';
 import { useDrawer, useDrawerResizable } from '../hooks/useDrawer';
 import { ProjectBar } from './ProjectBar';
@@ -18,8 +20,24 @@ const DrawerResizable = styled.div`
 `;
 
 export function ProjectDrawer() {
-	const { size, setSize } = useDrawer({ name: 'leftDrawer' });
+	const { size, setSize, isOpen, setOpen } = useDrawer({ name: 'leftDrawer' });
 	const { resizableRef, isMovingRef } = useDrawerResizable({ setSize });
+
+	if (isMobile)
+		return (
+			<BurgerMenu
+				isOpen={isOpen}
+				onStateChange={(nextState) => setOpen(nextState.isOpen)}
+				outerContainerId="drawer-parent"
+				pageWrapId="drawer-child"
+				customBurgerIcon={false}
+			>
+				<div style={{ backgroundColor: 'rgb(240, 240, 240)', height: '100%' }}>
+					<ProjectBar />
+					<TopLevelPages />
+				</div>
+			</BurgerMenu>
+		);
 
 	return (
 		<div style={{ width: size, height: '100%', position: 'relative' }}>

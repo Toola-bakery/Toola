@@ -1,5 +1,5 @@
-import { PropsWithChildren, ReactNode } from 'react';
-import * as React from 'react';
+import { PropsWithChildren } from 'react';
+import { isMobile } from 'react-device-detect';
 import { ProjectDrawer } from './ProjectDrawer';
 import { useDrawer } from '../hooks/useDrawer';
 import { useWindowSize } from '../../../hooks/useWindowSize';
@@ -9,9 +9,11 @@ export function LeftDrawerWrapper({ children, hide = false }: PropsWithChildren<
 	const { size: drawerWidth } = useDrawer({ name: 'leftDrawer' });
 
 	return (
-		<div style={{ display: 'flex', height: '100%' }}>
+		<div id="drawer-parent" style={{ display: 'flex', height: '100%' }}>
 			{hide ? null : <ProjectDrawer />}
-			<div style={{ height: '100%', width: hide ? '100%' : width - drawerWidth }}>{children}</div>
+			<div id="drawer-child" style={{ height: '100%', width: hide || isMobile ? '100%' : width - drawerWidth }}>
+				{children}
+			</div>
 		</div>
 	);
 }

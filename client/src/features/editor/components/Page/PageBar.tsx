@@ -3,8 +3,10 @@ import { decode } from 'html-entities';
 import * as React from 'react';
 import { useCallback } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
+import { useDrawer } from '../../../drawer/hooks/useDrawer';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
 import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/SwitchMenuItem';
 import { useEditor } from '../../hooks/useEditor';
@@ -33,6 +35,7 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 	const { deletePage } = usePagesMutations();
 	const { updateBlockProps } = useEditor();
 	const { navigate } = usePageNavigator();
+	const { setOpen } = useDrawer({ name: 'leftDrawer' });
 	const onChangeHandler = useCallback(
 		(text: string) => {
 			if (id) {
@@ -54,11 +57,12 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 				justifyContent: 'center',
 				alignItems: 'center',
 				flexDirection: 'row',
-				paddingLeft: isModal ? 8 : 30,
+				paddingLeft: isModal || isMobile ? 8 : 30,
 				paddingRight: 8,
 			}}
 		>
-			<div style={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+			<div style={{ display: 'flex', flexGrow: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+				{isMobile ? <FullscreenButton minimal icon="menu" onClick={() => setOpen(true)} /> : null}
 				{isModal ? (
 					<FullscreenButton
 						minimal
@@ -81,7 +85,7 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 				)}
 			</div>
 			<div style={{ flexShrink: 1, flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-				{!isModal ? (
+				{!isModal && !isMobile ? (
 					<Switch
 						style={{ margin: 0, marginRight: 8 }}
 						label="Editing"

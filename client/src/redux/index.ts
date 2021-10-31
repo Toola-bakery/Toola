@@ -4,11 +4,13 @@ import storage from 'redux-persist/lib/storage';
 import { editorReducer } from '../features/editor/redux/editor';
 import { userSlice } from '../features/usersAndProjects/redux/user';
 import { immerSlice } from './immerSlice';
+import { sessionImmerSlice } from './sessionImmerSlice';
 
 const appReducer = combineReducers({
 	editor: editorReducer,
 	user: userSlice.reducer,
 	immer: immerSlice.reducer,
+	sessionImmer: sessionImmerSlice.reducer,
 });
 
 const PERSIST_KEY = 'root';
@@ -25,7 +27,7 @@ const persistedReducer = persistReducer(
 	{
 		key: PERSIST_KEY,
 		storage,
-		blacklist: ['editor'],
+		blacklist: ['editor', 'sessionImmer'],
 	},
 	rootReducer,
 );

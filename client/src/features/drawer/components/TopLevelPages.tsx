@@ -6,6 +6,7 @@ import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { usePagesMutations } from '../../editor/components/Page/hooks/usePagesMutations';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
+import { useDrawer } from '../hooks/useDrawer';
 import { useTopLevelPages } from '../hooks/useTopLevelPages';
 
 const StyledMenuDivider = styled(MenuDivider)`
@@ -21,6 +22,7 @@ export function TopLevelPages() {
 	const { createPage, deletePage } = usePagesMutations();
 	const { navigate } = usePageNavigator();
 	const { pageId } = useParams<{ pageId: string }>();
+	const { setOpen } = useDrawer({ name: 'leftDrawer' });
 
 	const { onContextMenu, inspectorProps } = useInspectorState({
 		menu: pages.map((page) => ({
@@ -55,7 +57,10 @@ export function TopLevelPages() {
 					<MenuItem
 						key={page.id}
 						onContextMenu={(e) => onContextMenu(e, [page.id])}
-						onClick={() => navigate(page.id)}
+						onClick={() => {
+							setOpen(false);
+							navigate(page.id);
+						}}
 						active={page.id === pageId}
 						icon="document"
 						text={page.title}

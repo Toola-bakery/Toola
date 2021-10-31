@@ -1,5 +1,6 @@
 import { useHotkeys } from '@blueprintjs/core';
 import { useCallback, useMemo } from 'react';
+import { isMobile } from 'react-device-detect';
 import { useImmerState } from '../../../redux/hooks';
 
 export function useIsEditing() {
@@ -28,5 +29,5 @@ export function useIsEditing() {
 		),
 	);
 
-	return { editing, setEditing };
+	return { editing: isMobile ? false : editing, setEditing };
 }

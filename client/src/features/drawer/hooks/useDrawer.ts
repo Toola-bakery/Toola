@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useWindowSize } from '../../../hooks/useWindowSize';
-import { useImmerState } from '../../../redux/hooks';
+import { useImmerState, useSessionImmerState } from '../../../redux/hooks';
 
 const MIN_DRAWER_SIZE = 150;
 const MAX_DRAWER_SIZE = 300;
@@ -21,6 +21,10 @@ export function useDrawer({
 		show?: boolean;
 	}>(`drawer:${name}`);
 
+	const [{ isOpen } = { isOpen: false }, sessionImmer] = useSessionImmerState<{
+		isOpen?: boolean;
+	}>(`drawer:${name}`);
+
 	const { show = true, size = defaultSize } = data;
 
 	const setSize = useCallback(
@@ -30,8 +34,15 @@ export function useDrawer({
 			}),
 		[immer, maxSize, minSize],
 	);
+	const setOpen = useCallback(
+		(nextIsOpen: boolean) =>
+			sessionImmer((draft) => {
+				draft.isOpen = nextIsOpen;
+			}),
+		[sessionImmer],
+	);
 
-	return { show, size, setSize };
+	return { show, setOpen, isOpen, size, setSize };
 }
 
 export function useDrawerResizable({
