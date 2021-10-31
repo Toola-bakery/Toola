@@ -1,7 +1,9 @@
+import { Button } from '@blueprintjs/core';
 import { isMobile } from 'react-device-detect';
 import * as React from 'react';
 import { push as BurgerMenu } from 'react-burger-menu';
 import styled from 'styled-components';
+import { useIsDevtoolsOpen } from '../../editor/hooks/useIsDevtoolsOpen';
 import { useDrawer, useDrawerResizable } from '../hooks/useDrawer';
 import { ProjectBar } from './ProjectBar';
 import { TopLevelPages } from './TopLevelPages';
@@ -22,6 +24,7 @@ const DrawerResizable = styled.div`
 export function ProjectDrawer() {
 	const { size, setSize, isOpen, setOpen } = useDrawer({ name: 'leftDrawer' });
 	const { resizableRef, isMovingRef } = useDrawerResizable({ setSize });
+	const { isDevtoolsOpen, setDevtoolsOpen } = useIsDevtoolsOpen();
 
 	if (isMobile)
 		return (
@@ -50,11 +53,26 @@ export function ProjectDrawer() {
 					flexDirection: 'row',
 				}}
 			>
-				<div style={{ width: size, display: 'flex', flexDirection: 'column' }}>
-					<ProjectBar />
-					<div style={{ overflowY: 'auto', flexShrink: 1 }}>
-						<TopLevelPages />
+				<div
+					style={{
+						width: size,
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'space-between',
+						height: '100%',
+					}}
+				>
+					<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+						<ProjectBar />
+						<div style={{ overflowY: 'auto', flexShrink: 1 }}>
+							<TopLevelPages />
+						</div>
 					</div>
+					{!isDevtoolsOpen ? (
+						<Button minimal onClick={() => setDevtoolsOpen('queries')}>
+							Open devtools
+						</Button>
+					) : null}
 				</div>
 				<DrawerResizable
 					ref={resizableRef}

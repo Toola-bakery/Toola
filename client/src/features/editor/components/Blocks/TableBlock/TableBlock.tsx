@@ -103,7 +103,7 @@ export function TableBlock({ block, hide }: { block: BasicBlock & TableBlockType
 			<BlockInspector {...inspectorProps} />
 			<TableStyles>
 				<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
-					<div style={{ overflow: 'scroll', maxHeight: style === 'a4' ? 'none' : 500 }}>
+					<div style={{ overflow: 'scroll', height: style === 'a4' ? 'none' : 500 }}>
 						<HTMLTable
 							bordered
 							striped

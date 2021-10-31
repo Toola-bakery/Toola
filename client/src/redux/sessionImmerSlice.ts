@@ -7,8 +7,7 @@ export const sessionImmerSlice = createSlice({
 	initialState,
 	reducers: {
 		immerPatch: (state, action: PayloadAction<{ patches: Patch[]; key: string }>) => {
-			if (!state[action.payload.key]) state[action.payload.key] = {};
-			applyPatches(state[action.payload.key], action.payload.patches);
+			state[action.payload.key] = applyPatches(state[action.payload.key] || {}, action.payload.patches);
 		},
 	},
 });

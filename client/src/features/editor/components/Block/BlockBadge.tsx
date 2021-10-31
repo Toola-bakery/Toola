@@ -40,6 +40,7 @@ export function BlockBadge({
 					fontSize: 10,
 					display: 'flex',
 					flexDirection: 'row',
+					alignItems: 'center',
 				}}
 			>
 				<Icon

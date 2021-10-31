@@ -1,9 +1,10 @@
 import { useHotkeys } from '@blueprintjs/core';
 import { useCallback, useMemo } from 'react';
-import { useImmerState } from '../../../redux/hooks';
+import { useImmerState, useSessionImmerState } from '../../../redux/hooks';
 
 export function useIsDevtoolsOpen() {
-	const [{ state: isDevtoolsOpen = false } = {}, immer] = useImmerState<{ state?: string | false }>('isDevtoolsOpen');
+	const [{ state: isDevtoolsOpen = false } = {}, immer] =
+		useSessionImmerState<{ state?: string | false }>('isDevtoolsOpen');
 
 	const setDevtoolsOpen = useCallback(
 		(newValue) => {

@@ -28,9 +28,13 @@ const DevtoolsStyles = styled.div`
 	border: 0 solid rgb(237, 237, 237);
 	border-top-width: 1px;
 
+	background-color: white;
+	z-index: 999999;
+
 	.bp4-tab-panel {
 		margin-top: 0;
 		height: calc(100% - 31px);
+		min-height: unset !important;
 	}
 
 	.bp4-tabs {
@@ -41,6 +45,7 @@ const DevtoolsStyles = styled.div`
 		padding: 0 8px;
 		border: 0 solid rgb(237, 237, 237);
 		border-bottom-width: 1px;
+		align-items: center;
 	}
 `;
 
@@ -58,7 +63,7 @@ export function Devtools() {
 	if (!isDevtoolsOpen) return null;
 
 	return (
-		<DevtoolsStyles style={{ height: size }}>
+		<DevtoolsStyles className="DevtoolsStyles" style={{ height: size }}>
 			<Tabs
 				className="devtools-tabs"
 				id="DevtoolsTabs"

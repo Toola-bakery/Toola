@@ -1,11 +1,10 @@
 import { Button, Card, Spinner, Tab, Tabs } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
 import { stringify, parse } from 'flatted';
-import React, { useRef, useCallback, useState, useMemo } from 'react';
+import React, { useRef, useCallback } from 'react';
 import safeStringify from 'json-stringify-safe';
+import styled from 'styled-components';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
-import { GlobalsTab } from '../../../../devtools/components/Globals/GlobalsTab';
-import { QueriesTab } from '../../../../devtools/components/Queries/QueriesTab';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
@@ -37,6 +36,26 @@ export type CodeBlockComponentProps = {
 	hide: boolean;
 };
 
+const CodeBlockStyles = styled.div`
+	height: 100%;
+
+	.bp4-tab-panel {
+		margin-top: 0;
+		height: calc(100% - 31px);
+		min-height: 250px;
+	}
+
+	.bp4-tabs {
+		height: 100%;
+	}
+
+	.bp4-tab-list {
+		padding: 0 8px;
+		border: 0 solid rgb(237, 237, 237);
+		border-bottom-width: 1px;
+		align-items: center;
+	}
+`;
 export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	const { id, value, manualControl, watchList: watchListProp } = block;
 	const { updateBlockProps } = useEditor();
@@ -84,7 +103,7 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	if (isHide) return null;
 
 	const content = (
-		<>
+		<CodeBlockStyles>
 			<BlockInspector {...inspectorProps} />
 			<Tabs id={`CodeBlock:${id}`} animate={false}>
 				<Tab style={{ marginTop: 0 }} id="code" title="Code" panel={<MonacoEditor onEditorMount={onEditorMount} />} />
@@ -108,15 +127,16 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 						style={{ marginRight: 8, marginLeft: 8 }}
 						onClick={() => trigger()}
 						text="Run CODE"
+						small
 					/>
 				</div>
 			</Tabs>
-		</>
+		</CodeBlockStyles>
 	);
 
 	return block.parentId === 'queries' ? (
 		<div style={{ height: '100%' }}>{content}</div>
 	) : (
-		<Card style={{ height: '100%' }}>{content}</Card>
+		<Card style={{ height: '100%', padding: 0 }}>{content}</Card>
 	);
 }

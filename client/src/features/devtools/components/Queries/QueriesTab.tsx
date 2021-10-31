@@ -22,7 +22,7 @@ export function QueriesTab() {
 	if (!page) return null;
 
 	return (
-		<div style={{ display: 'flex', flex: 1, height: '100%' }}>
+		<div className="queries-tab" style={{ display: 'flex', flex: 1, height: '100%' }}>
 			<div
 				style={{
 					height: '100%',

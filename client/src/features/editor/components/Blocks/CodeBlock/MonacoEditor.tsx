@@ -9,8 +9,14 @@ import { CodeBlockType } from './CodeBlock';
 import { setupMonaco } from './setupMonaco';
 
 const MonacoEditorStyled = styled.div`
-	.monaco-editor.rename-box {
-		top: 0;
+	.monaco-editor {
+		z-index: 9999999;
+		.rename-box {
+			top: 0;
+		}
+		.view-overlays .current-line {
+			border: none !important;
+		}
 	}
 `;
 
