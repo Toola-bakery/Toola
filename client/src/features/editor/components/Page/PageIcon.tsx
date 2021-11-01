@@ -28,6 +28,7 @@ const StyledEmoji = styled.div<{ small: boolean }>`
 	.emoji-mart-emoji {
 		width: ${({ small }) => (small ? 20 : 25)}px;
 		height: ${({ small }) => (small ? 20 : 25)}px;
+		line-height: ${({ small }) => (small ? 20 : 25)}px;
 	}
 `;
 
