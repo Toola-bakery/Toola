@@ -14,6 +14,7 @@ import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspect
 import { usePage } from '../Page/hooks/usePage';
 import { Page } from '../Page/hooks/usePages';
 import { PageBlockProps } from '../Page/Page';
+import { PageIcon } from '../Page/PageIcon';
 
 export type SubPageBlockType = SubPageBlockProps;
 export type SubPageBlockProps = {
@@ -76,7 +77,7 @@ export function SubPageBlock({ block, hide }: { block: BasicBlock & SubPageBlock
 					onClick={() => {
 						if (page) navigate(subpageId, evaluate(state));
 					}}
-					icon="document"
+					icon={<PageIcon emoji={page?.emoji} />}
 					minimal
 					text={page?.title || 'Untitled'}
 				/>

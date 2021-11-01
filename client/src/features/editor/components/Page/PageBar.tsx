@@ -2,16 +2,17 @@ import { Button, EditableText, H4, Menu, MenuItem, Popover, Position, Switch } f
 import { decode } from 'html-entities';
 import * as React from 'react';
 import { useCallback } from 'react';
-import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useDrawer } from '../../../drawer/hooks/useDrawer';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
 import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/SwitchMenuItem';
+import { EmojiPopoverPicker } from '../../../pickers/components/EmojiPopoverPicker';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { usePagesMutations } from './hooks/usePagesMutations';
+import { PageIcon, PageIconWithPicker } from './PageIcon';
 
 const StyledEditableText = styled.div`
 	input:focus,
@@ -71,17 +72,25 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 						onClick={() => navigate(pageId, globals.pageParams)}
 					/>
 				) : (
-					<H4 style={{ fontWeight: 400, margin: 0 }}>
-						<StyledEditableText>
-							<EditableText
-								alwaysRenderInput
-								disabled={!editing || !id}
-								placeholder="Untitled"
-								value={(title === 'Untitled' ? '' : title) || ''}
-								onChange={(e) => onChangeHandler(e)}
-							/>
-						</StyledEditableText>
-					</H4>
+					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+						<PageIconWithPicker editable={editing && !!id} />
+						<H4
+							style={{
+								fontWeight: 400,
+								margin: 0,
+							}}
+						>
+							<StyledEditableText>
+								<EditableText
+									alwaysRenderInput
+									disabled={!editing || !id}
+									placeholder="Untitled"
+									value={(title === 'Untitled' ? '' : title) || ''}
+									onChange={(e) => onChangeHandler(e)}
+								/>
+							</StyledEditableText>
+						</H4>
+					</div>
 				)}
 			</div>
 			<div style={{ flexShrink: 1, flexDirection: 'row', display: 'flex', alignItems: 'center' }}>

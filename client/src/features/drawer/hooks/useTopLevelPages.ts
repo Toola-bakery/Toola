@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { useProjects } from '../../usersAndProjects/hooks/useProjects';
 
-type TopLevelPageItem = { title: string; id: string };
+type TopLevelPageItem = { title: string; emoji?: string; id: string };
 
 export function useTopLevelPages() {
 	const { currentProjectId } = useProjects();
@@ -19,12 +19,12 @@ export function useTopLevelPages() {
 				if (a.title?.toLowerCase() < b.title?.toLowerCase()) return -1;
 				if (a.title?.toLowerCase() > b.title?.toLowerCase()) return 1;
 				return 0;
-			}) as { title: string; id: string }[],
+			}) as TopLevelPageItem[],
 		[data],
 	);
 
 	const appendPage = useCallback(
-		({ title, id }: { title: string; id: string }) => {
+		({ title, id }: TopLevelPageItem) => {
 			queryClient.setQueryData<TopLevelPageItem[]>(
 				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
 				[...data, { title, id }],
@@ -35,7 +35,18 @@ export function useTopLevelPages() {
 
 	const renamePage = useCallback(
 		({ title, id }: { title: string; id: string }) => {
-			const items = data.map((item) => (item.id !== id ? item : { title, id }));
+			const items = data.map((item) => (item.id !== id ? item : { ...item, title, id }));
+			queryClient.setQueryData<TopLevelPageItem[]>(
+				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
+				items,
+			);
+		},
+		[currentProjectId, data, queryClient],
+	);
+
+	const changePageEmoji = useCallback(
+		({ emoji, id }: { emoji?: string; id: string }) => {
+			const items = data.map((item) => (item.id !== id ? item : { ...item, emoji, id }));
 			queryClient.setQueryData<TopLevelPageItem[]>(
 				['/pages/topLevelPages', { projectId: currentProjectId || '' }],
 				items,
@@ -55,5 +66,5 @@ export function useTopLevelPages() {
 		[currentProjectId, data, queryClient],
 	);
 
-	return { pages: sortedList, refetch, appendPage, renamePage, deletePage };
+	return { pages: sortedList, changePageEmoji, refetch, appendPage, renamePage, deletePage };
 }

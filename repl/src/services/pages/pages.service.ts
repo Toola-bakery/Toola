@@ -169,13 +169,18 @@ export const PagesService: ServiceSchema<
 							$group: {
 								_id: null,
 								pages: {
-									$addToSet: { title: '$value.page.title', lowerTitle: { $toLower: '$value.page.title' }, id: '$_id' },
+									$addToSet: {
+										title: '$value.page.title',
+										emoji: '$value.page.emoji',
+										lowerTitle: { $toLower: '$value.page.title' },
+										id: '$_id',
+									},
 								},
 							},
 						},
 						{ $unwind: '$pages' },
 						{ $sort: { 'pages.lowerTitle': 1 } },
-						{ $project: { _id: 0, title: '$pages.title', id: '$pages.id' } },
+						{ $project: { _id: 0, title: '$pages.title', emoji: '$pages.emoji', id: '$pages.id' } },
 					])
 					.toArray();
 			},

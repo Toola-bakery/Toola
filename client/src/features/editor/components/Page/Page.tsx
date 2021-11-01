@@ -25,6 +25,7 @@ export type PageBlockType = PageBlockProps;
 export type PageBlockProps = {
 	type: 'page';
 	title: string;
+	emoji?: string;
 	style: 'app' | 'a4';
 	blocks: string[];
 	queries: string[];
@@ -48,7 +49,17 @@ export const PageContext = React.createContext<PageContextType>({
 	pageId: '',
 	setBlockState: () => {},
 	blocksState: {},
-	page: { id: '', title: 'Untitled', pageId: '', parentId: '', type: 'page', style: 'app', blocks: [], queries: [] },
+	page: {
+		id: '',
+		title: 'Untitled',
+		emoji: undefined,
+		pageId: '',
+		parentId: '',
+		type: 'page',
+		style: 'app',
+		blocks: [],
+		queries: [],
+	},
 	editing: true,
 	setEditing: () => {},
 	blocksProps: {},

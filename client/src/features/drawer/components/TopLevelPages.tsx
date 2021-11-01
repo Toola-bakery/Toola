@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { usePagesMutations } from '../../editor/components/Page/hooks/usePagesMutations';
+import { PageIcon } from '../../editor/components/Page/PageIcon';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
 import { useDrawer } from '../hooks/useDrawer';
@@ -62,7 +63,7 @@ export function TopLevelPages() {
 							navigate(page.id);
 						}}
 						active={page.id === pageId}
-						icon="document"
+						icon={<PageIcon small emoji={page.emoji} />}
 						text={page.title}
 					/>
 				))}

@@ -9,6 +9,8 @@ import { AppRouters } from './routes';
 import { AppStyles } from './AppStyles';
 import './libs/firebase';
 
+import 'emoji-mart/css/emoji-mart.css';
+
 FocusStyleManager.onlyShowFocusOnTabs();
 
 export default function App(): JSX.Element {
