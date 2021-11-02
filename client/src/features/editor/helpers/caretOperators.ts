@@ -97,3 +97,12 @@ export function setCaretPosition(el: Node, start: number, end = start) {
 	sel?.removeAllRanges();
 	sel?.addRange(range);
 }
+
+export function setInputCaretPosition(elem: HTMLInputElement | null, caretPos: number) {
+	if (elem === null) return;
+
+	if (elem.selectionStart) {
+		elem.focus();
+		elem.setSelectionRange(caretPos, caretPos);
+	} else elem.focus();
+}

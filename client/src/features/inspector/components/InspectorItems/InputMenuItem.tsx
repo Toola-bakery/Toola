@@ -1,5 +1,6 @@
 import { MenuItem } from '@blueprintjs/core';
 import React from 'react';
+import styled from 'styled-components';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 import { CodeInput } from '../CodeInput';
 
@@ -11,21 +12,29 @@ export type InputMenuItemProps = BasicItemProps & {
 	multiline?: boolean;
 };
 
+const CSSFix = styled.div`
+	.bp4-text-overflow-ellipsis {
+		overflow: visible;
+	}
+`;
+
 export function InputMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<InputMenuItemProps>) {
 	return (
-		<Wrapper
-			shouldDismissPopover={false}
-			icon={item.icon}
-			text={
-				<CodeInput
-					multiline={item.multiline}
-					inline={inline}
-					label={item.label}
-					value={item.value}
-					type={item.codeType}
-					onChange={item.onChange}
-				/>
-			}
-		/>
+		<CSSFix>
+			<Wrapper
+				shouldDismissPopover={false}
+				icon={item.icon}
+				text={
+					<CodeInput
+						multiline={item.multiline}
+						inline={inline}
+						label={item.label}
+						value={item.value}
+						type={item.codeType}
+						onChange={item.onChange}
+					/>
+				}
+			/>
+		</CSSFix>
 	);
 }

@@ -16,11 +16,7 @@ export function useCaretPosition<T extends HTMLInputElement | HTMLTextAreaElemen
 	}, []);
 
 	useEffect(() => {
-		// Set the caret position by setting the selection range with the
-		// most current start and end values
-		if (node && node.current) {
-			node.current.setSelectionRange(start, end);
-		}
+		updateCaret();
 	});
 
 	return { start, end, ref: node, updateCaret };
