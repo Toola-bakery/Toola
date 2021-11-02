@@ -78,7 +78,7 @@ export const editorSlice = createSlice({
 	name: 'editor',
 	initialState,
 	reducers: {
-		addBlocks: (state, action: PayloadAction<(BasicBlock & Blocks)[]>) => {
+		addBlocks: (state, action: PayloadAction<(BasicBlock & BlockProps)[]>) => {
 			action.payload.forEach((block) => {
 				const page = getPageHelper(state, block.pageId);
 				page.blocksProperties[block.id] = block;
@@ -163,7 +163,7 @@ export const editorSlice = createSlice({
 			const { pageId, blockId } = action.payload;
 			deleteChildFromParentHelper(state, pageId, blockId);
 		},
-		setPage: (state, action: PayloadAction<{ blocks: { [id: string]: BasicBlock & Blocks }; pageId: string }>) => {
+		setPage: (state, action: PayloadAction<{ blocks: { [id: string]: BasicBlock & BlockProps }; pageId: string }>) => {
 			const page = getPageHelper(state, action.payload.pageId);
 			page.blocksProperties = action.payload.blocks;
 		},

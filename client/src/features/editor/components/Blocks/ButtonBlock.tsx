@@ -1,6 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import React from 'react';
-import { useEditor } from '../../hooks/useEditor';
+import { useBlock } from '../../hooks/useBlock';
+import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useReferenceEvaluator, useReferences } from '../../../executor/hooks/useReferences';
@@ -13,9 +14,10 @@ export type ButtonBlockProps = {
 	name: string;
 };
 
-export function ButtonBlock({ block, hide }: { block: BasicBlock & ButtonBlockType; hide: boolean }) {
-	const { id, value, name } = block;
-	const { updateBlockProps } = useEditor();
+export function ButtonBlock({ hide }: { hide: boolean }) {
+	const { show } = useBlock();
+	const [value, setValue] = useBlockProperty('value', '');
+	const [name, setName] = useBlockProperty('value', '');
 	const { evaluate } = useReferenceEvaluator();
 	const nameRef = useReferences(name);
 
@@ -23,18 +25,18 @@ export function ButtonBlock({ block, hide }: { block: BasicBlock & ButtonBlockTy
 		{
 			label: 'Name',
 			type: 'input',
-			onChange: (v) => updateBlockProps({ id, name: v }),
+			onChange: (v: string) => setName(v),
 			value: name,
 		},
 		{
 			label: 'Trigger',
 			type: 'input',
-			onChange: (v) => updateBlockProps({ id, value: v }),
+			onChange: (v: string) => setValue(v),
 			value,
 		},
 	]);
 
-	if (hide || !block.show) return <></>;
+	if (hide || !show) return null;
 
 	return (
 		<>

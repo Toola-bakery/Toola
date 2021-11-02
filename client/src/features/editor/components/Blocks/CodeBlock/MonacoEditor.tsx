@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import styled from 'styled-components';
 import { useBlock } from '../../../hooks/useBlock';
+import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { useEditor } from '../../../hooks/useEditor';
 import { CodeBlockType } from './CodeBlock';
 import { setupMonaco } from './setupMonaco';
@@ -26,9 +27,9 @@ export function MonacoEditor({
 	onEditorMount: (editor?: Monaco.editor.IStandaloneCodeEditor) => void;
 }) {
 	const { height, ref: blockRef } = useResizeDetector();
-	const { id, value, parentId } = useBlock<CodeBlockType>();
-	const { updateBlockProps } = useEditor();
-	const onEditorChange = useCallback<OnChange>((v) => updateBlockProps({ id, value: v }), [id, updateBlockProps]);
+	const { parentId } = useBlock();
+	const [value, setValue] = useBlockProperty('value', '');
+	const onEditorChange = useCallback<OnChange>((v) => setValue(v || ''), [setValue]);
 
 	// const { blocks, globals } = usePageContext();
 	// const blocksType = useMemo(

@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { usePagesMutations } from '../../editor/components/Page/hooks/usePagesMutations';
-import { PageIcon } from '../../editor/components/Page/PageIcon';
+import { EmojiIcon, EmojiPicker } from '../../editor/components/componentsWithLogic/EmojiPicker';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
 import { useDrawer } from '../hooks/useDrawer';
@@ -63,7 +63,7 @@ export function TopLevelPages() {
 							navigate(page.id);
 						}}
 						active={page.id === pageId}
-						icon={<PageIcon small emoji={page.emoji} />}
+						icon={<EmojiIcon small emoji={page.emoji} />}
 						text={page.title}
 					/>
 				))}

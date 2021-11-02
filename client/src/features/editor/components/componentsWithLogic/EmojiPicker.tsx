@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { EmojiPopoverPicker } from '../../../pickers/components/EmojiPopoverPicker';
+import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useEditor } from '../../hooks/useEditor';
 
 const boxStyles: CSSProperties = {
@@ -32,7 +33,13 @@ const StyledEmoji = styled.div<{ small: boolean }>`
 	}
 `;
 
-export function PageIcon({ emoji, small = false }: { emoji?: string; small?: boolean }) {
+type EmojiIconProps = {
+	emoji?: string;
+	small?: boolean;
+	useDefaultDocument?: boolean;
+};
+export function EmojiIcon({ emoji, small = false, useDefaultDocument = true }: EmojiIconProps) {
+	if (!emoji && !useDefaultDocument) return null;
 	return (
 		<StyledEmoji small={small} style={{ width: small ? 20 : 25, height: small ? 20 : 25 }}>
 			{emoji ? <Emoji size={small ? 18 : 20} emoji={emoji} native /> : <Icon size={small ? 16 : 18} icon="document" />}
@@ -40,15 +47,20 @@ export function PageIcon({ emoji, small = false }: { emoji?: string; small?: boo
 	);
 }
 
-export function PageIconWithPicker({ editable }: { editable: boolean }) {
-	const { page: { emoji, id } = {}, pageId } = usePageContext();
+export function EmojiPicker({
+	onChange,
+	propertyName = 'emoji',
+	...rest
+}: {
+	onChange?: (emoji: EmojiData | undefined) => void;
+	propertyName?: string;
+} & EmojiIconProps = {}) {
+	const { editing } = usePageContext();
 
-	const { updateBlockProps } = useEditor();
-	const { changePageEmoji } = useTopLevelPages();
+	const [emoji, setEmoji] = useBlockProperty<string | undefined>(propertyName);
+	const icon = <EmojiIcon {...rest} emoji={emoji} />;
 
-	const icon = <PageIcon emoji={emoji} />;
-
-	if (!editable) return <div style={boxStyles}>{icon}</div>;
+	if (!editing) return <div style={boxStyles}>{icon}</div>;
 	return (
 		<EmojiPopoverPicker
 			pickerProps={{
@@ -59,10 +71,8 @@ export function PageIconWithPicker({ editable }: { editable: boolean }) {
 				autoFocus: true,
 			}}
 			onSelect={(selectedEmoji) => {
-				if (id) {
-					updateBlockProps({ id, emoji: selectedEmoji?.id });
-					changePageEmoji({ id: pageId, emoji: selectedEmoji?.id });
-				}
+				setEmoji(selectedEmoji?.id);
+				onChange?.(selectedEmoji);
 			}}
 		>
 			<Button style={boxStyles} icon={icon} minimal small />

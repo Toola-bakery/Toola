@@ -12,6 +12,7 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 	['Heading 1', { type: 'text', style: 'heading1' }],
 	['Heading 2', { type: 'text', style: 'heading2' }],
 	['Heading 3', { type: 'text', style: 'heading3' }],
+	['Card', 'card'],
 	['Code', 'code'],
 	['Query', 'query'],
 	['Page', 'subpage'],

@@ -1,11 +1,17 @@
-import { ColumnTypes, TableBlockProps, TableBlockType } from '../TableBlock';
+import { useBlock } from '../../../../hooks/useBlock';
+import { useBlockProperty } from '../../../../hooks/useBlockProperty';
+import { ColumnTypes, TableBlockProps, TableColumnsProp } from '../TableBlock';
 import { MenuItemProps } from '../../../../../inspector/components/InspectorItem';
-import { BasicBlock } from '../../../../types/basicBlock';
 import { useBlockInspectorState } from '../../../../../inspector/hooks/useBlockInspectorState';
 import { useEditor } from '../../../../hooks/useEditor';
 
-export function useTableInspector(block: BasicBlock & TableBlockType) {
-	const { columns, value, id, connectedPage, manualPagination } = block;
+export function useTableInspector() {
+	const { id } = useBlock();
+	const [manualPagination] = useBlockProperty('manualPagination', false);
+	const [connectedPage] = useBlockProperty<string | undefined>('connectedPage');
+	const [columns, setColumns] = useBlockProperty<TableColumnsProp | undefined>('columns');
+
+	const [value] = useBlockProperty('value', '');
 
 	const { immerBlockProps } = useEditor();
 
@@ -18,8 +24,8 @@ export function useTableInspector(block: BasicBlock & TableBlockType) {
 					label: 'Header',
 					type: 'input',
 					onChange: (v) =>
-						immerBlockProps<TableBlockProps>(id, (draft) => {
-							const colDraft = draft.columns?.find((c) => c.id === col.id);
+						setColumns((draft) => {
+							const colDraft = draft?.find((c) => c.id === col.id);
 							if (colDraft) colDraft.header = v;
 						}),
 					value: col.header,
@@ -28,8 +34,8 @@ export function useTableInspector(block: BasicBlock & TableBlockType) {
 					label: 'Data Source',
 					type: 'input',
 					onChange: (v) =>
-						immerBlockProps<TableBlockProps>(id, (draft) => {
-							const colDraft = draft.columns?.find((c) => c.id === col.id);
+						setColumns((draft) => {
+							const colDraft = draft?.find((c) => c.id === col.id);
 							if (colDraft) colDraft.value = v;
 						}),
 					value: col.value,
@@ -39,8 +45,8 @@ export function useTableInspector(block: BasicBlock & TableBlockType) {
 					type: 'select',
 					options: Object.values(ColumnTypes),
 					onChange: (v) =>
-						immerBlockProps<TableBlockProps>(id, (draft) => {
-							const colDraft = draft.columns?.find((c) => c.id === col.id);
+						setColumns((draft) => {
+							const colDraft = draft?.find((c) => c.id === col.id);
 							if (colDraft) colDraft.type = v as ColumnTypes;
 						}),
 					value: col.type || ColumnTypes.text,
@@ -50,9 +56,9 @@ export function useTableInspector(block: BasicBlock & TableBlockType) {
 					type: 'item',
 					closeAfterCall: true,
 					call: () =>
-						immerBlockProps<TableBlockProps>(id, (draft) => {
-							const colIndex = draft.columns?.findIndex((c) => c.id === col.id);
-							if (typeof colIndex !== 'undefined' && colIndex >= 0 && draft.columns) draft.columns.splice(colIndex, 1);
+						setColumns((draft) => {
+							const colIndex = draft?.findIndex((c) => c.id === col.id);
+							if (typeof colIndex !== 'undefined' && colIndex >= 0 && draft) draft.splice(colIndex, 1);
 						}),
 				},
 			],

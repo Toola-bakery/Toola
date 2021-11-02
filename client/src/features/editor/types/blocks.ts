@@ -33,7 +33,8 @@ export type Blocks =
 	| LayoutBlocks
 	| SubPageBlockType
 	| QueryBlockType
-	| ButtonBlockType;
+	| ButtonBlockType
+	| { type: 'card' };
 
 export type LayoutBlocks = PageBlockType | ColumnBlockType | RowBlockType;
 

@@ -28,12 +28,12 @@ type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type UseEditorResponse = {
 	addChild: (parentId: string, blockId: string | string[], index?: number) => void;
 	addChildAfterId: (putAfterId: string, blockId: string | string[]) => void;
-	addBlocks: (blocks: (Optional<BasicBlock, 'id'> & Blocks)[]) => (BasicBlock & Blocks)[];
-	addBlockAfter: (putAfterId: string, block: Blocks, focus?: boolean | number) => void;
+	addBlocks: (blocks: (Optional<BasicBlock, 'id'> & BlockProps)[]) => (BasicBlock & Blocks)[];
+	addBlockAfter: (putAfterId: string, block: BlockProps, focus?: boolean | number) => void;
 	// TODO rename method
 	addChildInsteadOf: (blockId: string, replaceWithId: string) => void;
 	moveBlockAfterId: (blockId: string, putAfterId: string) => void;
-	addBlockIn: (parentId: string, block: Blocks) => void;
+	addBlockIn: (parentId: string, block: BlockProps) => void;
 	deleteBlock: (blockId: string) => void;
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
@@ -134,7 +134,7 @@ export function useEditor(): UseEditorResponse {
 				id: block.id || getNextId(block.type),
 			}));
 			dispatch(addBlocksAction(payload));
-			return payload;
+			return payload as (Blocks & BasicBlock)[];
 		},
 		[dispatch, getNextId],
 	);
@@ -195,7 +195,7 @@ export function useEditor(): UseEditorResponse {
 			const block = blocks[blockId];
 			const { parentId } = block;
 
-			const newBlock = BlockCreators[type](block);
+			const newBlock = BlockCreators[type] ? BlockCreators[type](block) : { ...block, type };
 
 			const [{ id: newId }] = addBlocks([
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -203,8 +203,10 @@ export function useEditor(): UseEditorResponse {
 				{ ...newBlock, ...(typeof typeOrBlock === 'string' ? {} : typeOrBlock), pageId, parentId, type },
 			]);
 
-			if (parentId) addChildInsteadOf(blockId, newId);
-			deleteBlock(blockId);
+			if (newId !== blockId) {
+				if (parentId) addChildInsteadOf(blockId, newId);
+				deleteBlock(blockId);
+			}
 		},
 		[addBlocks, pageId, addChildInsteadOf, deleteBlock],
 	);

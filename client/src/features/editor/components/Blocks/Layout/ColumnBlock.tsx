@@ -15,10 +15,15 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 	const { moveBlockAfterId, addChild } = useEditor();
 
 	const elements = useMemo(() => {
-		return block.blocks.map((blockKey) => {
+		return block.blocks?.map((blockKey) => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			if (block.type === 'card') console.log({ blockKey });
+			else console.log(blocks[blockKey], { blockKey, type: block.type });
 			return (
 				<div key={`${blocks[blockKey].id}`}>
 					{(() => {
+						if (!blocks[blockKey]) return null;
 						if (blocks[blockKey].type === 'row')
 							return <RowBlock block={blocks[blockKey] as BasicBlock & RowBlockType} />;
 						if (!blocks[blockKey].show) return null;
@@ -36,7 +41,7 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 				</div>
 			);
 		});
-	}, [block.blocks, block.id, blocks, fake, moveBlockAfterId, pageId]);
+	}, [block.blocks, block.id, block.type, blocks, fake, moveBlockAfterId, pageId]);
 
 	if (!block.show) return null;
 

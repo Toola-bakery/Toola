@@ -1,17 +1,18 @@
 import { useEffect, useMemo } from 'react';
 import { Column } from 'react-table';
 import { v4 } from 'uuid';
+import { useBlockProperty } from '../../../../hooks/useBlockProperty';
 import { TableBlockType, TableColumnsProp } from '../TableBlock';
 import { BasicBlock } from '../../../../types/basicBlock';
 import { useEditor } from '../../../../hooks/useEditor';
-import { useReferenceEvaluator } from '../../../../../executor/hooks/useReferences';
+import { usePageContext, useReferenceEvaluator } from '../../../../../executor/hooks/useReferences';
 
-export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType, isEditing: boolean) {
-	const { columns, value, id, pageId } = block;
+export function useTableBlockColumnsAndData() {
+	const { editing } = usePageContext();
+	const [columns, setColumns] = useBlockProperty<TableColumnsProp | undefined>('columns');
+	const [value] = useBlockProperty('value', '');
 
 	const { evaluate, isLoading } = useReferenceEvaluator();
-
-	const { updateBlockProps } = useEditor();
 
 	const data = useMemo<any[]>(() => {
 		const state = evaluate(value);
@@ -36,9 +37,9 @@ export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType, 
 
 	useEffect(() => {
 		if ((!columns || columns.length === 0) && columnsProp.length > 0) {
-			updateBlockProps({ id, columns: columnsProp });
+			setColumns(columnsProp);
 		}
-	}, [columns, columnsProp, id, pageId, updateBlockProps]);
+	}, [columns, columnsProp, setColumns]);
 
 	const calculatedColumns = useMemo<Column[]>(() => {
 		const cols: Column[] = columnsProp.map((col) => ({
@@ -51,7 +52,7 @@ export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType, 
 			id: col.id,
 		}));
 		const addCellWidth = 35;
-		if (isEditing)
+		if (editing)
 			cols.push({
 				id: 'add',
 				Header: '+',
@@ -62,7 +63,7 @@ export function useTableBlockColumnsAndData(block: BasicBlock & TableBlockType, 
 				// type: ColumnTypes.text,
 			});
 		return cols;
-	}, [columnsProp, evaluate, isEditing]);
+	}, [columnsProp, evaluate, editing]);
 
 	return { calculatedColumns, data, isLoading };
 }

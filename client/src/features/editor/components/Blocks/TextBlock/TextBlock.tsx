@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { getCaretIndex, getRange, getSelection, setCaretPosition } from '../../../helpers/caretOperators';
+import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -32,7 +33,10 @@ export type TextBlockProps = {
 const BR_TAG = /<br\s*\/?>/ms;
 
 export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; hide: boolean }) {
-	const { id, style, entities = [], value } = block;
+	const { id } = block;
+	const [entities, setEntities] = useBlockProperty<TextEntity[]>('entities', []);
+	const [value, setValue] = useBlockProperty('value', '');
+	const [style, setStyle] = useBlockProperty<TextBlockStyles>('style', 'text');
 
 	const { editing } = usePageContext();
 	const { updateBlockProps } = useEditor();

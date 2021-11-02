@@ -12,7 +12,7 @@ function copyProps<P extends Blocks['type']>(joinWith: { type: P } & BlockProps,
 	return copy;
 }
 
-export const BlockCreators: { [P in Blocks['type']]: (anyBlock?: BlockProps) => { type: P } & BlockProps } = {
+export const BlockCreators: { [key: string]: (anyBlock?: BlockProps) => BlockProps } = {
 	page: (anyBlock) => copyProps({ type: 'page', style: 'app', title: 'Untitled', blocks: [], queries: [] }, anyBlock),
 	column: (anyBlock) => copyProps({ type: 'column', blocks: [] }, anyBlock),
 	row: (anyBlock) => copyProps({ type: 'row', blocks: [] }, anyBlock),

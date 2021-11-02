@@ -13,8 +13,8 @@ import { BlockSelector } from './BlockSelector';
 
 type DragClickEventHandler = React.MouseEventHandler<HTMLElement>;
 
-export type BlockContextType<T extends Blocks = Blocks> = {
-	block: undefined | (BasicBlock & T);
+export type BlockContextType = {
+	block: undefined | BasicBlock;
 	setOnDragClick: (listener: DragClickEventHandler) => void;
 };
 

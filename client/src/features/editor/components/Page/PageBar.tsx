@@ -8,11 +8,10 @@ import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useDrawer } from '../../../drawer/hooks/useDrawer';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
 import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/SwitchMenuItem';
-import { EmojiPopoverPicker } from '../../../pickers/components/EmojiPopoverPicker';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { usePagesMutations } from './hooks/usePagesMutations';
-import { PageIcon, PageIconWithPicker } from './PageIcon';
+import { EmojiPicker } from '../componentsWithLogic/EmojiPicker';
 
 const StyledEditableText = styled.div`
 	input:focus,
@@ -32,7 +31,7 @@ const FullscreenButton = styled(Button)`
 
 export function PageBar({ isModal }: { isModal: boolean }) {
 	const { editing, setEditing, page: { id, title, parentId, style } = {}, pageId, globals } = usePageContext();
-	const { renamePage } = useTopLevelPages();
+	const { renamePage, changePageEmoji } = useTopLevelPages();
 	const { deletePage } = usePagesMutations();
 	const { updateBlockProps } = useEditor();
 	const { navigate } = usePageNavigator();
@@ -73,7 +72,11 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 					/>
 				) : (
 					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-						<PageIconWithPicker editable={editing && !!id} />
+						<EmojiPicker
+							onChange={(emoji) => {
+								changePageEmoji({ id: pageId, emoji: emoji?.id });
+							}}
+						/>
 						<H4
 							style={{
 								fontWeight: 400,

@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
 import { usePrevious } from '../../../hooks/usePrevious';
 import { useBlock } from './useBlock';
-import { useEditor } from './useEditor';
+import { useBlockState } from './useBlockProperty';
 
 export function useBlockSetState<T, K extends keyof T = keyof T>(key: K | keyof T, value: T[K]) {
 	const { id } = useBlock() || {};
 	const prevV = usePrevious(value);
-	const { updateBlockState } = useEditor();
+	const [, setValue] = useBlockState(key as string);
 	useEffect(() => {
 		if (!id) return;
 		if (prevV !== value) {
-			updateBlockState({ id, [key]: value });
+			setValue(value);
 		}
-	}, [id, key, prevV, updateBlockState, value]);
+	}, [id, prevV, setValue, value]);
 }

@@ -13,7 +13,7 @@ import { usePage } from './hooks/usePage';
 import { useIsEditing } from '../../hooks/useIsEditing';
 import { useStateToWS } from '../../hooks/useStateToWS';
 import { setPage } from '../../redux/editor';
-import { Block } from '../Block/Block';
+import { Block, BlockContext } from '../Block/Block';
 import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
 import { ColumnBlock, ColumnBlockType } from '../Blocks/Layout/ColumnBlock';
@@ -160,11 +160,17 @@ export function Page({
 									action={<Button text="Back home" onClick={() => navigate('')} />}
 								/>
 							) : null}
-							{!isError ? <PageBar isModal={isModal} /> : null}
-							<PageWrapper page={page}>
-								{!isError && page ? <ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} /> : null}
-								{editing ? <CreateBlockAtTheEnd parentId="page" /> : null}
-							</PageWrapper>
+							{page ? (
+								<BlockContext.Provider value={{ block: page, setOnDragClick: () => {} }}>
+									{!isError ? <PageBar isModal={isModal} /> : null}
+									<PageWrapper page={page}>
+										{!isError && page ? (
+											<ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} />
+										) : null}
+										{editing ? <CreateBlockAtTheEnd parentId="page" /> : null}
+									</PageWrapper>
+								</BlockContext.Provider>
+							) : null}
 						</div>
 					</LeftDrawerWrapper>
 				</DevtoolsWrapper>

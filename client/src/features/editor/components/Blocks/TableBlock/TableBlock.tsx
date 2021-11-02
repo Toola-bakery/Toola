@@ -3,18 +3,15 @@ import JSONTree from 'react-json-tree';
 import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
-import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { usePageModal } from '../../../../pageModal/hooks/usePageModal';
+import { useBlock } from '../../../hooks/useBlock';
+import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
 import { useBlockSetState } from '../../../hooks/useBlockSetState';
-import { usePageNavigator } from '../../../../../hooks/usePageNavigator';
-import { usePage } from '../../Page/hooks/usePage';
 import { useTableBlockColumnsAndData } from './hooks/useTableBlockColumnsAndData';
 import { useTableColumnResizing } from './hooks/useTableColumnResizing';
 import { useTableInspector } from './hooks/useTableInspector';
-import { BasicBlock } from '../../../types/basicBlock';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useEditor } from '../../../hooks/useEditor';
 import { ColumnDnD } from './ColumnDnD';
 import { TablePagination } from './TablePagination';
 import { TableStyles } from './TableStyles';
@@ -49,14 +46,21 @@ export type TableBlockState = {
 	pageSize: number;
 };
 
-export function TableBlock({ block, hide }: { block: BasicBlock & TableBlockType; hide: boolean }) {
-	const { id, manualPagination, connectedPage } = block;
+export function TableBlock({ hide }: { hide: boolean }) {
+	const { id, show } = useBlock();
+
+	const [manualPagination] = useBlockProperty('manualPagination', false);
+	const [connectedPage] = useBlockProperty<string | undefined>('connectedPage');
+	const [, setColumns] = useBlockProperty<TableColumnsProp | undefined>('columns');
+
+	const [, setSelectedRow] = useBlockState<any>('selectedRow');
+
 	const {
 		editing,
 		page: { style },
 	} = usePageContext();
-	const { updateBlockState, immerBlockProps } = useEditor();
-	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData(block, editing);
+
+	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData();
 	const modalHistory = usePageModal();
 	const {
 		getTableProps,
@@ -86,17 +90,18 @@ export function TableBlock({ block, hide }: { block: BasicBlock & TableBlockType
 	useBlockSetState<TableBlockState>('pageIndex', pageIndex);
 	useBlockSetState<TableBlockState>('pageSize', pageSize);
 
-	const { onContextMenu, inspectorProps } = useTableInspector(block);
+	const { onContextMenu, inspectorProps } = useTableInspector();
 	useTableColumnResizing(columnResizing);
 
 	const addColumn = useCallback(() => {
-		immerBlockProps<TableBlockProps>(id, (draft) => {
-			if (!draft.columns) draft.columns = [];
-			draft.columns.push({ id: v4(), header: 'column', type: ColumnTypes.text, value: '' });
+		setColumns((draft) => {
+			const newColumn = { id: v4(), header: 'column', type: ColumnTypes.text, value: '' };
+			if (draft) draft.push(newColumn);
+			return [newColumn];
 		});
-	}, [id, immerBlockProps]);
+	}, [setColumns]);
 
-	if (hide || !block.show) return null;
+	if (hide || !show) return null;
 
 	return (
 		<>
@@ -143,7 +148,7 @@ export function TableBlock({ block, hide }: { block: BasicBlock & TableBlockType
 												const { isSelected } = row;
 												toggleAllRowsSelected(false);
 												if (!isSelected) row.toggleRowSelected();
-												updateBlockState({ id, selectedRow: isSelected ? null : row.original });
+												setSelectedRow(isSelected ? null : row.original);
 											}}
 											onDoubleClick={() => {
 												if (connectedPage) {

@@ -5,11 +5,11 @@ import { usePageContext } from '../../../../../executor/hooks/useReferences';
 import { InspectorPropsType } from '../../../../../inspector/hooks/useBlockInspectorState';
 import { getCaretGlobalPosition, getCaretIndex, getSelection } from '../../../../helpers/caretOperators';
 import { useBlock } from '../../../../hooks/useBlock';
+import { useBlockProperty } from '../../../../hooks/useBlockProperty';
 import { useEditor } from '../../../../hooks/useEditor';
 import { selectBlockNeighborsProps } from '../../../../redux/editor';
 import { addPlugin, commonPlugins, concatEntities, removePlugin, sliceEntities } from '../plugins/TextEntitiesMutation';
-import { TextEntityPlugins } from '../plugins/TextPlugins';
-import { TextBlockProps } from '../TextBlock';
+import { TextEntity, TextEntityPlugins } from '../plugins/TextPlugins';
 
 const CMD_KEY = '/';
 
@@ -20,10 +20,12 @@ export function useTextBlockOnKeyDownHandler({
 }: {
 	contentEditableRef: RefObject<HTMLElement>;
 	setToPosRef: MutableRefObject<[number, number] | number | null>;
-	inspectorProps: InspectorPropsType;
+	inspectorProps?: InspectorPropsType;
 }) {
 	const setToPosRef = _setToPosRef;
-	const { id, value, entities } = useBlock<TextBlockProps>();
+	const { id } = useBlock();
+	const [entities, setEntities] = useBlockProperty<TextEntity[]>('entities', []);
+	const [value, setValue] = useBlockProperty('value', '');
 	const { pageId } = usePageContext();
 	const { updateBlockProps, updateBlockType, addBlockAfter, deleteBlock } = useEditor();
 	const { previous } = useAppSelector((state) => selectBlockNeighborsProps(state, pageId, id));
@@ -46,7 +48,8 @@ export function useTextBlockOnKeyDownHandler({
 		const newBlock = plugins.find((p) => p[0] === plugin[0])
 			? removePlugin(valueRef.current, entitiesRef.current, [start, end - 1], plugin[0])
 			: addPlugin(valueRef.current, entitiesRef.current, [start, end - 1], plugin);
-		updateBlockProps({ id, value: newBlock[0], entities: newBlock[1] });
+		setValue(newBlock[0]);
+		setEntities(newBlock[1]);
 	}
 
 	const onKeyDownHandler: KeyboardEventHandler = (e) => {
@@ -80,7 +83,8 @@ export function useTextBlockOnKeyDownHandler({
 
 		if (e.key === CMD_KEY) {
 			const position = getCaretGlobalPosition();
-			if (position) inspectorPropsRef.current.open(position.left, position.top, ['Turn into']);
+			if (position && inspectorPropsRef?.current)
+				inspectorPropsRef.current.open(position.left, position.top, ['Turn into']);
 		}
 		if (e.key === 'Enter' && !e.shiftKey) {
 			const index = getCaretIndex(contentEditableRef.current);
@@ -96,7 +100,8 @@ export function useTextBlockOnKeyDownHandler({
 				},
 				0,
 			);
-			updateBlockProps({ id, value: thisBlock[0], entities: thisBlock[1] });
+			setValue(thisBlock[0]);
+			setEntities(thisBlock[1]);
 			e.preventDefault();
 		}
 		if (e.key === 'Backspace') {
