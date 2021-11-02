@@ -43,6 +43,7 @@ export function CodeHints({ hints, onSelect }: { onSelect: (value: string | null
 				top: 3,
 				display: hints.length ? 'block' : 'none',
 				boxShadow: '0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%), 0 8px 24px rgb(17 20 24 / 20%)',
+				zIndex: 999,
 			}}
 		>
 			{hints.map((hint) => (
@@ -107,7 +108,7 @@ export function CodeInput({
 
 	const filteredSuggestions = useMemo(() => {
 		if (!isReference) return [];
-		return suggestions.filter((v) => v.value.startsWith(currentWord));
+		return suggestions.filter((v) => v.value.startsWith(currentWord) && v.value !== currentWord);
 	}, [isReference, suggestions, currentWord]);
 
 	return (
