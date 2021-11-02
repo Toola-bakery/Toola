@@ -3,6 +3,7 @@ import { Draft } from 'immer/dist/types/types-external';
 import { useCallback } from 'react';
 import { AppToaster } from '../../../components/Toaster';
 import { store } from '../../../redux';
+import { ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { useCurrent } from './useCurrent';
 import { DeleteBlockEvent } from './useDeleteBlockHook';
 import { useEvents, Event } from './useEvents';
@@ -198,18 +199,27 @@ export function useEditor(): UseEditorResponse {
 
 			const newBlock = BlockCreators[type] ? BlockCreators[type](block) : { ...block, type };
 
-			const [{ id: newId }] = addBlocks([
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				{ ...newBlock, ...(typeof typeOrBlock === 'string' ? {} : typeOrBlock), pageId, parentId, type },
-			]);
+			const [{ id: newId, blocks: maybeBlocks }] = addBlocks([
+				{
+					...newBlock,
+					...(typeof typeOrBlock === 'string' ? {} : typeOrBlock),
+					pageId,
+					parentId,
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					type,
+				},
+			]) as (BasicBlock & ColumnBlockType)[]; // to fix type error
 
 			if (newId !== blockId) {
 				if (parentId) addChildInsteadOf(blockId, newId);
 				deleteBlock(blockId);
+				if (Array.isArray(maybeBlocks)) {
+					maybeBlocks.forEach(() => updateParentId(blockId, newId));
+				}
 			}
 		},
-		[addBlocks, pageId, addChildInsteadOf, deleteBlock],
+		[pageId, addBlocks, addChildInsteadOf, deleteBlock, updateParentId],
 	);
 
 	const updateBlockId = useCallback<UseEditorResponse['updateBlockId']>(
