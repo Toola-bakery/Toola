@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useCurrent } from '../../../hooks/useCurrent';
 import { Block } from '../../Block/Block';
 import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
@@ -11,15 +12,12 @@ export type ColumnBlockType = ColumnBlockProps;
 export type ColumnBlockProps = { type: 'column'; blocks: string[] };
 
 export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockType; fake?: boolean }) {
-	const { blocks, pageId } = usePageContext();
+	const { pageId } = usePageContext();
+	const { blocks } = useCurrent();
 	const { moveBlockAfterId, addChild } = useEditor();
 
 	const elements = useMemo(() => {
 		return block.blocks?.map((blockKey) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			if (block.type === 'card') console.log({ blockKey });
-			else console.log(blocks[blockKey], { blockKey, type: block.type });
 			return (
 				<div key={`${blocks[blockKey].id}`}>
 					{(() => {
@@ -41,7 +39,7 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 				</div>
 			);
 		});
-	}, [block.blocks, block.id, block.type, blocks, fake, moveBlockAfterId, pageId]);
+	}, [block.blocks, block.id, blocks, fake, moveBlockAfterId, pageId]);
 
 	if (!block.show) return null;
 

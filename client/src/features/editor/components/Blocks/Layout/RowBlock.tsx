@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import { useCurrent } from '../../../hooks/useCurrent';
 import { Block } from '../../Block/Block';
 import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
@@ -22,8 +23,8 @@ function addAfterEachElement<T, R>(array: T[], get: (perviousEl: T) => R) {
 }
 
 export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlockType; fake?: boolean }) {
-	const { blocks, pageId } = usePageContext();
-
+	const { pageId } = usePageContext();
+	const { blocks } = useCurrent();
 	const { addBlocks, addChildInsteadOf, addChildAfterId, addChild } = useEditor();
 
 	const addColumnAfterAndPutItem = useCallback(

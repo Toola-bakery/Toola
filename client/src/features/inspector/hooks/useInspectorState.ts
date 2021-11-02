@@ -31,6 +31,7 @@ export function useInspectorState({ disabled = false, menu }: UseInspectorStateO
 			if (isOpenRef.current) return;
 			open(e.pageX - window.scrollX, e.pageY - window.scrollY, _path);
 			e.preventDefault();
+			e.stopPropagation();
 		},
 		[disabled, isOpenRef, open],
 	);

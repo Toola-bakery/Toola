@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { evalGet } from '../../executor/hooks/useWatchList';
 import { useWS } from '../../ws/hooks/useWS';
+import { useCurrent } from './useCurrent';
 import { useEventListener } from './useEvents';
 
 export type SateGetEvent = {
@@ -23,7 +24,8 @@ export type PageCallEvent = {
 
 export function useStateToWS() {
 	const { sendWS } = useWS();
-	const { blocks, blocksMethods, globals, pageId } = usePageContext();
+	const { globals, pageId } = usePageContext();
+	const { blocks, blocksMethods } = useCurrent();
 	useEventListener<SateGetEvent>(
 		`ws/page.getState`,
 		(event) => {

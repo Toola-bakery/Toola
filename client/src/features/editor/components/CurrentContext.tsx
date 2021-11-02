@@ -1,24 +1,35 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMap } from '../../../../../hooks/useMap';
-import { useAppSelector } from '../../../../../redux/hooks';
-import { selectBlocksProps } from '../../../redux/editor';
-import { BasicBlock } from '../../../types/basicBlock';
-import { BlockMethods, BlockProps, Blocks, BlockStates } from '../../../types/blocks';
+import { createContext, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
+import { useMap } from '../../../hooks/useMap';
+import { usePageContext } from '../../executor/hooks/useReferences';
+import { useCurrent } from '../hooks/useCurrent';
+import { BasicBlock } from '../types/basicBlock';
+import { BlockMethods, BlockProps, Blocks, BlockStates } from '../types/blocks';
 
-declare global {
-	interface Window {
-		blocks: { [p: string]: BasicBlock & Blocks };
-	}
-}
+export const CurrentContext = createContext<{ current: any } & ReturnType<typeof useCurrentBlocks>>({
+	current: undefined,
+	blocks: {},
+	deleteBlockMethods: () => {},
+	setBlockMethods: () => {},
+	setBlockState: () => {},
+	blocksMethods: {},
+	blocksState: {},
+	blocksProps: {},
+});
 
-export function useBlocks(pageId: string, options: { editing: boolean; isDevtoolsOpen: string | boolean }) {
+function useCurrentBlocks() {
+	const { blocksState: parentBlocksState, setBlockState: parentSetBlockState } = useCurrent();
+	const { pageId, blocksProps, editing, isDevtoolsOpen } = usePageContext();
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
 
 	const [blocksState, setBlockState] = useState<{ [id: string]: BlockStates }>({});
-	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
-
 	const [blocksMethods, setMethods] = useState<{ [blockId: string]: BlockMethods }>({});
+
+	const mergedBlocksState = useMemo(
+		() => ({ ...parentBlocksState, ...blocksState }),
+		[blocksState, parentBlocksState],
+	) as { [p: string]: BlockStates };
+
 	useEffect(() => {
 		return () => {
 			setBlockState({});
@@ -45,11 +56,10 @@ export function useBlocks(pageId: string, options: { editing: boolean; isDevtool
 		Object.keys(blocksProps).forEach((blockId) => {
 			const particles = blockParticles.get(blockId);
 			const newProps = blocksProps[blockId];
-			const newState = blocksState[blockId] || null;
+			const newState = mergedBlocksState[blockId] || null;
 			const newMethods = blocksMethods[blockId] || null;
 
-			const newShow =
-				newProps.parentId === 'queries' ? !!options.isDevtoolsOpen : options.editing || !newProps.display?.hide;
+			const newShow = newProps.parentId === 'queries' ? !!isDevtoolsOpen : editing || !newProps.display?.hide;
 
 			if (particles) {
 				const [oldProps, oldState, oldMethods] = particles;
@@ -71,11 +81,20 @@ export function useBlocks(pageId: string, options: { editing: boolean; isDevtool
 			blockParticles.set(blockId, [newProps, newState, newMethods]);
 		});
 		return response;
-	}, [blockParticles, blocksMethods, blocksProps, blocksState, options.editing, options.isDevtoolsOpen, joinedBlock]);
+	}, [blockParticles, blocksMethods, blocksProps, mergedBlocksState, editing, isDevtoolsOpen, joinedBlock]);
 
-	useEffect(() => {
-		window.blocks = blocks;
-	}, [blocks]);
+	return {
+		blocks,
+		deleteBlockMethods,
+		setBlockMethods,
+		blocksProps,
+		blocksMethods,
+		blocksState: mergedBlocksState,
+		setBlockState,
+	};
+}
 
-	return { deleteBlockMethods, setBlockMethods, blocks, blocksMethods, blocksState, setBlockState, blocksProps };
+export function CurrentContextProvider({ current, children }: PropsWithChildren<{ current: any }>) {
+	const context = useCurrentBlocks();
+	return <CurrentContext.Provider value={{ current, ...context }}>{children}</CurrentContext.Provider>;
 }

@@ -13,6 +13,7 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 	['Heading 2', { type: 'text', style: 'heading2' }],
 	['Heading 3', { type: 'text', style: 'heading3' }],
 	['Card', 'card'],
+	['List', 'list'],
 	['Code', 'code'],
 	['Query', 'query'],
 	['Page', 'subpage'],
@@ -37,7 +38,6 @@ export function useBlockInspectorState(
 	menuConfig: ((defaultMenu: MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],
 ) {
 	const { editing } = usePageContext();
-
 	const { id, display } = useBlock();
 	const { setOnDragClick } = useBlockWrapperController();
 	const { deleteBlock, immerBlockProps, updateBlockType, updateBlockId } = useEditor();

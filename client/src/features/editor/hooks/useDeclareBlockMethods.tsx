@@ -1,13 +1,14 @@
 import { DependencyList, useEffect, useMemo } from 'react';
 import { BlockMethods } from '../types/blocks';
 import { usePageContext } from '../../executor/hooks/useReferences';
+import { useCurrent } from './useCurrent';
 
 export function useDeclareBlockMethods<T extends BlockMethods = BlockMethods>(
 	blockId: string,
 	methods: T,
 	deps: DependencyList,
 ) {
-	const { deleteBlockMethods, setBlockMethods } = usePageContext();
+	const { deleteBlockMethods, setBlockMethods } = useCurrent();
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const memMethods = useMemo(() => methods, deps);
 

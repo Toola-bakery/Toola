@@ -1,6 +1,7 @@
 import { H3 } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
 import JSONTree from 'react-json-tree';
+import { useCurrent } from '../../../editor/hooks/useCurrent';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 
 const THEME = {
@@ -25,7 +26,8 @@ const THEME = {
 };
 
 export function GlobalsTab() {
-	const { blocks, globals } = usePageContext();
+	const { globals } = usePageContext();
+	const { blocks } = useCurrent();
 
 	const displayBlocks = useMemo(() => {
 		const regexp = /^(column|row)\d+$/;

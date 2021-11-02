@@ -4,15 +4,18 @@ import { Helmet } from 'react-helmet';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
-import { useAppDispatch } from '../../../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { DevtoolsWrapper } from '../../../devtools/components/DevtoolsWrapper';
 import { LeftDrawerWrapper } from '../../../drawer/components/LeftDrawerWrapper';
+import { usePageContext } from '../../../executor/hooks/useReferences';
+import { useCurrent } from '../../hooks/useCurrent';
 import { useIsDevtoolsOpen } from '../../hooks/useIsDevtoolsOpen';
-import { useBlocks } from './hooks/useBlocks';
+import { BlockProps } from '../../types/blocks';
+import { CurrentContextProvider } from '../CurrentContext';
 import { usePage } from './hooks/usePage';
 import { useIsEditing } from '../../hooks/useIsEditing';
 import { useStateToWS } from '../../hooks/useStateToWS';
-import { setPage } from '../../redux/editor';
+import { selectBlocksProps, setPage } from '../../redux/editor';
 import { Block, BlockContext } from '../Block/Block';
 import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
@@ -38,17 +41,13 @@ export type PageContextType = {
 	editing: boolean;
 	setEditing: (value: boolean) => void;
 	isDevtoolsOpen: string | false;
-} & ReturnType<typeof useBlocks>;
+	blocksProps: { [p: string]: BlockProps & BasicBlock };
+	isModal: boolean;
+};
 
 export const PageContext = React.createContext<PageContextType>({
-	blocks: {},
-	deleteBlockMethods: () => {},
-	setBlockMethods: () => {},
-	blocksMethods: {},
 	globals: { pageId: '' },
 	pageId: '',
-	setBlockState: () => {},
-	blocksState: {},
 	page: {
 		id: '',
 		title: 'Untitled',
@@ -64,11 +63,70 @@ export const PageContext = React.createContext<PageContextType>({
 	setEditing: () => {},
 	blocksProps: {},
 	isDevtoolsOpen: false,
+	isModal: false,
 });
 
 function WSHandler() {
 	useStateToWS();
 	return null;
+}
+
+function PageBlock({ isError }: { isError: boolean }) {
+	const { isModal, editing } = usePageContext();
+	const { blocks } = useCurrent();
+	const { navigate } = usePageNavigator();
+
+	const page = blocks?.page as BasicBlock & PageBlockType;
+
+	const hiddenBlocks = useMemo(() => {
+		return Object.values(blocks).filter((block) => !block.show);
+	}, [blocks]);
+
+	return (
+		<DndProvider backend={HTML5Backend}>
+			<WSHandler />
+			<Helmet title={page?.title} />
+			<DevtoolsWrapper>
+				<LeftDrawerWrapper hide={isModal}>
+					<div
+						style={{
+							width: '100%',
+							height: '100%',
+							overflowX: 'clip',
+							overflowY: 'hidden',
+							display: 'flex',
+							flex: 1,
+							flexDirection: 'column',
+						}}
+					>
+						{isError ? (
+							<NonIdealState
+								icon="search"
+								title="Page not found"
+								action={<Button text="Back home" onClick={() => navigate('')} />}
+							/>
+						) : null}
+						{page ? (
+							<BlockContext.Provider value={{ block: page, setOnDragClick: () => {} }}>
+								{!isError ? <PageBar isModal={isModal} /> : null}
+								<PageWrapper page={page}>
+									{!isError && page ? (
+										<ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} />
+									) : null}
+									{editing ? <CreateBlockAtTheEnd parentId="page" /> : null}
+								</PageWrapper>
+							</BlockContext.Provider>
+						) : null}
+					</div>
+				</LeftDrawerWrapper>
+			</DevtoolsWrapper>
+			<div>
+				{hiddenBlocks.map((block) => (
+					<Block key={block.id} block={block} />
+				))}
+			</div>
+		</DndProvider>
+	);
 }
 
 export function Page({
@@ -81,14 +139,8 @@ export function Page({
 	isModal?: boolean;
 }): JSX.Element {
 	const dispatch = useAppDispatch();
-	const { editing, setEditing } = useIsEditing();
-	const { isDevtoolsOpen, setDevtoolsOpen } = useIsDevtoolsOpen();
-	const { navigate } = usePageNavigator();
 
-	const { blocks, deleteBlockMethods, setBlockMethods, blocksMethods, setBlockState, blocksState, blocksProps } =
-		useBlocks(pageId, { editing, isDevtoolsOpen });
-
-	const page = blocks?.page as BasicBlock & PageBlockType;
+	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 
 	const { isError, isSuccess, data } = usePage(pageId);
 
@@ -98,88 +150,30 @@ export function Page({
 
 	usePageBlockPropsMutation(pageId, blocksProps);
 
-	const hiddenBlocks = useMemo(() => {
-		return Object.values(blocks).filter((block) => !block.show);
-	}, [blocks]);
+	const { editing, setEditing } = useIsEditing();
+	const { isDevtoolsOpen } = useIsDevtoolsOpen();
+
+	const page = blocksProps?.page as BasicBlock & PageBlockType;
 
 	const value = useMemo<PageContextType>(
 		() => ({
-			blocks,
 			pageId,
-			globals: { pageId, pageParams },
+			globals: { pageId, pageParams, isModal },
 			page,
-			deleteBlockMethods,
-			setBlockMethods,
-			blocksState,
-			setBlockState,
-			blocksMethods,
 			editing,
 			setEditing,
 			blocksProps,
 			isDevtoolsOpen,
+			isModal,
 		}),
-		[
-			blocks,
-			isDevtoolsOpen,
-			editing,
-			setEditing,
-			pageId,
-			pageParams,
-			page,
-			deleteBlockMethods,
-			setBlockMethods,
-			blocksState,
-			setBlockState,
-			blocksMethods,
-			blocksProps,
-		],
+		[isDevtoolsOpen, editing, setEditing, pageId, pageParams, page, blocksProps, isModal],
 	);
 
 	return (
-		<DndProvider backend={HTML5Backend}>
-			<PageContext.Provider value={value}>
-				<WSHandler />
-				<Helmet title={page?.title} />
-				<DevtoolsWrapper>
-					<LeftDrawerWrapper hide={isModal}>
-						<div
-							style={{
-								width: '100%',
-								height: '100%',
-								overflowX: 'clip',
-								overflowY: 'hidden',
-								display: 'flex',
-								flex: 1,
-								flexDirection: 'column',
-							}}
-						>
-							{isError ? (
-								<NonIdealState
-									icon="search"
-									title="Page not found"
-									action={<Button text="Back home" onClick={() => navigate('')} />}
-								/>
-							) : null}
-							{page ? (
-								<BlockContext.Provider value={{ block: page, setOnDragClick: () => {} }}>
-									{!isError ? <PageBar isModal={isModal} /> : null}
-									<PageWrapper page={page}>
-										{!isError && page ? (
-											<ColumnBlock fake block={page as unknown as BasicBlock & ColumnBlockType} />
-										) : null}
-										{editing ? <CreateBlockAtTheEnd parentId="page" /> : null}
-									</PageWrapper>
-								</BlockContext.Provider>
-							) : null}
-						</div>
-					</LeftDrawerWrapper>
-				</DevtoolsWrapper>
-				<div>
-					{hiddenBlocks.map((block) => (
-						<Block key={block.id} block={block} />
-					))}
-				</div>
-			</PageContext.Provider>
-		</DndProvider>
+		<PageContext.Provider value={value}>
+			<CurrentContextProvider current={undefined}>
+				<PageBlock isError={isError} />
+			</CurrentContextProvider>
+		</PageContext.Provider>
 	);
 }

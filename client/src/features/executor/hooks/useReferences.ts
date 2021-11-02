@@ -1,5 +1,6 @@
 import { useCallback, useContext, useMemo, useRef } from 'react';
 import { PageContext } from '../../editor/components/Page/Page';
+import { useCurrent } from '../../editor/hooks/useCurrent';
 import { useWatchList, WatchListProps } from './useWatchList';
 
 export function usePageContext() {
@@ -15,8 +16,8 @@ export function useReferenceEvaluator({
 	watchReferences?: boolean;
 	watchListProps?: WatchListProps;
 } = {}) {
-	const { blocks, globals } = usePageContext();
-
+	const { globals } = usePageContext();
+	const { blocks } = useCurrent();
 	const { watchList, isLoading, addToWatchList, setOnUpdate } = useWatchList({
 		syncWithBlockProps,
 		...watchListProps,
@@ -27,9 +28,9 @@ export function useReferenceEvaluator({
 	const updateId = useCallback(() => {
 		watchId.current = (watchId.current || 0) + 1;
 	}, [watchId]);
-
+	const { current: currentContext } = useCurrent();
 	const evaluate = useCallback(
-		(sourceCode: string, current?: unknown) => {
+		(sourceCode: string, current: unknown = currentContext) => {
 			const myWatchId = watchId.current;
 			const blockProxy = new Proxy(blocks, {
 				get: (target1, key1: string) => {
@@ -67,7 +68,7 @@ export function useReferenceEvaluator({
 				return e.message;
 			}
 		},
-		[addToWatchList, blocks, globals, updateId, watchReferences],
+		[addToWatchList, blocks, currentContext, globals, updateId, watchReferences],
 	);
 
 	return { evaluate, watchList, isLoading, setOnUpdate };
@@ -77,7 +78,7 @@ export function useReferences<T extends string | string[]>(_sourceCode: T): T {
 	return useMemo(() => {
 		try {
 			const references = (Array.isArray(_sourceCode) ? _sourceCode : [_sourceCode]).map((v) => v.trim());
-			const calculatedReferences = references.map(evaluate);
+			const calculatedReferences = references.map((i) => evaluate(i));
 			return Array.isArray(_sourceCode) ? calculatedReferences : calculatedReferences[0];
 		} catch (e) {
 			return e;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePrevious } from '../../../hooks/usePrevious';
 import { useBlock } from '../../editor/hooks/useBlock';
+import { useCurrent } from '../../editor/hooks/useCurrent';
 import { useEditor } from '../../editor/hooks/useEditor';
 import { usePageContext } from './useReferences';
 
@@ -34,7 +35,8 @@ export function useWatchList({
 	onUpdate: onUpdateInitial,
 	syncWithBlockProps,
 }: WatchListProps = {}) {
-	const { blocks, pageId, globals } = usePageContext();
+	const { pageId, globals } = usePageContext();
+	const { blocks } = useCurrent();
 	const [watchListObj, setWatchListObj] = useState<WatchListObj>(() =>
 		initialList.reduce((acc, v) => ({ ...acc, [watchListKeyGetter(v)]: v }), {}),
 	);

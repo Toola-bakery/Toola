@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { DropTarget } from '../../../editor/components/Blocks/Layout/DropTarget';
 import { PageBlockProps } from '../../../editor/components/Page/Page';
 import { useBlockDrag } from '../../../editor/hooks/useBlockDrag';
+import { useCurrent } from '../../../editor/hooks/useCurrent';
 import { useEditor } from '../../../editor/hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 
@@ -17,7 +18,7 @@ function QueryMenuItem({
 	setActiveBlock: (blockId: string) => void;
 	onDrop: (afterBlockId: string | null, event: { id: string }) => void;
 }) {
-	const { blocks } = usePageContext();
+	const { blocks } = useCurrent();
 	const [{ opacity }, dragRef] = useBlockDrag(blocks[blockId]);
 	return (
 		<>

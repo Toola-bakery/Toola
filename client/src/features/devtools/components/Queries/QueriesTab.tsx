@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { usePrevious } from '../../../../hooks/usePrevious';
 import { Block } from '../../../editor/components/Block/Block';
+import { useCurrent } from '../../../editor/hooks/useCurrent';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { QueryList } from './QueryList';
 
 export function QueriesTab() {
-	const { blocks, page, pageId } = usePageContext();
+	const { page, pageId } = usePageContext();
+	const { blocks } = useCurrent();
 	const [activeBlockId, setActiveBlockId] = useState<string | undefined>(page?.queries?.[0]);
 	const queries = page?.queries || [];
 	const defaultQuery = queries[0];

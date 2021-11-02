@@ -3,6 +3,7 @@ import { Draft } from 'immer/dist/types/types-external';
 import { useCallback } from 'react';
 import { AppToaster } from '../../../components/Toaster';
 import { store } from '../../../redux';
+import { useCurrent } from './useCurrent';
 import { DeleteBlockEvent } from './useDeleteBlockHook';
 import { useEvents, Event } from './useEvents';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -57,8 +58,8 @@ export function useEditor(): UseEditorResponse {
 
 	const {
 		globals: { pageId },
-		setBlockState,
 	} = usePageContext();
+	const { setBlockState } = useCurrent();
 
 	const dispatch = useAppDispatch();
 

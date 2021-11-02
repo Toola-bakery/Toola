@@ -2,6 +2,7 @@ import { parse } from 'flatted';
 import { useCallback, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 import { useRefsLatest } from '../../../hooks/useRefLatest';
+import { useCurrent } from '../../editor/hooks/useCurrent';
 import { useEventListener } from '../../editor/hooks/useEvents';
 import { usePageContext } from './useReferences';
 import { SateGetEvent } from '../../editor/hooks/useStateToWS';
@@ -37,8 +38,8 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value,
 		syncWithBlockProps: true,
 	});
 
-	const { blocks, globals } = usePageContext();
-
+	const { globals } = usePageContext();
+	const { blocks } = useCurrent();
 	useEventListener<FunctionExecutorAction>(
 		`ws/${UUID}`,
 		(event) => {

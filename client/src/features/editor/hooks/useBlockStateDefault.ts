@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useCurrent } from './useCurrent';
 import { useEditor } from './useEditor';
 import { usePageContext } from '../../executor/hooks/useReferences';
 
@@ -7,7 +8,8 @@ export function useBlockStateDefault<T>(
 	blockId: string,
 	_pageId?: string,
 ) {
-	const { pageId: pageIdContext, blocksState } = usePageContext();
+	const { pageId: pageIdContext } = usePageContext();
+	const { blocksState } = useCurrent();
 	const pageId = _pageId || pageIdContext;
 	const [previousPageId, setPreviousPageId] = useState<string | null>(null);
 
