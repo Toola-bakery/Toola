@@ -17,7 +17,7 @@ export type ButtonBlockProps = {
 export function ButtonBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const [value, setValue] = useBlockProperty('value', '');
-	const [name, setName] = useBlockProperty('value', '');
+	const [name, setName] = useBlockProperty('name', '');
 	const { evaluate } = useReferenceEvaluator();
 	const nameRef = useReferences(name);
 

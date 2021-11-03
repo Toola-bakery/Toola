@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import styled from 'styled-components';
 import { TextInput } from '../../../ui/components/TextInput';
 import { useDeclareBlockMethods } from '../../hooks/useDeclareBlockMethods';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
@@ -18,6 +19,12 @@ export type InputBlockState = {
 	value?: string;
 };
 export type InputBlockMethods = { setValue: (value: string) => void };
+
+const StyledInput = styled.div`
+	.bp4-form-group {
+		margin-bottom: 0;
+	}
+`;
 
 export function InputBlock({ block, hide }: { block: BasicBlock & InputBlockType; hide: boolean }) {
 	const { id, value, pageId, label, initialValue } = block;
@@ -59,7 +66,7 @@ export function InputBlock({ block, hide }: { block: BasicBlock & InputBlockType
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
-			<div onContextMenu={onContextMenu}>
+			<StyledInput onContextMenu={onContextMenu}>
 				<TextInput
 					label={label}
 					fill
@@ -70,7 +77,7 @@ export function InputBlock({ block, hide }: { block: BasicBlock & InputBlockType
 						setValue(e.target.value);
 					}}
 				/>
-			</div>
+			</StyledInput>
 		</>
 	);
 }

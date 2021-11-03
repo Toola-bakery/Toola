@@ -14,14 +14,15 @@ import { useTextBlockOnKeyDownHandler } from './hooks/useTextBlockOnKeyDownHandl
 
 export type TextBlockType = TextBlockProps;
 
-export type TextBlockStyles = 'text' | 'heading1' | 'heading2' | 'heading3';
-
 const textBlockStyleTag = {
 	text: 'p',
 	heading1: 'h1',
 	heading2: 'h2',
 	heading3: 'h3',
+	heading4: 'h4',
 };
+
+export type TextBlockStyles = keyof typeof textBlockStyleTag;
 
 export type TextBlockProps = {
 	type: 'text';
@@ -111,7 +112,7 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 				innerRef={contentEditableRef}
 				html={isFocused ? htmlValue : htmlString}
 				tagName={textBlockStyleTag[style || 'text']}
-				style={{ margin: 0, paddingTop: 1, marginBottom: 9, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+				style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
 			/>
