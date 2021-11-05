@@ -15,6 +15,7 @@ export function ResourcesList() {
 				<thead>
 					<tr>
 						<th>Resource name</th>
+						<th>Resource id</th>
 						<th>Database type</th>
 						<th>Database name</th>
 						<th>Created</th>
@@ -25,6 +26,7 @@ export function ResourcesList() {
 						return (
 							<tr key={database._id}>
 								<td>{database.name}</td>
+								<td>{database._id}</td>
 								<td>{database.type}</td>
 								<td>{database.dbName}</td>
 								<td>{database.name}</td>

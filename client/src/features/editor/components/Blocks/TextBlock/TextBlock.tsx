@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import styled from 'styled-components';
 import { getCaretIndex, getRange, getSelection, setCaretPosition } from '../../../helpers/caretOperators';
 import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { useEditor } from '../../../hooks/useEditor';
@@ -32,6 +33,14 @@ export type TextBlockProps = {
 };
 
 const BR_TAG = /<br\s*\/?>/ms;
+
+const StyledContentEditable = styled.div`
+	[contenteditable]:empty:after,
+	.forcePlaceholder:after {
+		color: rgba(55, 53, 47, 0.4);
+		content: attr(placeholder);
+	}
+`;
 
 export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; hide: boolean }) {
 	const { id } = block;
@@ -91,31 +100,44 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 	);
 
 	const html = useReferences(isFocused ? '' : htmlValue);
+
+	useEffect(() => {
+		const currentRef = contentEditableRef.current;
+		if (isFocused && !value) {
+			currentRef?.setAttribute('placeholder', "Type '/' for components");
+		} else {
+			currentRef?.setAttribute('placeholder', '');
+		}
+	}, [isFocused, value]);
+
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
+
 	if (hide || !block.show) return null;
 
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
-			<ContentEditable
-				disabled={!editing}
-				onContextMenu={(e) => {
-					if (contentEditableRef.current) {
-						const [n1, n2] = getSelection(contentEditableRef.current);
-						if (n1 !== n2) return;
-					}
-					onContextMenu(e);
-				}}
-				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
-				onFocus={() => setIsFocused(true)}
-				onBlur={() => setIsFocused(false)}
-				innerRef={contentEditableRef}
-				html={isFocused ? htmlValue : htmlString}
-				tagName={textBlockStyleTag[style || 'text']}
-				style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-				onChange={onChangeHandler}
-				onKeyDown={onKeyDownHandler}
-			/>
+			<StyledContentEditable>
+				<ContentEditable
+					disabled={!editing}
+					onContextMenu={(e) => {
+						if (contentEditableRef.current) {
+							const [n1, n2] = getSelection(contentEditableRef.current);
+							if (n1 !== n2) return;
+						}
+						onContextMenu(e);
+					}}
+					className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
+					onFocus={() => setIsFocused(true)}
+					onBlur={() => setIsFocused(false)}
+					innerRef={contentEditableRef}
+					html={isFocused ? htmlValue : htmlString}
+					tagName={textBlockStyleTag[style || 'text']}
+					style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+					onChange={onChangeHandler}
+					onKeyDown={onKeyDownHandler}
+				/>
+			</StyledContentEditable>
 		</>
 	);
 }
