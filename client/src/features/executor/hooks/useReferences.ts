@@ -73,7 +73,7 @@ export function useReferenceEvaluator({
 
 	return { evaluate, watchList, isLoading, setOnUpdate };
 }
-export function useReferences<T extends string | string[]>(_sourceCode: T): T {
+export function useReferences<T extends string | string[]>(_sourceCode: T): T | any {
 	const { evaluate } = useReferenceEvaluator();
 	return useMemo(() => {
 		try {
