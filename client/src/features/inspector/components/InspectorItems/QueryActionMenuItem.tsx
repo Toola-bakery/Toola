@@ -1,7 +1,7 @@
 import { MenuItem, Button, FormGroup } from '@blueprintjs/core';
 import { Select } from '@blueprintjs/select';
 import React, { useMemo } from 'react';
-import { Database, DatabaseAction, useDatabases } from '../../../resources/hooks/useDatabases';
+import { Database, DatabaseAction, useResources } from '../../../resources/hooks/useResources';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type QueryActionMenuItemProps = BasicItemProps & {
@@ -18,7 +18,7 @@ export function QueryActionMenuItem({
 	Wrapper = MenuItem,
 	inline,
 }: InspectorItemProps<QueryActionMenuItemProps>) {
-	const { data } = useDatabases();
+	const { data } = useResources();
 
 	const { databaseId, value, onChange, label, icon } = item;
 

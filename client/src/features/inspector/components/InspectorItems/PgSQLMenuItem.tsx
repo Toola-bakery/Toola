@@ -1,6 +1,7 @@
 import { FormGroup, MenuItem } from '@blueprintjs/core';
 import Editor from '@monaco-editor/react';
 import React from 'react';
+import { MonacoEditorStyled } from '../../../../components/MonacoEditorStyled';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 import { CodeInput } from '../CodeInput';
 
@@ -29,9 +30,14 @@ export function PgSQLMenuItem({ item, Wrapper = MenuItem, inline }: InspectorIte
 			icon={item.icon}
 			text={
 				<FormGroup label={item.label} inline={inline}>
-					<Editor
-						height="50vh"
+					<MonacoEditorStyled
+						height="300px"
 						defaultValue={item.value}
+						options={{
+							minimap: { enabled: false },
+							scrollBeyondLastLine: false,
+							scrollbar: { vertical: 'hidden', useShadows: false },
+						}}
 						onChange={(v) => typeof v !== 'undefined' && item.onChange(v)}
 						language="pgsql"
 					/>

@@ -1,25 +1,11 @@
-import Editor, { OnChange } from '@monaco-editor/react';
+import { OnChange } from '@monaco-editor/react';
 import Monaco from 'monaco-editor';
 import React, { useCallback, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
-import styled from 'styled-components';
+import { MonacoEditorStyled } from '../../../../../components/MonacoEditorStyled';
 import { useBlock } from '../../../hooks/useBlock';
 import { useBlockProperty } from '../../../hooks/useBlockProperty';
-import { useEditor } from '../../../hooks/useEditor';
-import { CodeBlockType } from './CodeBlock';
 import { setupMonaco } from './setupMonaco';
-
-const MonacoEditorStyled = styled.div`
-	.monaco-editor {
-		z-index: 9999999;
-		.rename-box {
-			top: 0;
-		}
-		.view-overlays .current-line {
-			border: none !important;
-		}
-	}
-`;
 
 export function MonacoEditor({
 	onEditorMount,
@@ -49,8 +35,8 @@ export function MonacoEditor({
 	// );
 
 	return (
-		<MonacoEditorStyled style={{ height: parentId === 'queries' ? 'calc(100%)' : undefined }} ref={blockRef}>
-			<Editor
+		<div style={{ height: parentId === 'queries' ? 'calc(100%)' : undefined }} ref={blockRef}>
+			<MonacoEditorStyled
 				height={parentId === 'queries' ? height || 20 : 250}
 				options={{
 					minimap: { enabled: false },
@@ -96,6 +82,6 @@ export const pageState: {
 				}}
 				language="javascript"
 			/>
-		</MonacoEditorStyled>
+		</div>
 	);
 }

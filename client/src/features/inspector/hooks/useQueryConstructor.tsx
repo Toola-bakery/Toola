@@ -45,7 +45,6 @@ export function useQueryConstructor<T = any>(properties: QueryProperties, initia
 					onChange,
 				};
 
-			console.log({ type });
 			if (['pgSQL', 'database', 'switch'].includes(type))
 				return {
 					type,

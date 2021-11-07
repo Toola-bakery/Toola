@@ -5,7 +5,7 @@ import React, { useRef, useCallback } from 'react';
 import safeStringify from 'json-stringify-safe';
 import styled from 'styled-components';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
-import { useBlockSetState } from '../../../hooks/useBlockSetState';
+import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { WatchList } from '../../../../executor/hooks/useWatchList';
@@ -56,6 +56,7 @@ const CodeBlockStyles = styled.div`
 		align-items: center;
 	}
 `;
+
 export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	const { id, value, manualControl, watchList: watchListProp } = block;
 	const { updateBlockProps } = useEditor();
@@ -66,9 +67,9 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 		watchListProp,
 	});
 
-	useBlockSetState<CodeBlockState>('result', result);
-	useBlockSetState<CodeBlockState>('logs', logs);
-	useBlockSetState<CodeBlockState>('loading', loading);
+	useSyncBlockState<CodeBlockState>('result', result);
+	useSyncBlockState<CodeBlockState>('logs', logs);
+	useSyncBlockState<CodeBlockState>('loading', loading);
 
 	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
 

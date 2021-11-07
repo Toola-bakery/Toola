@@ -7,7 +7,7 @@ import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { usePageModal } from '../../../../pageModal/hooks/usePageModal';
 import { useBlock } from '../../../hooks/useBlock';
 import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
-import { useBlockSetState } from '../../../hooks/useBlockSetState';
+import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useTableBlockColumnsAndData } from './hooks/useTableBlockColumnsAndData';
 import { useTableColumnResizing } from './hooks/useTableColumnResizing';
 import { useTableInspector } from './hooks/useTableInspector';
@@ -20,7 +20,7 @@ export type TableBlockType = TableBlockProps & TableBlockState;
 export type TableBlockProps = {
 	type: 'table';
 	value: string;
-	columns?: TableColumnsProp;
+	columns?: TableColumnProp[];
 	manualPagination: boolean;
 	connectedPage?: string;
 };
@@ -31,13 +31,14 @@ export enum ColumnTypes {
 	text = 'text',
 }
 
-export type TableColumnsProp = {
+export type TableColumnProp = {
 	id: string;
 	header: string;
 	value: string;
 	width?: number;
 	type?: ColumnTypes;
-}[];
+	custom: boolean;
+};
 
 export type TableBlockState = {
 	page?: number;
@@ -51,7 +52,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 
 	const [manualPagination] = useBlockProperty('manualPagination', false);
 	const [connectedPage] = useBlockProperty<string | undefined>('connectedPage');
-	const [, setColumns] = useBlockProperty<TableColumnsProp | undefined>('columns');
+	const [, setColumns] = useBlockProperty<TableColumnProp[] | undefined>('columns');
 
 	const [, setSelectedRow] = useBlockState<any>('selectedRow');
 
@@ -60,7 +61,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 		page: { style },
 	} = usePageContext();
 
-	const { data, calculatedColumns, isLoading } = useTableBlockColumnsAndData();
+	const { data, reactTableColumns, isLoading } = useTableBlockColumnsAndData();
 	const modalHistory = usePageModal();
 	const {
 		getTableProps,
@@ -75,7 +76,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 		setPageSize,
 	} = useTable(
 		{
-			columns: calculatedColumns,
+			columns: reactTableColumns,
 			data,
 			manualPagination,
 			...(manualPagination ? { pageCount: -1 } : {}),
@@ -87,15 +88,21 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	);
 
 	const { pageIndex, pageSize, columnResizing } = state;
-	useBlockSetState<TableBlockState>('pageIndex', pageIndex);
-	useBlockSetState<TableBlockState>('pageSize', pageSize);
+	useSyncBlockState<TableBlockState>('pageIndex', pageIndex);
+	useSyncBlockState<TableBlockState>('pageSize', pageSize);
 
 	const { onContextMenu, inspectorProps } = useTableInspector();
 	useTableColumnResizing(columnResizing);
 
 	const addColumn = useCallback(() => {
 		setColumns((draft) => {
-			const newColumn = { id: v4(), header: 'column', type: ColumnTypes.text, value: '' };
+			const newColumn: TableColumnProp = {
+				id: v4(),
+				header: 'column',
+				type: ColumnTypes.text,
+				value: '',
+				custom: true,
+			};
 			if (draft) draft.push(newColumn);
 			return [newColumn];
 		});
@@ -106,16 +113,10 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
-			<TableStyles>
+			<TableStyles onContextMenu={(e) => onContextMenu(e, ['global'])}>
 				<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
-					<div style={{ overflow: 'scroll', height: style === 'a4' ? 'none' : 500 }}>
-						<HTMLTable
-							bordered
-							striped
-							{...getTableProps()}
-							onContextMenu={(e) => onContextMenu(e, ['global'])}
-							className="table"
-						>
+					<div style={{ overflow: 'auto', height: style === 'a4' ? 'none' : 500 }}>
+						<HTMLTable bordered striped {...getTableProps()} className="table">
 							<thead style={{ position: 'sticky', top: 0, zIndex: 3 }}>
 								{headerGroups.map((headerGroup) => (
 									<tr {...headerGroup.getHeaderGroupProps()} className="tr">
@@ -129,6 +130,11 @@ export function TableBlock({ hide }: { hide: boolean }) {
 													onClick={(e) => {
 														if (column.id === 'add') addColumn();
 														else onContextMenu(e, [`col${column.id}`]);
+													}}
+													onContextMenu={(e) => {
+														onContextMenu(e, [`col${column.id}`]);
+														e.stopPropagation();
+														e.preventDefault();
 													}}
 												/>
 											);

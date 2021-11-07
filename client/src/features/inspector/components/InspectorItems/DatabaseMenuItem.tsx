@@ -1,7 +1,7 @@
 import { MenuItem, Button, FormGroup } from '@blueprintjs/core';
 import { Select } from '@blueprintjs/select';
 import React, { useMemo } from 'react';
-import { Database, useDatabases } from '../../../resources/hooks/useDatabases';
+import { Database, useResources } from '../../../resources/hooks/useResources';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type DatabaseMenuItemProps = BasicItemProps & {
@@ -13,7 +13,7 @@ export type DatabaseMenuItemProps = BasicItemProps & {
 const DatabaseSelect = Select.ofType<Database>();
 
 export function DatabaseMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<DatabaseMenuItemProps>) {
-	const { data } = useDatabases();
+	const { data } = useResources();
 	const selectedDatabase = useMemo(
 		() => data?.find((database) => database._id === item.value?._id),
 		[item.value, data],

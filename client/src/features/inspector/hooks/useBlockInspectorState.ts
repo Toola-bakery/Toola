@@ -83,7 +83,7 @@ export function useBlockInspectorState(
 		{
 			type: 'item',
 			icon: 'trash',
-			label: 'Delete',
+			label: `Delete block "${id}"`,
 			closeAfterCall: true,
 			call: () => deleteBlock(id),
 		},

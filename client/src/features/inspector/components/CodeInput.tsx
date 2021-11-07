@@ -1,7 +1,8 @@
 import { Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { setCaretPosition, setInputCaretPosition } from '../../editor/helpers/caretOperators';
+import { useCurrent } from '../../editor/hooks/useCurrent';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { useCaretPosition } from '../../editor/hooks/useCaretPosition';
 import { TextInput } from '../../ui/components/TextInput';
@@ -77,10 +78,6 @@ export function CodeInput({
 	inline?: boolean;
 	multiline?: boolean;
 }) {
-	// const ref = useRef<HTMLDivElement>(null);
-	const context = usePageContext();
-	const [isFocused, setFocused] = useState(false);
-
 	const { start, ref: inputRef, updateCaret } = useCaretPosition();
 
 	const [nextCursorPosition, setNextCursorPosition] = useState<null | number>(null);
@@ -104,7 +101,8 @@ export function CodeInput({
 		return { isReference: isRef, currentWord: word, suggestionWordStartIndex: index };
 	}, [start, type, value]);
 
-	const suggestions = useMemo(() => getSuggestionKeys(context), [context]);
+	const { blocks } = useCurrent();
+	const suggestions = useMemo(() => getSuggestionKeys({ blocks }), [blocks]);
 
 	const filteredSuggestions = useMemo(() => {
 		if (!isReference) return [];
@@ -122,8 +120,6 @@ export function CodeInput({
 				multiline={multiline}
 				fill
 				autoComplete="off"
-				onBlur={() => setFocused(false)}
-				onFocus={() => setFocused(true)}
 				onChange={(e) => {
 					onChange(e.target.value);
 					updateCaret();

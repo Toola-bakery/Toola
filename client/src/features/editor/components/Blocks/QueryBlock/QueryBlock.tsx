@@ -1,11 +1,13 @@
-import { Button, Card, Pre } from '@blueprintjs/core';
+import { Button, Card, Pre, Spinner, Tab, Tabs } from '@blueprintjs/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import safeStringify from 'json-stringify-safe';
+import styled from 'styled-components';
 import { useNextRenderHook } from '../../../../../hooks/useNextRenderHook';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
-import { Database } from '../../../../resources/hooks/useDatabases';
+import { SchemaDrawerWrapper } from '../../../../resources/components/SchemaDrawer/SchemaDrawerWrapper';
+import { Database } from '../../../../resources/hooks/useResources';
 import { useQueryConstructor } from '../../../../inspector/hooks/useQueryConstructor';
-import { useBlockSetState } from '../../../hooks/useBlockSetState';
+import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
@@ -14,6 +16,7 @@ import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
 import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { CodeBlockState } from '../CodeBlock/CodeBlock';
+import { MonacoEditor } from '../CodeBlock/MonacoEditor';
 
 export type QueryBlockType = QueryBlockProps & QueryBlockState & QueryBlockMethods;
 export type QueryBlockProps = {
@@ -35,11 +38,30 @@ export type QueryBlockComponentProps = {
 	hide: boolean;
 };
 
+const CodeBlockStyles = styled.div`
+	height: 100%;
+
+	.bp4-tab-panel {
+		margin-top: 0;
+		height: calc(100% - 31px);
+		min-height: 250px;
+	}
+
+	.bp4-tabs {
+		height: 100%;
+	}
+
+	.bp4-tab-list {
+		padding: 0 8px;
+		border: 0 solid rgb(237, 237, 237);
+		border-bottom-width: 1px;
+		align-items: center;
+	}
+`;
+
 export function QueryBlock({ block, hide }: QueryBlockComponentProps) {
 	const { id, manualControl, values } = block;
-	const { updateBlockProps, updateBlockState } = useEditor();
-
-	const [showLogs, setShowLogs] = useState(false);
+	const { updateBlockProps } = useEditor();
 
 	const [databaseId, setDatabaseId] = useState<string>();
 
@@ -89,9 +111,9 @@ async function main () {
 		disabled,
 	});
 
-	useBlockSetState<CodeBlockState>('result', result);
-	useBlockSetState<CodeBlockState>('logs', logs);
-	useBlockSetState<CodeBlockState>('loading', loading);
+	useSyncBlockState<CodeBlockState>('result', result);
+	useSyncBlockState<CodeBlockState>('logs', logs);
+	useSyncBlockState<CodeBlockState>('loading', loading);
 
 	useDeclareBlockMethods<QueryBlockMethods>(id, { trigger }, [trigger]);
 
@@ -116,26 +138,53 @@ async function main () {
 
 	if (hide || !block.show) return null;
 
-	return (
-		<Card>
+	const content = (
+		<CodeBlockStyles onContextMenu={onContextMenu}>
 			<BlockInspector {...inspectorProps} />
-			<div onContextMenu={onContextMenu}>
-				{component}
-				{component2}
-				<Button onClick={() => setShowLogs((v) => !v)}>{showLogs ? 'HIDE LOGS' : 'SHOW LOGS'}</Button>
-				<Button disabled={disabled} loading={loading} onClick={() => trigger()}>
-					Run CODE
-				</Button>
-				{showLogs ? (
-					<Pre style={{ wordBreak: 'break-word', overflow: 'scroll', maxHeight: 500 }}>
-						{code}
-						{'\n'}
-						{logs.join('')}
-						{'\n'}
-						{safeStringify(result)}
-					</Pre>
-				) : null}
-			</div>
-		</Card>
+			<SchemaDrawerWrapper>
+				<Tabs id={`QueryBlock:${id}`} animate={false}>
+					<Tab
+						style={{ marginTop: 0 }}
+						id="code"
+						title="Code"
+						panel={
+							<div>
+								{component}
+								{component2}
+							</div>
+						}
+					/>
+					<Tab
+						id="logs"
+						title="Logs"
+						panel={
+							<div style={{ height: '100%', overflowY: 'scroll' }}>
+								<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
+									{logs.join('')}
+									{safeStringify(result, null, '\t')}
+								</pre>
+							</div>
+						}
+					/>
+					<Tabs.Expander />
+					<div style={{ display: 'flex', alignContent: 'center' }}>
+						{loading ? <Spinner size={20} /> : null}
+						<Button
+							intent="primary"
+							style={{ marginRight: 8, marginLeft: 8 }}
+							onClick={() => trigger()}
+							text="Run query"
+							small
+						/>
+					</div>
+				</Tabs>
+			</SchemaDrawerWrapper>
+		</CodeBlockStyles>
+	);
+
+	return block.parentId === 'queries' ? (
+		<div style={{ height: '100%' }}>{content}</div>
+	) : (
+		<Card style={{ height: '100%', padding: 0 }}>{content}</Card>
 	);
 }

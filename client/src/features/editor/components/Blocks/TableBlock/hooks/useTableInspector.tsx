@@ -1,6 +1,6 @@
 import { useBlock } from '../../../../hooks/useBlock';
 import { useBlockProperty } from '../../../../hooks/useBlockProperty';
-import { ColumnTypes, TableBlockProps, TableColumnsProp } from '../TableBlock';
+import { ColumnTypes, TableBlockProps, TableColumnProp } from '../TableBlock';
 import { MenuItemProps } from '../../../../../inspector/components/InspectorItem';
 import { useBlockInspectorState } from '../../../../../inspector/hooks/useBlockInspectorState';
 import { useEditor } from '../../../../hooks/useEditor';
@@ -9,7 +9,7 @@ export function useTableInspector() {
 	const { id } = useBlock();
 	const [manualPagination] = useBlockProperty('manualPagination', false);
 	const [connectedPage] = useBlockProperty<string | undefined>('connectedPage');
-	const [columns, setColumns] = useBlockProperty<TableColumnsProp | undefined>('columns');
+	const [columns, setColumns] = useBlockProperty<TableColumnProp[] | undefined>('columns');
 
 	const [value] = useBlockProperty('value', '');
 
@@ -26,7 +26,10 @@ export function useTableInspector() {
 					onChange: (v) =>
 						setColumns((draft) => {
 							const colDraft = draft?.find((c) => c.id === col.id);
-							if (colDraft) colDraft.header = v;
+							if (colDraft) {
+								colDraft.header = v;
+								colDraft.custom = true;
+							}
 						}),
 					value: col.header,
 				},
@@ -36,7 +39,10 @@ export function useTableInspector() {
 					onChange: (v) =>
 						setColumns((draft) => {
 							const colDraft = draft?.find((c) => c.id === col.id);
-							if (colDraft) colDraft.value = v;
+							if (colDraft) {
+								colDraft.value = v;
+								colDraft.custom = true;
+							}
 						}),
 					value: col.value,
 				},
@@ -47,7 +53,10 @@ export function useTableInspector() {
 					onChange: (v) =>
 						setColumns((draft) => {
 							const colDraft = draft?.find((c) => c.id === col.id);
-							if (colDraft) colDraft.type = v as ColumnTypes;
+							if (colDraft) {
+								colDraft.type = v as ColumnTypes;
+								colDraft.custom = true;
+							}
 						}),
 					value: col.type || ColumnTypes.text,
 				},

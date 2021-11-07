@@ -1,9 +1,9 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { useOnMountedEffect } from '../../../hooks/useOnMounted';
-import { useDatabases } from '../hooks/useDatabases';
+import { useResources } from '../hooks/useResources';
 
 export function ResourcesList() {
-	const { data, refetch } = useDatabases();
+	const { data, refetch } = useResources();
 
 	useOnMountedEffect(() => {
 		refetch();

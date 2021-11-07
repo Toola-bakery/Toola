@@ -1,10 +1,8 @@
 import { Button, Tab, Tabs } from '@blueprintjs/core';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 import { useDrawer, useDrawerResizable } from '../../drawer/hooks/useDrawer';
 import { useIsDevtoolsOpen } from '../../editor/hooks/useIsDevtoolsOpen';
-import { usePageContext } from '../../executor/hooks/useReferences';
 import { GlobalsTab } from './Globals/GlobalsTab';
 import { QueriesTab } from './Queries/QueriesTab';
 
@@ -29,11 +27,12 @@ const DevtoolsStyles = styled.div`
 	border-top-width: 1px;
 
 	background-color: white;
-	z-index: 999999;
+	z-index: 9;
 
 	.bp4-tab-panel {
 		margin-top: 0;
 		height: calc(100% - 31px);
+		overflow-y: auto;
 		min-height: unset !important;
 	}
 
@@ -53,6 +52,7 @@ export function Devtools() {
 	const { setDevtoolsOpen, isDevtoolsOpen } = useIsDevtoolsOpen();
 	const { height } = useWindowSize({ height: 1000 });
 	const { size, setSize } = useDrawer({ name: 'devtools', maxSize: Math.floor(height * 0.75), defaultSize: 300 });
+	const { setOpen: setSchemaOpen, isOpen: isSchemaOpen } = useDrawer({ name: 'schemaDrawer' });
 
 	const { isMovingRef, resizableRef } = useDrawerResizable({
 		axis: 'y',
@@ -75,6 +75,14 @@ export function Devtools() {
 				<Tab id="globals" title="Globals" panel={<GlobalsTab />} />
 				<Tabs.Expander />
 				<div style={{ display: 'flex', alignContent: 'center' }}>
+					<Button
+						title="Open Resources Schema Panel"
+						icon="panel-stats"
+						active={isSchemaOpen}
+						small
+						minimal
+						onClick={() => setSchemaOpen(!isSchemaOpen)}
+					/>
 					<Button icon="cross" small minimal onClick={() => setDevtoolsOpen(false)} />
 				</div>
 			</Tabs>

@@ -1,15 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Column } from 'react-table';
 import { v4 } from 'uuid';
+import { usePrevious } from '../../../../../../hooks/usePrevious';
+import { useRefLatest } from '../../../../../../hooks/useRefLatest';
 import { useBlockProperty } from '../../../../hooks/useBlockProperty';
-import { TableBlockType, TableColumnsProp } from '../TableBlock';
-import { BasicBlock } from '../../../../types/basicBlock';
-import { useEditor } from '../../../../hooks/useEditor';
+import { TableColumnProp } from '../TableBlock';
 import { usePageContext, useReferenceEvaluator } from '../../../../../executor/hooks/useReferences';
 
 export function useTableBlockColumnsAndData() {
 	const { editing } = usePageContext();
-	const [columns, setColumns] = useBlockProperty<TableColumnsProp | undefined>('columns');
+	const [columns, setColumns] = useBlockProperty<TableColumnProp[] | undefined>('columns');
 	const [value] = useBlockProperty('value', '');
 
 	const { evaluate, isLoading } = useReferenceEvaluator();
@@ -21,28 +21,30 @@ export function useTableBlockColumnsAndData() {
 		return [];
 	}, [evaluate, value]);
 
-	const columnsProp = useMemo<TableColumnsProp>(() => {
-		if (columns) return columns;
+	const calculateColumnsFromData = useCallback(() => {
 		const keys = new Set<string>();
 		data.forEach((row) => {
 			if (typeof row === 'object' && row !== null) Object.keys(row).forEach((key) => keys.add(key));
 		});
-		return Array.from(keys).map((accessor) => ({
+		return Array.from(keys).map<TableColumnProp>((accessor) => ({
 			header: accessor,
 			value: `\${current["${accessor}"]}`,
 			width: 150,
 			id: v4(),
+			custom: false,
 		}));
-	}, [columns, data]);
+	}, [data]);
+
+	const previousValue = usePrevious(value);
 
 	useEffect(() => {
-		if ((!columns || columns.length === 0) && columnsProp.length > 0) {
-			setColumns(columnsProp);
-		}
-	}, [columns, columnsProp, setColumns]);
+		if (!previousValue || !value || value === previousValue) return;
+		const newColumns = calculateColumnsFromData();
+		if (newColumns.length) setColumns([...(columns?.filter((c) => c.custom) || []), ...newColumns]);
+	}, [calculateColumnsFromData, previousValue, setColumns, value, columns]);
 
-	const calculatedColumns = useMemo<Column[]>(() => {
-		const cols: Column[] = columnsProp.map((col) => ({
+	const reactTableColumns = useMemo<Column[]>(() => {
+		const cols: Column[] = (columns || []).map((col) => ({
 			Header: col.header,
 			accessor: (originalRow) => evaluate(col.value, originalRow),
 			minWidth: 100,
@@ -63,7 +65,7 @@ export function useTableBlockColumnsAndData() {
 				// type: ColumnTypes.text,
 			});
 		return cols;
-	}, [columnsProp, evaluate, editing]);
+	}, [columns, evaluate, editing]);
 
-	return { calculatedColumns, data, isLoading };
+	return { reactTableColumns, data, isLoading };
 }

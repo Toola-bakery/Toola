@@ -1,0 +1,13 @@
+diff --git a/node_modules/@blueprintjs/core/src/components/icon/icon.tsx b/node_modules/@blueprintjs/core/src/components/icon/icon.tsx
+index 4414735..93ff8d8 100644
+--- a/node_modules/@blueprintjs/core/src/components/icon/icon.tsx
++++ b/node_modules/@blueprintjs/core/src/components/icon/icon.tsx
+@@ -21,7 +21,7 @@ import { IconName, IconSvgPaths16, IconSvgPaths20, iconNameToPathsRecordKey } fr
+ 
+ import { AbstractPureComponent2, Classes, DISPLAYNAME_PREFIX, IntentProps, Props, MaybeElement } from "../../common";
+ 
+-export { IconName };
++export type { IconName };
+ 
+ export enum IconSize {
+     STANDARD = 16,
