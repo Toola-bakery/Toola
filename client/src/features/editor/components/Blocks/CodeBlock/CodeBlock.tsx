@@ -5,6 +5,7 @@ import React, { useRef, useCallback } from 'react';
 import safeStringify from 'json-stringify-safe';
 import styled from 'styled-components';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
+import { SchemaDrawerWrapper } from '../../../../resources/components/SchemaDrawer/SchemaDrawerWrapper';
 import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
@@ -106,32 +107,34 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	const content = (
 		<CodeBlockStyles>
 			<BlockInspector {...inspectorProps} />
-			<Tabs id={`CodeBlock:${id}`} animate={false}>
-				<Tab style={{ marginTop: 0 }} id="code" title="Code" panel={<MonacoEditor onEditorMount={onEditorMount} />} />
-				<Tab
-					id="logs"
-					title="Logs"
-					panel={
-						<div style={{ height: '100%', overflowY: 'scroll' }}>
-							<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
-								{logs.join('')}
-								{safeStringify(result, null, '\t')}
-							</pre>
-						</div>
-					}
-				/>
-				<Tabs.Expander />
-				<div style={{ display: 'flex', alignContent: 'center' }}>
-					{loading ? <Spinner size={20} /> : null}
-					<Button
-						intent="primary"
-						style={{ marginRight: 8, marginLeft: 8 }}
-						onClick={() => trigger()}
-						text="Run CODE"
-						small
+			<SchemaDrawerWrapper>
+				<Tabs id={`CodeBlock:${id}`} animate={false}>
+					<Tab style={{ marginTop: 0 }} id="code" title="Code" panel={<MonacoEditor onEditorMount={onEditorMount} />} />
+					<Tab
+						id="logs"
+						title="Logs"
+						panel={
+							<div style={{ height: '100%', overflowY: 'scroll' }}>
+								<pre style={{ wordBreak: 'break-word', overflow: 'scroll' }}>
+									{logs.join('')}
+									{safeStringify(result, null, '\t')}
+								</pre>
+							</div>
+						}
 					/>
-				</div>
-			</Tabs>
+					<Tabs.Expander />
+					<div style={{ display: 'flex', alignContent: 'center' }}>
+						{loading ? <Spinner size={20} /> : null}
+						<Button
+							intent="primary"
+							style={{ marginRight: 8, marginLeft: 8 }}
+							onClick={() => trigger()}
+							text="Run CODE"
+							small
+						/>
+					</div>
+				</Tabs>
+			</SchemaDrawerWrapper>
 		</CodeBlockStyles>
 	);
 
