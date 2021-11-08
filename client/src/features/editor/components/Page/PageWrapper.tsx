@@ -9,8 +9,9 @@ export function PageWrapper({ page, children }: PropsWithChildren<{ page: BasicB
 				overflowY: 'auto',
 				width: '100%',
 				height: 'calc(100% - 40px)',
-				backgroundColor: 'rgb(229 230 231)',
+				backgroundColor: page?.style === 'a4' ? 'rgb(229 230 231)' : 'white',
 				alignItems: 'center',
+				paddingTop: page?.style === 'a4' ? undefined : 15,
 			}}
 		>
 			<div
@@ -26,7 +27,13 @@ export function PageWrapper({ page, children }: PropsWithChildren<{ page: BasicB
 								marginTop: 20,
 								marginBottom: 20,
 						  }
-						: { width: '100%', minHeight: '100%', backgroundColor: 'white', paddingRight: 25 }
+						: {
+								...(page.isWide ? { width: '100%' } : { maxWidth: '21cm' }),
+								minHeight: '100%',
+								margin: 'auto',
+								backgroundColor: 'white',
+								paddingRight: 25,
+						  }
 				}
 			>
 				{children}

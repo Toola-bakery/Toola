@@ -8,6 +8,7 @@ import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useDrawer } from '../../../drawer/hooks/useDrawer';
 import { useTopLevelPages } from '../../../drawer/hooks/useTopLevelPages';
 import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/SwitchMenuItem';
+import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { usePagesMutations } from './hooks/usePagesMutations';
@@ -35,6 +36,7 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 	const { deletePage } = usePagesMutations();
 	const { updateBlockProps } = useEditor();
 	const { navigate } = usePageNavigator();
+	const [isWide, setIsWide] = useBlockProperty('isWide', false);
 	const { setOpen } = useDrawer({ name: 'leftDrawer' });
 	const onChangeHandler = useCallback(
 		(text: string) => {
@@ -122,15 +124,27 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 									}}
 								/>
 							) : null}
-							<SwitchMenuItem
-								item={{
-									icon: 'print',
-									label: 'Use A4 layout',
-									value: style === 'a4',
-									onChange: (v) => id && updateBlockProps({ id, style: v ? 'a4' : 'app' }),
-									type: 'switch',
-								}}
-							/>
+
+							{/*<SwitchMenuItem*/}
+							{/*	item={{*/}
+							{/*		icon: 'print',*/}
+							{/*		label: 'Use A4 layout',*/}
+							{/*		value: style === 'a4',*/}
+							{/*		onChange: (v) => id && updateBlockProps({ id, style: v ? 'a4' : 'app' }),*/}
+							{/*		type: 'switch',*/}
+							{/*	}}*/}
+							{/*/>*/}
+							{style !== 'a4' ? (
+								<SwitchMenuItem
+									item={{
+										icon: 'print',
+										label: 'Full width',
+										value: isWide,
+										onChange: (v) => setIsWide(!isWide),
+										type: 'switch',
+									}}
+								/>
+							) : null}
 							<MenuItem onClick={() => deletePage(pageId)} icon="trash" text="Delete page" />
 						</Menu>
 					}

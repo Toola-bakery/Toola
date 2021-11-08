@@ -17,7 +17,11 @@ export const CurrentContext = createContext<{ current: any } & ReturnType<typeof
 });
 
 function useCurrentBlocks() {
-	const { blocksState: parentBlocksState, setBlockState: parentSetBlockState } = useCurrent();
+	const {
+		blocksState: parentBlocksState,
+		setBlockState: parentSetBlockState,
+		blocksMethods: parentBlockMethods,
+	} = useCurrent();
 	const { pageId, blocksProps, editing, isDevtoolsOpen } = usePageContext();
 	const blockParticles = useMap<string, [BlockProps, BlockStates | null, BlockMethods | null]>([pageId]);
 	const joinedBlock = useMap<string, BasicBlock & Blocks>([pageId]);
@@ -29,6 +33,11 @@ function useCurrentBlocks() {
 		() => ({ ...parentBlocksState, ...blocksState }),
 		[blocksState, parentBlocksState],
 	) as { [p: string]: BlockStates };
+
+	const mergedBlocksMethods = useMemo(
+		() => ({ ...parentBlockMethods, ...blocksMethods }),
+		[blocksMethods, parentBlockMethods],
+	) as { [p: string]: BlockMethods };
 
 	useEffect(() => {
 		return () => {
@@ -57,7 +66,7 @@ function useCurrentBlocks() {
 			const particles = blockParticles.get(blockId);
 			const newProps = blocksProps[blockId];
 			const newState = mergedBlocksState[blockId] || null;
-			const newMethods = blocksMethods[blockId] || null;
+			const newMethods = mergedBlocksMethods[blockId] || null;
 
 			const newShow = newProps.parentId === 'queries' ? !!isDevtoolsOpen : editing || !newProps.display?.hide;
 
@@ -81,14 +90,14 @@ function useCurrentBlocks() {
 			blockParticles.set(blockId, [newProps, newState, newMethods]);
 		});
 		return response;
-	}, [blockParticles, blocksMethods, blocksProps, mergedBlocksState, editing, isDevtoolsOpen, joinedBlock]);
+	}, [blockParticles, mergedBlocksMethods, blocksProps, mergedBlocksState, editing, isDevtoolsOpen, joinedBlock]);
 
 	return {
 		blocks,
 		deleteBlockMethods,
 		setBlockMethods,
 		blocksProps,
-		blocksMethods,
+		blocksMethods: mergedBlocksMethods,
 		blocksState: mergedBlocksState,
 		setBlockState,
 	};

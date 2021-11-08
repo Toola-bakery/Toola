@@ -104,7 +104,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 				custom: true,
 			};
 			if (draft) draft.push(newColumn);
-			return [newColumn];
+			else return [newColumn];
 		});
 	}, [setColumns]);
 

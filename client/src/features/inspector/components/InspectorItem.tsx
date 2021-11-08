@@ -8,6 +8,7 @@ import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenu
 import { PageMenuItem, PageMenuItemProps } from './InspectorItems/PageMenuItem';
 import { PgSQLMenuItem, PgSQLMenuItemProps } from './InspectorItems/PgSQLMenuItem';
 import { QueryActionMenuItem, QueryActionMenuItemProps } from './InspectorItems/QueryActionMenuItem';
+import { QuerySelectorMenuItem, QuerySelectorMenuItemProps } from './InspectorItems/QuerySelectorMenuItem';
 import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
 import { SimpleMenuItem, SimpleMenuItemProps } from './InspectorItems/SimpleMenuItem';
 import { SwitchMenuItem, SwitchMenuItemProps } from './InspectorItems/SwitchMenuItem';
@@ -16,6 +17,7 @@ import { ViewMenuItem, ViewMenuItemProps } from './InspectorItems/ViewItem';
 export type BasicItemProps = {
 	label: string;
 	icon?: IconName;
+	hide?: boolean;
 };
 
 export type MenuItemProps =
@@ -24,6 +26,7 @@ export type MenuItemProps =
 	| ViewMenuItemProps
 	| InputMenuItemProps
 	| SelectMenuItemProps
+	| QuerySelectorMenuItemProps
 	| DatabaseMenuItemProps
 	| QueryActionMenuItemProps
 	| PageMenuItemProps
@@ -44,6 +47,8 @@ export function InspectorItem(props: InspectorItemProps) {
 	if (item.type === 'blockName')
 		return <BlockNameMenuItem {...(props as InspectorItemProps<BlockNameMenuItemProps>)} />;
 	if (item.type === 'item') return <SimpleMenuItem {...(props as InspectorItemProps<SimpleMenuItemProps>)} />;
+	if (item.type === 'querySelector')
+		return <QuerySelectorMenuItem {...(props as InspectorItemProps<QuerySelectorMenuItemProps>)} />;
 	if (item.type === 'switch') return <SwitchMenuItem {...(props as InspectorItemProps<SwitchMenuItemProps>)} />;
 	if (item.type === 'nested') return <NestedMenuItem {...(props as InspectorItemProps<NestedMenuItemProps>)} />;
 	if (item.type === 'view') return <ViewMenuItem {...(props as InspectorItemProps<ViewMenuItemProps>)} />;

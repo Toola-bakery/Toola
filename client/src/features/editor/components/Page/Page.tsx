@@ -30,6 +30,7 @@ export type PageBlockProps = {
 	title: string;
 	emoji?: string;
 	style: 'app' | 'a4';
+	isWide: boolean;
 	blocks: string[];
 	queries: string[];
 };
@@ -58,6 +59,7 @@ export const PageContext = React.createContext<PageContextType>({
 		style: 'app',
 		blocks: [],
 		queries: [],
+		isWide: false,
 	},
 	editing: true,
 	setEditing: () => {},

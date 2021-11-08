@@ -41,7 +41,7 @@ export function ListBlock({ hide }: { hide: boolean }) {
 			<div onContextMenu={onContextMenu}>
 				{data.map((item) => (
 					<CurrentContextProvider current={item}>
-						<Card>
+						<Card style={{ padding: 8, paddingLeft: 0, marginBottom: 8 }}>
 							<ColumnBlock fake block={block as BasicBlock & ColumnBlockType} />
 						</Card>
 					</CurrentContextProvider>
