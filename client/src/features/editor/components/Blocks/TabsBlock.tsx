@@ -60,25 +60,20 @@ export function TabsBlock({ hide }: { hide: boolean }) {
 			const [{ id: columnId }] = addBlocks([{ type: 'column', pageId, parentId: block.id, blocks: [] }]);
 			if (item) addChild(columnId, item.id, 0);
 
-			if (putAfterColumnId) {
-				const index = tabs.indexOf(putAfterColumnId);
-				setTabs((draft) => {
-					draft.splice(index + 1, 0, columnId);
-				});
-				setTabNames((draft) => {
-					draft.splice(index + 1, 0, 'Untitled');
-				});
-				setTabEmojis((draft) => {
-					draft.splice(index + 1, 0, undefined);
-				});
-			} else {
-				setTabs([columnId, ...tabs]);
-				setTabNames(['Untitled', ...tabNames]);
-				setTabEmojis([undefined, ...tabEmojis]);
-			}
+			const index = putAfterColumnId ? tabs.indexOf(putAfterColumnId) : 0;
+			setTabs((draft) => {
+				draft.splice(index + 1, 0, columnId);
+			});
+			setTabNames((draft) => {
+				draft.splice(index + 1, 0, '');
+			});
+			setTabEmojis((draft) => {
+				draft.splice(index + 1, 0, undefined);
+			});
+
 			return columnId;
 		},
-		[addBlocks, addChild, block.id, pageId, setTabEmojis, setTabNames, setTabs, tabEmojis, tabNames, tabs],
+		[addBlocks, addChild, block.id, pageId, setTabEmojis, setTabNames, setTabs, tabs],
 	);
 
 	useEffect(() => {
@@ -138,7 +133,6 @@ export function TabsBlock({ hide }: { hide: boolean }) {
 				<Tabs>
 					{tabs.map((blockId, i) => (
 						<Tab
-							// disabled
 							style={{ marginTop: 0 }}
 							id={blockId}
 							title={
