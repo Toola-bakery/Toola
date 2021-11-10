@@ -2,18 +2,11 @@ import { Button, Icon } from '@blueprintjs/core';
 import React from 'react';
 import { ConnectDragSource } from 'react-dnd';
 import { useBlock } from '../../hooks/useBlock';
+import { useBlockContext } from '../../hooks/useBlockContext';
 
-export function BlockBadge({
-	show,
-	dragRef,
-	onDragClick,
-}: {
-	onDragClick: React.MouseEventHandler<HTMLElement> | undefined;
-	show: boolean;
-	dragRef: ConnectDragSource;
-}) {
+export function BlockBadge({ show, dragRef }: { show: boolean; dragRef: ConnectDragSource }) {
 	const { id } = useBlock();
-
+	const { onDragClick } = useBlockContext();
 	return (
 		<div
 			ref={dragRef}

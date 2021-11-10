@@ -34,7 +34,7 @@ export type Blocks =
 	| SubPageBlockType
 	| QueryBlockType
 	| ButtonBlockType
-	| { type: 'card' | 'list' };
+	| { type: 'card' | 'list' | 'tabs' };
 
 export type LayoutBlocks = PageBlockType | ColumnBlockType | RowBlockType;
 

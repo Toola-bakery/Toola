@@ -73,11 +73,11 @@ export function useTableInspector() {
 			],
 		})) || [];
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState((defaultMenu) => [
+	const { onContextMenu, inspectorProps } = useBlockInspectorState((defaultMenuWrap) => [
 		{
 			type: 'nested',
 			label: 'global',
-			next: [
+			next: defaultMenuWrap([
 				{
 					label: 'Connected Page Id',
 					type: 'pages',
@@ -105,8 +105,7 @@ export function useTableInspector() {
 							draft.manualPagination = v;
 						}),
 				},
-				...defaultMenu,
-			],
+			]),
 		},
 		...columnMenus,
 	]);

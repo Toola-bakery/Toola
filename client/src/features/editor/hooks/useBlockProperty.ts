@@ -4,7 +4,7 @@ import { useOnMountedEffect } from '../../../hooks/useOnMounted';
 import { useBlock } from './useBlock';
 import { useEditor } from './useEditor';
 
-type Dispatch<T> = (nextValue: ((draft: Draft<T>) => undefined | void | T) | T) => void;
+export type Dispatch<T> = (nextValue: ((draft: Draft<T>) => undefined | void | T) | T) => void;
 export function useBlockProperty<T>(name: string): [T | undefined, Dispatch<T>];
 export function useBlockProperty<T>(name: string, defaultValue: T): [T, Dispatch<T>];
 export function useBlockProperty<T>(name: string, defaultValue?: T): [T | undefined, Dispatch<T>] {

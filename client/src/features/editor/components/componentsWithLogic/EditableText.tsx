@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import styled from 'styled-components';
 import { usePageContext, useReferences } from '../../../executor/hooks/useReferences';
 import { getCaretIndex, getSelection, setCaretPosition } from '../../helpers/caretOperators';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
@@ -9,26 +10,49 @@ import { TextEntity } from '../Blocks/TextBlock/plugins/TextPlugins';
 
 const BR_TAG = /<br\s*\/?>/ms;
 
+const StyledContentEditable = styled.div`
+	[contenteditable]:empty:after,
+	.forcePlaceholder:after {
+		color: rgba(55, 53, 47, 0.4);
+		content: attr(placeholder);
+	}
+`;
+
 export function EditableText({
 	defaultValue = '',
 	tagName = 'span',
 	className,
 	style,
+	value: controlledValue,
+	setValue: controlledSetValue,
+	allowEntities = true,
+	placeholder,
 }: {
 	defaultValue?: string;
 	tagName?: string;
 	className?: string;
 	style?: React.CSSProperties;
+	setValue?: (nextValue: string) => void;
+	value?: string;
+	allowEntities?: boolean;
+	placeholder?: string;
 } = {}) {
 	const { editing } = usePageContext();
 	const [isFocused, setIsFocused] = useState(false);
 	const contentEditableRef = useRef<HTMLElement>(null);
 	const setToPosRef = useRef<[number, number] | number | null>(null);
 
-	const [value, setValue] = useBlockProperty('value', defaultValue);
-	const [entities, setEntities] = useBlockProperty<TextEntity[]>('entities', []);
+	if (typeof defaultValue !== 'undefined' && typeof controlledSetValue !== 'undefined')
+		throw new Error('You cant use defaultValue with setValue');
+	const [internalValue, setInternalValue] = useBlockProperty('value', defaultValue);
+	const [entities, setEntities] = useBlockProperty<TextEntity[] | undefined>(
+		'entities',
+		allowEntities ? [] : undefined,
+	);
+	const value = controlledSetValue ? controlledValue || '' : internalValue;
+	const setValue = controlledSetValue || setInternalValue;
 
-	const htmlValue = useMemo<string>(() => entitiesToHTML(value, entities), [value, entities]);
+	const htmlValue = useMemo<string>(() => entitiesToHTML(value, entities || []), [value, entities]);
 	const html = useReferences(isFocused ? '' : htmlValue);
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 
@@ -52,9 +76,9 @@ export function EditableText({
 				if (setToPosRef.current > text.length) setToPosRef.current = text.length;
 			}
 			setValue(text);
-			setEntities(newEntities);
+			setEntities(allowEntities ? newEntities : []);
 		},
-		[setEntities, setValue],
+		[allowEntities, setEntities, setValue],
 	);
 
 	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
@@ -63,24 +87,27 @@ export function EditableText({
 	});
 
 	return (
-		<ContentEditable
-			disabled={!editing}
-			onContextMenu={(e) => {
-				// if (contentEditableRef.current) {
-				// 	const [n1, n2] = getSelection(contentEditableRef.current);
-				// 	if (n1 !== n2) return;
-				// }
-				// onContextMenu(e);
-			}}
-			className={className}
-			onFocus={() => setIsFocused(true)}
-			onBlur={() => setIsFocused(false)}
-			innerRef={contentEditableRef}
-			html={isFocused ? htmlValue : htmlString}
-			tagName={tagName}
-			style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: 0, ...style }}
-			onChange={onChangeHandler}
-			onKeyDown={onKeyDownHandler}
-		/>
+		<StyledContentEditable>
+			<ContentEditable
+				disabled={!editing}
+				onContextMenu={(e) => {
+					// if (contentEditableRef.current) {
+					// 	const [n1, n2] = getSelection(contentEditableRef.current);
+					// 	if (n1 !== n2) return;
+					// }
+					// onContextMenu(e);
+				}}
+				className={className}
+				onFocus={() => setIsFocused(true)}
+				onBlur={() => setIsFocused(false)}
+				innerRef={contentEditableRef}
+				html={isFocused ? htmlValue : htmlString}
+				tagName={tagName}
+				style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: 0, ...style }}
+				onChange={onChangeHandler}
+				onKeyDown={onKeyDownHandler}
+				placeholder={placeholder}
+			/>
+		</StyledContentEditable>
 	);
 }

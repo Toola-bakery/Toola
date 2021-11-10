@@ -17,10 +17,12 @@ export function useTextBlockOnKeyDownHandler({
 	contentEditableRef,
 	inspectorProps,
 	setToPosRef: _setToPosRef,
+	allowEntities = true,
 }: {
 	contentEditableRef: RefObject<HTMLElement>;
 	setToPosRef: MutableRefObject<[number, number] | number | null>;
 	inspectorProps?: InspectorPropsType;
+	allowEntities?: boolean;
 }) {
 	const setToPosRef = _setToPosRef;
 	const { id } = useBlock();
@@ -40,7 +42,7 @@ export function useTextBlockOnKeyDownHandler({
 	});
 
 	function togglePlugin(plugin: TextEntityPlugins) {
-		if (!contentEditableRef.current) return;
+		if (!contentEditableRef.current || !allowEntities) return;
 		const [start, end] = getSelection(contentEditableRef.current);
 		if (start === end) return;
 		setToPosRef.current = [start, end];

@@ -50,14 +50,20 @@ export function EmojiIcon({ emoji, small = false, useDefaultDocument = true }: E
 export function EmojiPicker({
 	onChange,
 	propertyName = 'emoji',
+	setEmoji: setControlledEmoji,
+	emoji: controlledEmoji,
 	...rest
 }: {
 	onChange?: (emoji: EmojiData | undefined) => void;
 	propertyName?: string;
+	emoji?: string;
+	setEmoji?: (newEmoji: string | undefined) => void;
 } & EmojiIconProps = {}) {
 	const { editing } = usePageContext();
 
-	const [emoji, setEmoji] = useBlockProperty<string | undefined>(propertyName);
+	const [internalEmoji, setInternalEmoji] = useBlockProperty<string | undefined>(propertyName);
+	const emoji = setControlledEmoji ? controlledEmoji : internalEmoji;
+	const setEmoji = setControlledEmoji || setInternalEmoji;
 	const icon = <EmojiIcon {...rest} emoji={emoji} />;
 
 	if (!editing) return <div style={boxStyles}>{icon}</div>;

@@ -12,12 +12,14 @@ import { ListBlock } from '../Blocks/ListBlock/ListBlock';
 import { QueryBlock, QueryBlockType } from '../Blocks/QueryBlock/QueryBlock';
 import { SubPageBlock, SubPageBlockType } from '../Blocks/SubPageBlock';
 import { TableBlock } from '../Blocks/TableBlock/TableBlock';
+import { TabsBlock } from '../Blocks/TabsBlock';
 import { TextBlock, TextBlockType } from '../Blocks/TextBlock/TextBlock';
 
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
 	const type = block.type as string;
 	if (type === 'text') return <TextBlock hide={hide} block={block as BasicBlock & TextBlockType} />;
 	if (type === 'list') return <ListBlock hide={hide} />;
+	if (type === 'tabs') return <TabsBlock hide={hide} />;
 	if (type === 'code') return <CodeBlock hide={hide} block={block as BasicBlock & CodeBlockType} />;
 	if (type === 'query') return <QueryBlock hide={hide} block={block as BasicBlock & QueryBlockType} />;
 	if (type === 'JSONView') return <JSONViewBlock hide={hide} block={block as BasicBlock & JSONViewBlockType} />;

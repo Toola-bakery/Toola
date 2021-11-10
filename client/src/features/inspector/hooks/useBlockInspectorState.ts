@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useBlockWrapperController } from '../../editor/hooks/useBlockWrapperController';
+import React, { useCallback, useEffect } from 'react';
+import { useBlockContext } from '../../editor/hooks/useBlockContext';
 import { useInspectorState } from './useInspectorState';
 import { MenuItemProps } from '../components/InspectorItem';
 import { BlockProps, Blocks } from '../../editor/types/blocks';
@@ -14,6 +14,7 @@ const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Part
 	['Heading 3', { type: 'text', style: 'heading3' }],
 	['Heading 4', { type: 'text', style: 'heading4' }],
 	['Card', 'card'],
+	['Tabs', 'tabs'],
 	['List', 'list'],
 	['Code', 'code'],
 	['Query', 'query'],
@@ -36,11 +37,11 @@ export type InspectorPropsType = {
 };
 
 export function useBlockInspectorState(
-	menuConfig: ((defaultMenu: MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],
+	menuConfig: ((defaultWrap: (items: MenuItemProps[]) => MenuItemProps[]) => MenuItemProps[]) | MenuItemProps[],
 ) {
 	const { editing } = usePageContext();
 	const { id, display } = useBlock();
-	const { setOnDragClick } = useBlockWrapperController();
+	const { setOnDragClick } = useBlockContext();
 	const { deleteBlock, immerBlockProps, updateBlockType, updateBlockId } = useEditor();
 
 	const { onContextMenu, inspectorProps } = useInspectorState({
@@ -52,54 +53,54 @@ export function useBlockInspectorState(
 		setOnDragClick(onContextMenu);
 	}, [onContextMenu, setOnDragClick]);
 
-	const defaultMenu: MenuItemProps[] = [
-		{
-			type: 'nested',
-			label: 'Display',
-			icon: 'eye-open',
-			next: [
-				{
-					label: 'Hide',
-					type: 'switch',
-					value: Boolean(display?.hide),
-					onChange: (v) =>
-						immerBlockProps(id, (draft) => {
-							if (!draft.display) draft.display = {};
-							draft.display.hide = v;
-						}),
+	const defaultWrap = (items: MenuItemProps[]): MenuItemProps[] => {
+		return [
+			{
+				type: 'blockName',
+				label: id,
+				onChange: (v) => {
+					updateBlockId(id, v);
 				},
-			],
-		},
-		{
-			type: 'nested',
-			label: 'Turn into',
-			icon: 'rotate-document',
-			next: TurnIntoBlocks.map((blockType) => ({
-				label: blockType[0],
-				type: 'item',
-				call: () => updateBlockType(id, blockType[1]),
-			})),
-		},
-		{
-			type: 'item',
-			icon: 'trash',
-			label: `Delete block "${id}"`,
-			closeAfterCall: true,
-			call: () => deleteBlock(id),
-		},
-	];
-
-	const menu: MenuItemProps[] = [
-		{
-			type: 'blockName',
-			label: id,
-			onChange: (v) => {
-				updateBlockId(id, v);
 			},
-		},
-		...(typeof menuConfig === 'function' ? menuConfig(defaultMenu) : menuConfig),
-		...(typeof menuConfig === 'function' ? [] : defaultMenu),
-	];
+			...items,
+			{
+				type: 'nested',
+				label: 'Display',
+				icon: 'eye-open',
+				next: [
+					{
+						label: 'Hide',
+						type: 'switch',
+						value: Boolean(display?.hide),
+						onChange: (v) =>
+							immerBlockProps(id, (draft) => {
+								if (!draft.display) draft.display = {};
+								draft.display.hide = v;
+							}),
+					},
+				],
+			},
+			{
+				type: 'nested',
+				label: 'Turn into',
+				icon: 'rotate-document',
+				next: TurnIntoBlocks.map((blockType) => ({
+					label: blockType[0],
+					type: 'item',
+					call: () => updateBlockType(id, blockType[1]),
+				})),
+			},
+			{
+				type: 'item',
+				icon: 'trash',
+				label: `Delete block "${id}"`,
+				closeAfterCall: true,
+				call: () => deleteBlock(id),
+			},
+		];
+	};
+
+	const menu: MenuItemProps[] = typeof menuConfig === 'function' ? menuConfig(defaultWrap) : defaultWrap(menuConfig);
 
 	return { onContextMenu, inspectorProps: { ...inspectorProps, menu } };
 }
