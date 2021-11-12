@@ -226,4 +226,17 @@ export const selectBlockNeighborsProps = createCachedSelector(
 	},
 )((_, blockId) => blockId);
 
+export const selectAllChildren = createCachedSelector(
+	(state) => state,
+	(_, pageId: string) => pageId,
+	selectBlockProps,
+	(state, pageId, block): string[] => {
+		const { blocks: children, id } = block as LayoutBlocks & BasicBlock;
+		if (!children) return [id];
+		const resp = children.flatMap((childId) => selectAllChildren(state, pageId, childId));
+		resp.push(id);
+		return resp;
+	},
+)((_, blockId) => blockId);
+
 export const editorReducer = editorSlice.reducer;

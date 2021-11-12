@@ -7,13 +7,14 @@ import { useBlock } from '../../editor/hooks/useBlock';
 import { useEditor } from '../../editor/hooks/useEditor';
 import { usePageContext } from '../../executor/hooks/useReferences';
 
-const TurnIntoBlocks: [string, Blocks['type'] | ({ type: Blocks['type'] } & Partial<BlockProps>)][] = [
+const TurnIntoBlocks: [string, string | ({ [key: string]: any } & { type: string })][] = [
 	['Text', 'text'],
 	['Heading 1', { type: 'text', style: 'heading1' }],
 	['Heading 2', { type: 'text', style: 'heading2' }],
 	['Heading 3', { type: 'text', style: 'heading3' }],
 	['Heading 4', { type: 'text', style: 'heading4' }],
 	['Card', 'card'],
+	['Form', 'form'],
 	['Tabs', 'tabs'],
 	['List', 'list'],
 	['Code', 'code'],

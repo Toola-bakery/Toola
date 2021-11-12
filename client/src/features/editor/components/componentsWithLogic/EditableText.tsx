@@ -106,7 +106,7 @@ export function EditableText({
 				style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: 0, ...style }}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
-				placeholder={placeholder}
+				placeholder={editing ? placeholder : ''}
 			/>
 		</StyledContentEditable>
 	);

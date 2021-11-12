@@ -51,6 +51,15 @@ const StyledSchemaDrawer = styled.div`
 		width: 100%;
 		z-index: 100;
 	}
+
+	.bp4-tree-node-content-2 {
+		font-size: 12px;
+		height: 18px;
+		.bp4-tree-node-label {
+			font-weight: 600;
+		}
+	}
+
 	.bp4-tree-node-secondary-label {
 		color: rgba(0, 0, 0, 0.28);
 	}

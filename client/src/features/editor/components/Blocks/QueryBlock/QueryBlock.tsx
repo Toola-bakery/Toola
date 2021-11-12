@@ -115,7 +115,7 @@ async function main () {
 	useSyncBlockState<CodeBlockState>('logs', logs);
 	useSyncBlockState<CodeBlockState>('loading', loading);
 
-	useDeclareBlockMethods<QueryBlockMethods>(id, { trigger }, [trigger]);
+	useDeclareBlockMethods<QueryBlockMethods>({ trigger }, [trigger]);
 
 	const { callNextTime } = useNextRenderHook(trigger);
 

@@ -72,7 +72,7 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 	useSyncBlockState<CodeBlockState>('logs', logs);
 	useSyncBlockState<CodeBlockState>('loading', loading);
 
-	useDeclareBlockMethods<CodeBlockMethods>(id, { trigger }, [trigger]);
+	useDeclareBlockMethods<CodeBlockMethods>({ trigger }, [trigger]);
 
 	const onEditorMount = useCallback(
 		(editor?: Monaco.editor.IStandaloneCodeEditor) => {

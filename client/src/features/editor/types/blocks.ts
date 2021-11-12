@@ -68,4 +68,5 @@ export type BlockPropsAndState =
 	| ButtonBlockProps;
 
 export type BlockStates = InputBlockState | TableBlockState | CodeBlockState | QueryBlockState;
-export type BlockMethods = QueryBlockMethods | CodeBlockMethods | InputBlockMethods;
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type BlockMethods = { [key: string]: Function };

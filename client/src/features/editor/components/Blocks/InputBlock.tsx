@@ -44,7 +44,7 @@ export function InputBlock({ block, hide }: { block: BasicBlock & InputBlockType
 		[id, updateBlockState],
 	);
 
-	useDeclareBlockMethods<InputBlockMethods>(id, { setValue }, [setValue]);
+	useDeclareBlockMethods<InputBlockMethods>({ setValue }, [setValue]);
 	const { onContextMenu, inspectorProps } = useBlockInspectorState([
 		{
 			label: 'Label',
