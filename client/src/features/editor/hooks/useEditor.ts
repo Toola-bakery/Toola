@@ -3,11 +3,12 @@ import { Draft } from 'immer/dist/types/types-external';
 import { useCallback } from 'react';
 import { AppToaster } from '../../../components/Toaster';
 import { store } from '../../../redux';
+import { installedBlocks } from '../components/Block/BlockSelector';
 import { ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { useCurrent } from './useCurrent';
 import { DeleteBlockEvent } from './useDeleteBlockHook';
 import { useEvents, Event } from './useEvents';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { useAppDispatch } from '../../../redux/hooks';
 import {
 	addBlocks as addBlocksAction,
 	updateBlockProps as updateBlockPropsAction,
@@ -25,6 +26,8 @@ import { usePageContext } from '../../executor/hooks/useReferences';
 import { BlockCreators } from '../helpers/BlockCreators';
 import { BlockProps, Blocks } from '../types/blocks';
 
+const GENERATED_ID_REGEXP = new RegExp(`^(${Object.keys(installedBlocks).join('|')})\\d+`);
+
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 type UseEditorResponse = {
@@ -39,7 +42,7 @@ type UseEditorResponse = {
 	deleteBlock: (blockId: string) => void;
 	deleteFromParent: (blockId: string) => void;
 	updateParentId: (blockId: string, parentId: string) => void;
-	updateBlockType: (blockId: string, type: Blocks['type'] | ({ type: Blocks['type'] } & Partial<BlockProps>)) => void;
+	updateBlockType: (blockId: string, type: string | ({ [p: string]: any } & { type: string })) => void;
 	updateBlockId: (blockId: string, newBlockId: string) => void;
 	updateBlockProps: (block: Partial<BlockProps> & Pick<BasicBlock, 'id'>, focus?: boolean | number) => void;
 	immerBlockProps: <Block extends BlockProps = BlockProps, D = Draft<Block & BasicBlock>>(
@@ -47,7 +50,7 @@ type UseEditorResponse = {
 		recipe: (draft: D) => undefined | void,
 	) => void;
 	updateBlockState: (block: Partial<Blocks> & Pick<BasicBlock, 'id'>, focus?: boolean | number) => void;
-	getNextId: (name: Blocks['type']) => string;
+	getNextId: (name: string) => string;
 };
 
 const cache: { [pageId: string]: { [key: string]: number } } = {};
@@ -190,38 +193,6 @@ export function useEditor(): UseEditorResponse {
 		[dispatch, pageId],
 	);
 
-	const updateBlockType = useCallback<UseEditorResponse['updateBlockType']>(
-		(blockId, typeOrBlock) => {
-			const type = typeof typeOrBlock === 'string' ? typeOrBlock : typeOrBlock.type;
-			const blocks = getBlocks(pageId);
-			const block = blocks[blockId];
-			const { parentId } = block;
-
-			const newBlock = BlockCreators[type] ? BlockCreators[type](block) : { ...block, type };
-
-			const [{ id: newId, blocks: maybeBlocks }] = addBlocks([
-				{
-					...newBlock,
-					...(typeof typeOrBlock === 'string' ? {} : typeOrBlock),
-					pageId,
-					parentId,
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					type,
-				},
-			]) as (BasicBlock & ColumnBlockType)[]; // to fix type error
-
-			if (newId !== blockId) {
-				if (parentId) addChildInsteadOf(blockId, newId);
-				deleteBlock(blockId);
-				if (Array.isArray(maybeBlocks)) {
-					maybeBlocks.forEach(() => updateParentId(blockId, newId));
-				}
-			}
-		},
-		[pageId, addBlocks, addChildInsteadOf, deleteBlock, updateParentId],
-	);
-
 	const updateBlockId = useCallback<UseEditorResponse['updateBlockId']>(
 		(blockId, newBlockId) => {
 			if (blockId === newBlockId) return;
@@ -258,10 +229,46 @@ export function useEditor(): UseEditorResponse {
 			// @ts-ignore
 			addBlocks([{ ...block, id: newBlockId }]);
 
-			if (parentId) addChildInsteadOf(blockId, newBlockId);
+			if (parentId && parentId !== 'queries') addChildInsteadOf(blockId, newBlockId);
+			const children = (block as ColumnBlockType).blocks;
+
+			if (Array.isArray(children)) {
+				children.forEach((childId) => updateParentId(childId, newBlockId));
+			}
 			deleteBlock(blockId);
 		},
-		[addBlocks, pageId, addChildInsteadOf, deleteBlock],
+		[pageId, addBlocks, addChildInsteadOf, deleteBlock, updateParentId],
+	);
+
+	const updateBlockType = useCallback<UseEditorResponse['updateBlockType']>(
+		(blockId, typeOrBlock) => {
+			const type = typeof typeOrBlock === 'string' ? typeOrBlock : typeOrBlock.type;
+			const blocks = getBlocks(pageId);
+			const block = blocks[blockId];
+			const { parentId } = block;
+
+			const newBlock = BlockCreators[type] ? BlockCreators[type](block) : block;
+
+			addBlocks([
+				{
+					...newBlock,
+					...(typeof typeOrBlock === 'string' ? {} : typeOrBlock),
+					pageId,
+					parentId,
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					type,
+					id: blockId,
+				},
+			]);
+
+			const isGeneratedId = GENERATED_ID_REGEXP.test(blockId);
+			if (isGeneratedId) {
+				const newId = getNextId(type);
+				updateBlockId(blockId, newId);
+			}
+		},
+		[pageId, addBlocks, getNextId, updateBlockId],
 	);
 	return {
 		immerBlockProps,

@@ -4,6 +4,7 @@ import { Blocks } from '../../types/blocks';
 import { ButtonBlock, ButtonBlockType } from '../Blocks/ButtonBlock';
 import { CardBlock } from '../Blocks/CardBlock';
 import { CodeBlock, CodeBlockType } from '../Blocks/CodeBlock/CodeBlock';
+import { FormBlock } from '../Blocks/FormBlock';
 import { ImageBlock, ImageBlockType } from '../Blocks/ImageBlock';
 import { InputBlock, InputBlockType } from '../Blocks/InputBlock';
 import { JSONViewBlock, JSONViewBlockType } from '../Blocks/JSONViewBlock';
@@ -15,20 +16,27 @@ import { TableBlock } from '../Blocks/TableBlock/TableBlock';
 import { TabsBlock } from '../Blocks/TabsBlock';
 import { TextBlock, TextBlockType } from '../Blocks/TextBlock/TextBlock';
 
+export const installedBlocks = {
+	text: TextBlock,
+	list: ListBlock,
+	form: FormBlock,
+	tabs: TabsBlock,
+	code: CodeBlock,
+	query: QueryBlock,
+	JSONView: JSONViewBlock,
+	keyValue: KeyValueBlock,
+	table: TableBlock,
+	image: ImageBlock,
+	input: InputBlock,
+	button: ButtonBlock,
+	card: CardBlock,
+	subpage: SubPageBlock,
+};
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
-	const type = block.type as string;
-	if (type === 'text') return <TextBlock hide={hide} block={block as BasicBlock & TextBlockType} />;
-	if (type === 'list') return <ListBlock hide={hide} />;
-	if (type === 'tabs') return <TabsBlock hide={hide} />;
-	if (type === 'code') return <CodeBlock hide={hide} block={block as BasicBlock & CodeBlockType} />;
-	if (type === 'query') return <QueryBlock hide={hide} block={block as BasicBlock & QueryBlockType} />;
-	if (type === 'JSONView') return <JSONViewBlock hide={hide} block={block as BasicBlock & JSONViewBlockType} />;
-	if (type === 'keyValue') return <KeyValueBlock hide={hide} block={block as BasicBlock & KeyValueBlockType} />;
-	if (type === 'table') return <TableBlock hide={hide} />;
-	if (type === 'image') return <ImageBlock hide={hide} block={block as BasicBlock & ImageBlockType} />;
-	if (type === 'input') return <InputBlock hide={hide} block={block as BasicBlock & InputBlockType} />;
-	if (type === 'button') return <ButtonBlock hide={hide} />;
-	if (type === 'subpage') return <SubPageBlock hide={hide} block={block as BasicBlock & SubPageBlockType} />;
-	if (type === 'card') return <CardBlock hide={hide} />;
-	return null;
+	const type = block.type as keyof typeof installedBlocks;
+	const BlockComponent = installedBlocks[type];
+	if (!BlockComponent) return null;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	return <BlockComponent hide={hide} block={block as BasicBlock & SubPageBlockType} />;
 }
