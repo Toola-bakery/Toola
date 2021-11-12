@@ -55,6 +55,7 @@ export function useReferenceEvaluator({
 
 			const evaluateContext = Object.entries({
 				blocks: watchReferences ? blockProxy : blocks,
+				...(watchReferences ? blockProxy : blocks),
 				globals,
 				current,
 				updateId,

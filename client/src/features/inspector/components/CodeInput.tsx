@@ -9,32 +9,56 @@ import { TextInput } from '../../ui/components/TextInput';
 
 const GO_DEEPER_TYPES = ['object', 'array'];
 
-type Suggestion = { value: string; type: string };
+type Suggestion = { value: string; type: string; canGoDeeper: boolean };
+
+function typeOf(object: any) {
+	const type = typeof object;
+
+	if (type === 'undefined') {
+		return 'undefined';
+	}
+
+	if (object) {
+		return object.constructor.name.toLowerCase();
+	}
+	if (type === 'object') {
+		return toString.call(object).slice(8, -1).toLowerCase();
+	}
+
+	return type.toLowerCase();
+}
 
 function wrapKey(key: string) {
 	if (/^[a-z_][a-z0-9_]*$/gi.test(key)) return `.${key}`;
 	return `["${key}"]`;
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getSuggestionKeys(currentState: any) {
+export function getSuggestionKeys(currentState: any, level?: number) {
 	const suggestions: Suggestion[] = [];
 	Object.keys(currentState).forEach((key) => {
 		const value1 = currentState[key];
+
+		const canGoDeeper1 = GO_DEEPER_TYPES.includes(typeOf(value1));
+		if (level === 0 || value1 === null || !canGoDeeper1)
+			return suggestions.push({ value: key, type: typeOf(value1), canGoDeeper: canGoDeeper1 });
+
 		Object.keys(value1).forEach((key2) => {
 			const value2 = value1[key2];
-			if (value2 == null || !GO_DEEPER_TYPES.includes(typeof value2))
-				suggestions.push({ value: `${key}${wrapKey(key2)}`, type: typeof value2 });
-			else
-				Object.keys(value2).forEach((key3) => {
-					const value3 = value2[key3];
-					suggestions.push({ value: `${key}${wrapKey(key2)}${wrapKey(key3)}`, type: typeof value3 });
-				});
+			const canGoDeeper2 = GO_DEEPER_TYPES.includes(typeOf(value2));
+
+			if (level === 1 || value2 === null || !canGoDeeper2)
+				return suggestions.push({ value: `${key}${wrapKey(key2)}`, type: typeOf(value2), canGoDeeper: canGoDeeper2 });
+
+			Object.keys(value2).forEach((key3) => {
+				const value3 = value2[key3];
+				suggestions.push({ value: `${key}${wrapKey(key2)}${wrapKey(key3)}`, type: typeOf(value3), canGoDeeper: false });
+			});
 		});
 	});
 	return suggestions;
 }
 
-export function CodeHints({ hints, onSelect }: { onSelect: (value: string | null) => void; hints: Suggestion[] }) {
+export function CodeHints({ hints, onSelect }: { onSelect: (value: Suggestion | null) => void; hints: Suggestion[] }) {
 	return (
 		<Menu
 			style={{
@@ -50,7 +74,7 @@ export function CodeHints({ hints, onSelect }: { onSelect: (value: string | null
 			{hints.map((hint) => (
 				<MenuItem
 					onClick={(e) => {
-						onSelect(hint.value);
+						onSelect(hint);
 						e.preventDefault();
 						e.stopPropagation();
 					}}
@@ -102,7 +126,13 @@ export function CodeInput({
 	}, [start, type, value]);
 
 	const { blocks } = useCurrent();
-	const suggestions = useMemo(() => getSuggestionKeys({ blocks }), [blocks]);
+	const { globals } = usePageContext();
+
+	const level = currentWord.length - currentWord.replace(/\./g, '').length;
+
+	const suggestions = useMemo(() => {
+		return getSuggestionKeys({ ...blocks, globals }, level);
+	}, [blocks, globals, level]);
 
 	const filteredSuggestions = useMemo(() => {
 		if (!isReference) return [];
@@ -129,9 +159,10 @@ export function CodeInput({
 				<CodeHints
 					onSelect={(v) => {
 						if (!v) return;
-						const newValue = value.slice(0, suggestionWordStartIndex) + v + value.slice(start);
+						const append = v.value + (v.canGoDeeper ? '.' : '');
+						const newValue = value.slice(0, suggestionWordStartIndex) + append + value.slice(start);
 						onChange(newValue);
-						setNextCursorPosition(suggestionWordStartIndex + v.length);
+						setNextCursorPosition(suggestionWordStartIndex + append.length);
 					}}
 					hints={filteredSuggestions}
 				/>
