@@ -2,7 +2,7 @@ import { Button, Tab, Tabs } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 import { useDrawer, useDrawerResizable } from '../../drawer/hooks/useDrawer';
-import { useIsDevtoolsOpen } from '../../editor/hooks/useIsDevtoolsOpen';
+import { DevtoolsStates, useIsDevtoolsOpen } from '../../editor/hooks/useIsDevtoolsOpen';
 import { GlobalsTab } from './Globals/GlobalsTab';
 import { QueriesTab } from './Queries/QueriesTab';
 
@@ -68,11 +68,11 @@ export function Devtools() {
 				className="devtools-tabs"
 				id="DevtoolsTabs"
 				animate={false}
-				onChange={(newTabId) => setDevtoolsOpen(newTabId as string)}
+				onChange={(newTabId) => setDevtoolsOpen(newTabId as DevtoolsStates)}
 				selectedTabId={isDevtoolsOpen}
 			>
 				<Tab style={{ marginTop: 0 }} id="queries" title="Queries" panel={<QueriesTab />} />
-				<Tab id="globals" title="Globals" panel={<GlobalsTab />} />
+				<Tab id="blocks" title="Blocks" panel={<GlobalsTab />} />
 				<Tabs.Expander />
 				<div style={{ display: 'flex', alignContent: 'center' }}>
 					<Button

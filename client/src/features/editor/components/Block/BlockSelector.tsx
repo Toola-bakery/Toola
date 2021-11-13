@@ -1,20 +1,20 @@
 import React from 'react';
 import { BasicBlock } from '../../types/basicBlock';
 import { Blocks } from '../../types/blocks';
-import { ButtonBlock, ButtonBlockType } from '../Blocks/ButtonBlock';
+import { ButtonBlock } from '../Blocks/ButtonBlock';
 import { CardBlock } from '../Blocks/CardBlock';
-import { CodeBlock, CodeBlockType } from '../Blocks/CodeBlock/CodeBlock';
+import { CodeBlock } from '../Blocks/CodeBlock/CodeBlock';
 import { FormBlock } from '../Blocks/FormBlock';
-import { ImageBlock, ImageBlockType } from '../Blocks/ImageBlock';
-import { InputBlock, InputBlockType } from '../Blocks/InputBlock';
-import { JSONViewBlock, JSONViewBlockType } from '../Blocks/JSONViewBlock';
-import { KeyValueBlock, KeyValueBlockType } from '../Blocks/KeyValueBlock';
+import { ImageBlock } from '../Blocks/ImageBlock';
+import { InputBlock } from '../Blocks/InputBlock';
+import { JSONViewBlock } from '../Blocks/JSONViewBlock';
+import { KeyValueBlock } from '../Blocks/KeyValueBlock';
 import { ListBlock } from '../Blocks/ListBlock/ListBlock';
-import { QueryBlock, QueryBlockType } from '../Blocks/QueryBlock/QueryBlock';
-import { SubPageBlock, SubPageBlockType } from '../Blocks/SubPageBlock';
+import { QueryBlock } from '../Blocks/QueryBlock/QueryBlock';
+import { SubPageBlock } from '../Blocks/SubPageBlock';
 import { TableBlock } from '../Blocks/TableBlock/TableBlock';
 import { TabsBlock } from '../Blocks/TabsBlock';
-import { TextBlock, TextBlockType } from '../Blocks/TextBlock/TextBlock';
+import { TextBlock } from '../Blocks/TextBlock/TextBlock';
 
 export const installedBlocks = {
 	text: TextBlock,
@@ -38,5 +38,5 @@ export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blo
 	if (!BlockComponent) return null;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	return <BlockComponent hide={hide} block={block as BasicBlock & SubPageBlockType} />;
+	return <BlockComponent hide={hide} block={block} />;
 }
