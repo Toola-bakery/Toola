@@ -1,5 +1,5 @@
-import { Dialog, Divider, FormGroup, HTMLSelect, HTMLTable, InputGroup } from '@blueprintjs/core';
-import React, { useState } from 'react';
+import { Button, Dialog, FormGroup, HTMLSelect, HTMLTable, InputGroup } from '@blueprintjs/core';
+import React, { useCallback, useState } from 'react';
 import { noCase } from 'change-case';
 import styled from 'styled-components';
 import { useResourceSchema } from '../../../../resources/hooks/useResourceSchema';
@@ -31,6 +31,8 @@ export function GenerateFormModal({ isOpen, close }: { isOpen: boolean; close: (
 	const [tableName, setTableName] = useState<string>();
 	const currentResource = schemas.find((schema) => schema.resource._id === resourceId);
 	const currentTables = (tableName && currentResource && (currentResource?.schema as any)[tableName]) || {};
+
+	const createForm = useCallback(() => {}, []);
 
 	return (
 		<Dialog
@@ -101,9 +103,9 @@ export function GenerateFormModal({ isOpen, close }: { isOpen: boolean; close: (
 					paddingRight: 8,
 				}}
 			>
-				<button type="submit" className="bp4-button bp4-intent-primary">
+				<Button onClick={() => {}} intent="primary">
 					Create form
-				</button>
+				</Button>
 			</div>
 		</Dialog>
 	);
