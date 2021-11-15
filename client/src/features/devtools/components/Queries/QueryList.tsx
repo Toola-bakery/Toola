@@ -1,7 +1,10 @@
-import { Button, Icon, InputGroup, Menu, MenuItem, NonIdealState } from '@blueprintjs/core';
+import { Button, Icon, InputGroup, Menu, MenuItem, NonIdealState, Position } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
+import * as React from 'react';
 import { useCallback } from 'react';
 import { DropTarget } from '../../../editor/components/Blocks/Layout/DropTarget';
 import { PageBlockProps } from '../../../editor/components/Page/Page';
+import { BlockCreators } from '../../../editor/helpers/BlockCreators';
 import { useBlockDrag } from '../../../editor/hooks/useBlockDrag';
 import { useCurrent } from '../../../editor/hooks/useCurrent';
 import { useEditor } from '../../../editor/hooks/useEditor';
@@ -47,20 +50,34 @@ export function QueryList({
 	setActiveBlock: (blockId: string) => void;
 	activeBlockId: string | undefined;
 }) {
-	const { page } = usePageContext();
-	const { updateParentId, immerBlockProps } = useEditor();
-
-	const onDrop = useCallback(
-		(afterBlockId: string | null, event: { id: string }) => {
-			const blockId = event.id;
-			updateParentId(blockId, 'queries');
+	const { page, pageId } = usePageContext();
+	const { updateParentId, immerBlockProps, addBlocks } = useEditor();
+	const addToQueries = useCallback(
+		(blockId: string, afterBlockId?: string | null) => {
 			immerBlockProps<PageBlockProps>('page', (draft) => {
 				if (!draft.queries) draft.queries = [];
 				if (!afterBlockId) draft.queries = [blockId, ...draft.queries];
 				else draft.queries.splice(draft.queries.indexOf(afterBlockId) + 1, 0, blockId);
 			});
 		},
-		[immerBlockProps, updateParentId],
+		[immerBlockProps],
+	);
+	const onDrop = useCallback(
+		(afterBlockId: string | null, event: { id: string }) => {
+			const blockId = event.id;
+			updateParentId(blockId, 'queries');
+			addToQueries(event.id, afterBlockId);
+		},
+		[addToQueries, updateParentId],
+	);
+
+	const createQuery = useCallback(
+		(type: 'code' | 'query') => {
+			const [{ id }] = addBlocks([{ ...BlockCreators[type](), pageId, parentId: 'queries' }]);
+			setActiveBlock(id);
+			addToQueries(id);
+		},
+		[addBlocks, addToQueries, pageId, setActiveBlock],
 	);
 
 	return (
@@ -76,7 +93,23 @@ export function QueryList({
 				}}
 			>
 				<InputGroup fill small placeholder="Search..." />
-				<Button style={{ marginLeft: 3 }} icon="plus" minimal small />
+				<Popover2
+					minimal
+					content={
+						<Menu
+							style={{
+								boxShadow:
+									'0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%), 0 8px 24px rgb(17 20 24 / 20%)',
+							}}
+						>
+							<MenuItem icon="form" text="Add Query block" onClick={() => createQuery('query')} />
+							<MenuItem icon="code" text="Add Code block" onClick={() => createQuery('code')} />
+						</Menu>
+					}
+					position={Position.BOTTOM}
+				>
+					<Button style={{ marginLeft: 3 }} icon="plus" minimal small />
+				</Popover2>
 			</div>
 			<Menu>
 				<DropTarget onDrop={(d) => onDrop(null, d)} dropIds={['Block:code', 'Block:query']} />

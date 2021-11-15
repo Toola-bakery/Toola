@@ -1,4 +1,5 @@
-import { Menu, Divider, Popover, MenuItem, Position } from '@blueprintjs/core';
+import { Menu, Divider, MenuItem, Position } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useProjects } from '../../usersAndProjects/hooks/useProjects';
@@ -15,10 +16,15 @@ export function ProjectBar() {
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
-			<Popover
+			<Popover2
 				minimal
 				content={
-					<Menu>
+					<Menu
+						style={{
+							boxShadow: '0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%), 0 8px 24px rgb(17 20 24 / 20%)',
+							maxWidth: 250,
+						}}
+					>
 						{projects?.map((project) => (
 							<MenuItem
 								key={project._id}
@@ -38,7 +44,7 @@ export function ProjectBar() {
 				<DrawerMenuItem icon={<ProjectAvatar size={18} />} height={40}>
 					{currentProject?.name}
 				</DrawerMenuItem>
-			</Popover>
+			</Popover2>
 			<DrawerOmnibar>
 				<DrawerMenuItem iconStyle={{ color: 'rgba(0, 0, 0, 0.3)' }} icon="search">
 					Quick find
