@@ -4,6 +4,7 @@
 	"private": true,
 	"dependencies": {
 		"@blueprintjs/core": "next",
+		"@blueprintjs/datetime": "next",
 		"@blueprintjs/icons": "next",
 		"@blueprintjs/popover2": "next",
 		"@blueprintjs/select": "next",
@@ -19,6 +20,7 @@
 		"@types/react-router-dom": "^5.3.1",
 		"@types/react-table": "^7.7.2",
 		"@types/uuid": "^8.3.1",
+		"change-case": "^4.1.2",
 		"copy-to-clipboard": "^3.3.1",
 		"dayjs": "^1.10.7",
 		"emoji-mart": "^3.0.1",
@@ -32,6 +34,7 @@
 		"json-stringify-safe": "^5.0.1",
 		"just-debounce": "^1.1.0",
 		"ky": "^0.28.5",
+		"moment": "^2.29.1",
 		"monaco-editor": "^0.27.0",
 		"patch-package": "^6.4.7",
 		"postinstall-postinstall": "^2.1.0",

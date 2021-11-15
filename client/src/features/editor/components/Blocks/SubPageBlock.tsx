@@ -1,16 +1,18 @@
 import { Button } from '@blueprintjs/core';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as React from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Config } from '../../../../Config';
 import { useKy } from '../../../../hooks/useKy';
+import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { useProjects } from '../../../usersAndProjects/hooks/useProjects';
+import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
+import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 import { usePage } from '../Page/hooks/usePage';
 import { Page } from '../Page/hooks/usePages';
 import { PageBlockProps } from '../Page/Page';
@@ -29,17 +31,22 @@ export function SubPageBlock({ block, hide }: { block: BasicBlock & SubPageBlock
 	const { immerBlockProps, updateBlockProps } = useEditor();
 	const { currentProjectId } = useProjects();
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([
-		{
-			label: 'Page Params',
-			type: 'input',
-			onChange: (v) =>
-				immerBlockProps<SubPageBlockProps>(id, (draft) => {
-					draft.state = v;
-				}),
-			value: state,
-		},
-	]);
+	const menu = useMemo<MenuItemProps[]>(
+		() => [
+			{
+				label: 'Page Params',
+				type: 'input',
+				onChange: (v) =>
+					immerBlockProps<SubPageBlockProps>(id, (draft) => {
+						draft.state = v;
+					}),
+				value: state,
+			},
+		],
+		[id, immerBlockProps, state],
+	);
+	useAppendBlockMenu(menu, 1);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	const { navigate } = usePageNavigator();
 	const ky = useKy();

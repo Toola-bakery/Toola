@@ -4,9 +4,12 @@ import { Blocks } from '../../types/blocks';
 import { ButtonBlock } from '../Blocks/ButtonBlock';
 import { CardBlock } from '../Blocks/CardBlock';
 import { CodeBlock } from '../Blocks/CodeBlock/CodeBlock';
-import { FormBlock } from '../Blocks/FormBlock';
+import { FormBlock } from '../Blocks/FormBlock/FormBlock';
 import { ImageBlock } from '../Blocks/ImageBlock';
-import { InputBlock } from '../Blocks/InputBlock';
+import { DateInputBlock } from '../Blocks/Inputs/DateInputBlock';
+import { InputBlock } from '../Blocks/Inputs/InputBlock';
+import { NumericInputBlock } from '../Blocks/Inputs/NumericInputBlock';
+import { TextAreaBlock } from '../Blocks/Inputs/TextAreaBlock';
 import { JSONViewBlock } from '../Blocks/JSONViewBlock';
 import { KeyValueBlock } from '../Blocks/KeyValueBlock';
 import { ListBlock } from '../Blocks/ListBlock/ListBlock';
@@ -28,6 +31,9 @@ export const installedBlocks = {
 	table: TableBlock,
 	image: ImageBlock,
 	input: InputBlock,
+	numericInput: NumericInputBlock,
+	dateInput: DateInputBlock,
+	textArea: TextAreaBlock,
 	button: ButtonBlock,
 	card: CardBlock,
 	subpage: SubPageBlock,

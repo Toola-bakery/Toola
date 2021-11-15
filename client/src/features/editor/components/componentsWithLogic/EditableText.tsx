@@ -15,6 +15,7 @@ const StyledContentEditable = styled.div`
 	.forcePlaceholder:after {
 		color: rgba(55, 53, 47, 0.4);
 		content: attr(placeholder);
+		cursor: text;
 	}
 `;
 
@@ -27,7 +28,9 @@ export function EditableText({
 	setValue: controlledSetValue,
 	allowEntities = true,
 	placeholder,
+	valuePropertyName = 'value',
 }: {
+	valuePropertyName?: string;
 	defaultValue?: string;
 	tagName?: string;
 	className?: string;
@@ -44,7 +47,7 @@ export function EditableText({
 
 	if (typeof defaultValue !== 'undefined' && typeof controlledSetValue !== 'undefined')
 		throw new Error('You cant use defaultValue with setValue');
-	const [internalValue, setInternalValue] = useBlockProperty('value', defaultValue);
+	const [internalValue, setInternalValue] = useBlockProperty(valuePropertyName, defaultValue);
 	const [entities, setEntities] = useBlockProperty<TextEntity[] | undefined>(
 		'entities',
 		allowEntities ? [] : undefined,

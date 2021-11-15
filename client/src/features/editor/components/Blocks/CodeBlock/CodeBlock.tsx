@@ -1,18 +1,20 @@
 import { Button, Card, Spinner, Tab, Tabs } from '@blueprintjs/core';
 import Monaco from 'monaco-editor';
 import { stringify, parse } from 'flatted';
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import safeStringify from 'json-stringify-safe';
 import styled from 'styled-components';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
+import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
 import { SchemaDrawerWrapper } from '../../../../resources/components/SchemaDrawer/SchemaDrawerWrapper';
+import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
 import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
-import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
+import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { MonacoEditor } from './MonacoEditor';
 
@@ -92,14 +94,21 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 		if (!block.show) onEditorMount();
 	});
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([
-		{
-			type: 'switch',
-			label: 'Manual control',
-			onChange: (nextValue: boolean) => updateBlockProps({ id, manualControl: nextValue }),
-			value: block.manualControl,
-		},
-	]);
+	const menu = useMemo<MenuItemProps[]>(
+		() => [
+			{
+				type: 'switch',
+				label: 'Manual control',
+				onChange: (nextValue: boolean) => updateBlockProps({ id, manualControl: nextValue }),
+				value: block.manualControl,
+			},
+		],
+		[block.manualControl, id, updateBlockProps],
+	);
+
+	useAppendBlockMenu(menu, 1);
+
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	const isHide = hide || !block.show;
 	if (isHide) return null;

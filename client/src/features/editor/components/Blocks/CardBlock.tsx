@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useBlock } from '../../hooks/useBlock';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
+import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 import { BasicBlock } from '../../types/basicBlock';
 import { EditableText } from '../componentsWithLogic/EditableText';
 import { EmojiPicker } from '../componentsWithLogic/EmojiPicker';
@@ -13,7 +13,7 @@ export function CardBlock({ hide }: { hide: boolean }) {
 	const block = useBlock();
 	const [blocks] = useBlockProperty<string[]>('blocks', []);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 	if (hide || !block.show) return null;
 
 	return (

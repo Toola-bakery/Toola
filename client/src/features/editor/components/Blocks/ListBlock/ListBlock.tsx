@@ -2,7 +2,9 @@ import { Card } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
 import { useReferenceEvaluator } from '../../../../executor/hooks/useReferences';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
+import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
+import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
+import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { useBlock } from '../../../hooks/useBlock';
 import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -24,14 +26,19 @@ export function ListBlock({ hide }: { hide: boolean }) {
 		return Array.isArray(state) ? state : [state];
 	}, [evaluate, value]);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([
-		{
-			label: 'Data Source',
-			type: 'input',
-			onChange: (v) => setValue(v),
-			value,
-		},
-	]);
+	const menu = useMemo<MenuItemProps[]>(
+		() => [
+			{
+				label: 'Data Source',
+				type: 'input',
+				onChange: (v) => setValue(v),
+				value,
+			},
+		],
+		[setValue, value],
+	);
+	useAppendBlockMenu(menu, 1);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	if (hide || !block.show) return null;
 

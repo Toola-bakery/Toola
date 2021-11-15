@@ -1,14 +1,16 @@
 import { Button } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
+import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { usePageModal } from '../../../pageModal/hooks/usePageModal';
+import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlock } from '../../hooks/useBlock';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useCurrent } from '../../hooks/useCurrent';
 import { BasicBlock } from '../../types/basicBlock';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useReferenceEvaluator, useReferences } from '../../../executor/hooks/useReferences';
-import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
+import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 import { CodeBlockType } from './CodeBlock/CodeBlock';
 import { QueryBlockType } from './QueryBlock/QueryBlock';
 
@@ -33,49 +35,69 @@ export function ButtonBlock({ hide }: { hide: boolean }) {
 	const { navigate } = usePageNavigator();
 	const { push } = usePageModal();
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([
-		{
-			label: 'Name',
-			type: 'input',
-			onChange: (v: string) => setButtonName(v),
-			value: buttonName,
-		},
-		{
-			label: 'Action type',
-			type: 'select',
-			options: ['Trigger query', 'Navigate page', 'Open modal', 'Custom code'],
-			onChange: (v) => setActionType(v),
-			value: actionType,
-		},
-		{
-			label: 'Trigger',
-			type: 'input',
-			hide: actionType !== 'Custom code',
-			onChange: (v: string) => setCustomCode(v),
-			value: customCode,
-		},
-		{
-			label: 'Select query',
-			type: 'querySelector',
-			hide: actionType !== 'Trigger query',
-			onChange: (v: string) => setQuery(v),
-			value: query,
-		},
-		{
-			label: 'Select page',
-			type: 'pages',
-			hide: !['Navigate page', 'Open modal'].includes(actionType),
-			onChange: (v: string) => setSelectedPage(v),
-			value: selectedPage,
-		},
-		{
-			label: 'Page params',
-			type: 'input',
-			hide: !['Navigate page', 'Open modal'].includes(actionType),
-			onChange: (v: string) => setPageParams(v),
-			value: pageParams,
-		},
-	]);
+	const menu = useMemo<MenuItemProps[]>(
+		() => [
+			{
+				label: 'Name',
+				type: 'input',
+				onChange: (v: string) => setButtonName(v),
+				value: buttonName,
+			},
+			{
+				label: 'Action type',
+				type: 'select',
+				options: ['Trigger query', 'Navigate page', 'Open modal', 'Custom code'],
+				onChange: (v) => setActionType(v),
+				value: actionType,
+			},
+			{
+				label: 'Trigger',
+				type: 'input',
+				hide: actionType !== 'Custom code',
+				onChange: (v: string) => setCustomCode(v),
+				value: customCode,
+			},
+			{
+				label: 'Select query',
+				type: 'querySelector',
+				hide: actionType !== 'Trigger query',
+				onChange: (v: string) => setQuery(v),
+				value: query,
+			},
+			{
+				label: 'Select page',
+				type: 'pages',
+				hide: !['Navigate page', 'Open modal'].includes(actionType),
+				onChange: (v: string) => setSelectedPage(v),
+				value: selectedPage,
+			},
+			{
+				label: 'Page params',
+				type: 'input',
+				hide: !['Navigate page', 'Open modal'].includes(actionType),
+				onChange: (v: string) => setPageParams(v),
+				value: pageParams,
+			},
+		],
+		[
+			actionType,
+			buttonName,
+			customCode,
+			pageParams,
+			query,
+			selectedPage,
+			setActionType,
+			setButtonName,
+			setCustomCode,
+			setPageParams,
+			setQuery,
+			setSelectedPage,
+		],
+	);
+
+	useAppendBlockMenu(menu, 1);
+
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	if (hide || !show) return null;
 

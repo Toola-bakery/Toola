@@ -73,21 +73,21 @@ export function SchemaDrawer() {
 		reverse: true,
 		setSize,
 	});
-	const { responses, resources } = useResourceSchema();
+	const schemas = useResourceSchema();
 
 	const [countSuccess, setCountSuccess] = useState(0);
 	const [state, immer] = useImmer<TreeNodeInfo[]>([]);
 
 	useEffect(() => {
-		if (responses.filter((v) => v.isSuccess).length === countSuccess) return;
-		setCountSuccess(responses.filter((v) => v.isSuccess).length);
-		const contents = responses
-			.map<TreeNodeInfo | null>((resp, i) => {
-				if (!resp.isSuccess || !resp.data) return null;
-				const resourceName = resources[i].name;
+		if (schemas.filter((v) => v.schemaQuery.isSuccess).length === countSuccess) return;
+		setCountSuccess(schemas.filter((v) => v.schemaQuery.isSuccess).length);
+		const contents = schemas
+			.map<TreeNodeInfo | null>((resp) => {
+				if (!resp.schemaQuery.isSuccess || !resp.resource) return null;
+				const resourceName = resp.resource.name;
 
 				return {
-					id: resources[i]._id,
+					id: resp.resource._id,
 					label: resourceName,
 					isExpanded: true,
 					secondaryLabel: (
@@ -96,16 +96,16 @@ export function SchemaDrawer() {
 							minimal
 							style={{ minHeight: 20, minWidth: 20, color: 'rgba(0,0,0,0.37)' }}
 							rightIcon={<Icon icon="duplicate" size={12} style={{ color: 'rgba(0,0,0,0.37)' }} />}
-							onClick={() => copy(resources[i]._id)}
+							onClick={() => copy(resp.resource._id)}
 						>
 							id
 						</Button>
 					),
-					childNodes: Object.entries(resp.data as any).map(([tableName, columns]) => ({
+					childNodes: Object.entries(resp.schema as any).map(([tableName, columns]) => ({
 						id: tableName,
 						label: tableName,
 						isExpanded: false,
-						childNodes: Object.entries(columns as any).map(([columnName, v]) => ({
+						childNodes: Object.entries((resp.schema as any)[tableName]).map(([columnName, v]) => ({
 							id: columnName,
 							label: columnName,
 							secondaryLabel: (v as any)?.data_type,
@@ -115,7 +115,7 @@ export function SchemaDrawer() {
 			})
 			.filter((v): v is TreeNodeInfo => !!v);
 		immer(contents);
-	}, [countSuccess, immer, resources, responses]);
+	}, [countSuccess, immer, schemas]);
 
 	return (
 		<StyledSchemaDrawer style={{ width: size, overflowY: 'hidden' }}>

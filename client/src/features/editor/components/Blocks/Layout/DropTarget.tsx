@@ -1,22 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDrop } from 'react-dnd';
-import { BlockTypes } from '../../../helpers/BlockCreators';
 import { BasicBlock } from '../../../types/basicBlock';
 import { Blocks } from '../../../types/blocks';
-
-const DropIds = BlockTypes.map((type) => `Block:${type}`);
+import { installedBlocks } from '../../Block/BlockSelector';
 
 export function DropTarget({
 	vertical = false,
 	onDrop,
-	dropIds = DropIds,
+	dropIds,
 }: {
 	vertical?: boolean;
 	onDrop: (item: BasicBlock & Blocks) => void;
 	dropIds?: string[];
 }) {
+	const defaultDropIds = useMemo(() => Object.keys(installedBlocks).map((type) => `Block:${type}`), []);
+
 	const [{ isOver }, drop] = useDrop(() => ({
-		accept: dropIds,
+		accept: dropIds || defaultDropIds,
 		drop: onDrop,
 		collect: (monitor) => ({
 			isOver: monitor.isOver(),

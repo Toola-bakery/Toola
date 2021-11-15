@@ -17,5 +17,7 @@ export function useResourceSchema() {
 
 	const responses = useQueries(queries);
 
-	return { responses, resources: data };
+	return useMemo(() => {
+		return data.map((v, i) => ({ resource: v, schema: responses[i].data, schemaQuery: responses[i] }));
+	}, [data, responses]);
 }

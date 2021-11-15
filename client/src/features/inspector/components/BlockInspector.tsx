@@ -2,6 +2,7 @@ import { Classes, Menu } from '@blueprintjs/core';
 import { Popover2, Popover2TargetProps } from '@blueprintjs/popover2';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
+import styled from 'styled-components';
 import { InspectorItem, MenuItemProps } from './InspectorItem';
 import { NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
 import { ViewMenuItemProps } from './InspectorItems/ViewItem';
@@ -13,6 +14,14 @@ export type BlockInspectorProps = {
 	path: string[];
 	setPath: (state: ((oldPath: string[]) => string[]) | string[]) => void;
 };
+
+const StyledMenu = styled(Menu)`
+	max-height: 350px;
+	overflow-y: auto;
+	.bp4-menu-item-icon:empty {
+		display: none !important;
+	}
+`;
 
 export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInspectorProps) {
 	const state = path.reduce<(NestedMenuItemProps | ViewMenuItemProps)['next']>((acc, key) => {
@@ -52,7 +61,7 @@ export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInsp
 			positioningStrategy="fixed"
 			content={
 				Array.isArray(state) ? (
-					<Menu
+					<StyledMenu
 						style={{
 							boxShadow: '0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%), 0 8px 24px rgb(17 20 24 / 20%)',
 						}}
@@ -62,7 +71,7 @@ export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInsp
 							.map((item) => (
 								<InspectorItem key={item.label} close={close} item={item} setPath={setPath} />
 							))}
-					</Menu>
+					</StyledMenu>
 				) : (
 					state({}) || <></>
 				)

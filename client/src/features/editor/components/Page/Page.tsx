@@ -16,7 +16,7 @@ import { usePage } from './hooks/usePage';
 import { useIsEditing } from '../../hooks/useIsEditing';
 import { useStateToWS } from '../../hooks/useStateToWS';
 import { selectBlocksProps, setPage } from '../../redux/editor';
-import { Block, BlockContext } from '../Block/Block';
+import { Block, BlockContext, BlockContextProvider } from '../Block/Block';
 import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
 import { ColumnBlock, ColumnBlockType } from '../Blocks/Layout/ColumnBlock';
@@ -109,7 +109,7 @@ function PageBlock({ isError }: { isError: boolean }) {
 							/>
 						) : null}
 						{page ? (
-							<BlockContext.Provider value={{ block: page, setOnDragClick: () => {} }}>
+							<BlockContextProvider block={page}>
 								{!isError ? <PageBar isModal={isModal} /> : null}
 								<PageWrapper page={page}>
 									{!isError && page ? (
@@ -117,7 +117,7 @@ function PageBlock({ isError }: { isError: boolean }) {
 									) : null}
 									{editing ? <CreateBlockAtTheEnd parentId="page" /> : null}
 								</PageWrapper>
-							</BlockContext.Provider>
+							</BlockContextProvider>
 						) : null}
 					</div>
 				</LeftDrawerWrapper>

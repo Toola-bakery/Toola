@@ -1,4 +1,4 @@
-import { MenuItem } from '@blueprintjs/core';
+import { Icon, MenuItem } from '@blueprintjs/core';
 import React from 'react';
 import { MenuItemProps, BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
@@ -16,6 +16,7 @@ export function NestedMenuItem({ item, setPath, Wrapper = MenuItem }: InspectorI
 				setPath?.((path) => [...path, item.label]);
 			}}
 			text={item.label}
+			labelElement={<Icon icon="chevron-right" />}
 		/>
 	);
 }

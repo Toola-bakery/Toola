@@ -20,7 +20,12 @@ import { JSONViewBlockProps, JSONViewBlockType } from '../components/Blocks/JSON
 import { PageBlockProps, PageBlockType } from '../components/Page/Page';
 import { RowBlockProps, RowBlockType } from '../components/Blocks/Layout/RowBlock';
 import { TableBlockProps, TableBlockState, TableBlockType } from '../components/Blocks/TableBlock/TableBlock';
-import { InputBlockMethods, InputBlockProps, InputBlockState, InputBlockType } from '../components/Blocks/InputBlock';
+import {
+	InputBlockMethods,
+	InputBlockProps,
+	InputBlockState,
+	InputBlockType,
+} from '../components/Blocks/Inputs/InputBlock';
 
 export type Blocks =
 	| InputBlockType

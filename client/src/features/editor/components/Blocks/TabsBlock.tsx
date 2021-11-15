@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import { usePageContext, useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
-import { useBlockInspectorState } from '../../../inspector/hooks/useBlockInspectorState';
+import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
+import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 import { useBlock } from '../../hooks/useBlock';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useCurrent } from '../../hooks/useCurrent';
@@ -82,47 +83,43 @@ export function TabsBlock({ hide }: { hide: boolean }) {
 		}
 	}, [addColumnAfterAndPutItem, tabs]);
 
-	const tabMenus =
-		tabs?.map<MenuItemProps>((tab, i) => ({
-			type: 'nested',
-			label: `tab${tab}`,
-			next: [
-				{
-					label: 'Header',
-					type: 'input',
-					onChange: (v) =>
-						setTabNames((draft) => {
-							draft[i] = v;
-						}),
-					value: tabNames[i],
-				},
-				{
-					label: 'Delete tab',
-					type: 'item',
-					closeAfterCall: true,
-					call: () => {
-						setTabNames((draft) => {
-							draft.splice(i, 1);
-						});
-						setTabEmojis((draft) => {
-							draft.splice(i, 1);
-						});
-						setTabs((draft) => {
-							draft.splice(i, 1);
-						});
+	const menu = useMemo<MenuItemProps[]>(() => {
+		const tabMenus =
+			tabs?.map<MenuItemProps>((tab, i) => ({
+				type: 'nested',
+				label: `tab${tab}`,
+				next: [
+					{
+						label: 'Header',
+						type: 'input',
+						onChange: (v) =>
+							setTabNames((draft) => {
+								draft[i] = v;
+							}),
+						value: tabNames[i],
 					},
-				},
-			],
-		})) || [];
-
-	const { onContextMenu, inspectorProps } = useBlockInspectorState((defaultMenuWrap) => [
-		{
-			type: 'nested',
-			label: 'global',
-			next: defaultMenuWrap([]),
-		},
-		...tabMenus,
-	]);
+					{
+						label: 'Delete tab',
+						type: 'item',
+						closeAfterCall: true,
+						call: () => {
+							setTabNames((draft) => {
+								draft.splice(i, 1);
+							});
+							setTabEmojis((draft) => {
+								draft.splice(i, 1);
+							});
+							setTabs((draft) => {
+								draft.splice(i, 1);
+							});
+						},
+					},
+				],
+			})) || [];
+		return [...tabMenus];
+	}, [setTabEmojis, setTabNames, setTabs, tabNames, tabs]);
+	useAppendBlockMenu(menu, 1);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	if (hide || !block.show) return null;
 

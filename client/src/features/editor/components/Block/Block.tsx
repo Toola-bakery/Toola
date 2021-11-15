@@ -1,8 +1,11 @@
 import { Button } from '@blueprintjs/core';
 import React, { PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
+import { v4 } from 'uuid';
 import { usePageContext } from '../../../executor/hooks/useReferences';
+import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { BlockCreators } from '../../helpers/BlockCreators';
+import { useBlockInspectorProvider } from '../../hooks/blockInspector/useBlockInspectorProvider';
 import { useBlockDrag } from '../../hooks/useBlockDrag';
 import { useCurrent } from '../../hooks/useCurrent';
 import { useEditor } from '../../hooks/useEditor';
@@ -18,9 +21,13 @@ export type BlockContextType = {
 	block: undefined | BasicBlock;
 	setOnDragClick: (listener: DragClickEventHandler) => void;
 	onDragClick?: DragClickEventHandler;
+	menu: MenuItemProps[];
+	appendMenuParticle: (menu: MenuItemProps[], index: number) => () => void;
 };
 
 export const BlockContext = React.createContext<BlockContextType>({
+	appendMenuParticle: () => () => {},
+	menu: [],
 	block: undefined,
 	setOnDragClick: () => {},
 	onDragClick: () => {},
@@ -40,9 +47,14 @@ export function BlockContextProvider({
 
 	const block = blockId ? blocks[blockId] : customBlock;
 
-	if (!blockId && !customBlock) throw new Error('BlockContextProvider: set customBlock or blockId');
+	if ((!blockId && !customBlock) || !block) throw new Error('BlockContextProvider: set customBlock or blockId');
 
-	const value = useMemo(() => ({ block, setOnDragClick, onDragClick }), [block, setOnDragClick, onDragClick]);
+	const { appendMenuParticle, menu } = useBlockInspectorProvider(block);
+
+	const value = useMemo(
+		() => ({ block, setOnDragClick, onDragClick, menu, appendMenuParticle }),
+		[block, setOnDragClick, onDragClick, menu, appendMenuParticle],
+	);
 	return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
 }
 

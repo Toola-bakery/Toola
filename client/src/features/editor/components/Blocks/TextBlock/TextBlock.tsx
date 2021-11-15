@@ -8,7 +8,7 @@ import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext, useReferences } from '../../../../executor/hooks/useReferences';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../../inspector/hooks/useBlockInspectorState';
+import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { commonPlugins, entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
 import { TextEntity } from './plugins/TextPlugins';
 import { useTextBlockOnKeyDownHandler } from './hooks/useTextBlockOnKeyDownHandler';
@@ -82,7 +82,7 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 		}
 	});
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState([]);
+	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
 		contentEditableRef,

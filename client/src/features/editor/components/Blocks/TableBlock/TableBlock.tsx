@@ -113,7 +113,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	return (
 		<>
 			<BlockInspector {...inspectorProps} />
-			<TableStyles onContextMenu={(e) => onContextMenu(e, ['global'])}>
+			<TableStyles onContextMenu={onContextMenu}>
 				<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
 					<div style={{ overflow: 'auto', height: style === 'a4' ? 'none' : 500 }}>
 						<HTMLTable bordered striped {...getTableProps()} className="table">

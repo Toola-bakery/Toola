@@ -12,7 +12,7 @@ export type InputMenuItemProps = BasicItemProps & {
 	multiline?: boolean;
 };
 
-const CSSFix = styled.div`
+const CSSFix = styled.div<{ hasIcon: boolean }>`
 	.bp4-text-overflow-ellipsis {
 		overflow: visible;
 	}
@@ -20,7 +20,7 @@ const CSSFix = styled.div`
 
 export function InputMenuItem({ item, Wrapper = MenuItem, inline }: InspectorItemProps<InputMenuItemProps>) {
 	return (
-		<CSSFix>
+		<CSSFix hasIcon={!!item.icon}>
 			<Wrapper
 				shouldDismissPopover={false}
 				icon={item.icon}
