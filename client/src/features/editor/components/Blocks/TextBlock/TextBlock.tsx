@@ -28,8 +28,8 @@ export type TextBlockStyles = keyof typeof textBlockStyleTag;
 export type TextBlockProps = {
 	type: 'text';
 	style?: TextBlockStyles;
-	value: string;
-	entities: TextEntity[];
+	value?: string;
+	entities?: TextEntity[];
 };
 
 const BR_TAG = /<br\s*\/?>/ms;

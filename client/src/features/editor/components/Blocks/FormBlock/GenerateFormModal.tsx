@@ -1,16 +1,12 @@
 import { Button, Dialog, FormGroup, HTMLSelect, HTMLTable, InputGroup } from '@blueprintjs/core';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { noCase } from 'change-case';
 import styled from 'styled-components';
+import { useImmer } from 'use-immer';
+import { normalizeCase } from '../../../../../libs/normalizeCase';
 import { useResourceSchema } from '../../../../resources/hooks/useResourceSchema';
-
-function upperCaseFirst(input: string) {
-	return input.charAt(0).toUpperCase() + input.substr(1);
-}
-
-function styleLabel(input: string) {
-	return upperCaseFirst(noCase(input));
-}
+import { useBlock } from '../../../hooks/useBlock';
+import { useEditor } from '../../../hooks/useEditor';
 
 const StyledHTMLTable = styled(HTMLTable)`
 	& tbody tr:first-child th,
@@ -25,14 +21,54 @@ const StyledHTMLTable = styled(HTMLTable)`
 		//box-shadow: inset 0 1px 0 0 rgb(17 20 24 / 15%);
 	}
 `;
+
 export function GenerateFormModal({ isOpen, close }: { isOpen: boolean; close: () => void }) {
+	const { id, pageId } = useBlock();
 	const schemas = useResourceSchema();
 	const [resourceId, setResourceId] = useState<string>();
 	const [tableName, setTableName] = useState<string>();
-	const currentResource = schemas.find((schema) => schema.resource._id === resourceId);
-	const currentTables = (tableName && currentResource && (currentResource?.schema as any)[tableName]) || {};
+	const currentResource = useMemo(
+		() => schemas.find((schema) => schema.resource._id === resourceId),
+		[resourceId, schemas],
+	);
+	useEffect(() => {
+		if (!resourceId && schemas?.[0]?.resource?._id) setResourceId(schemas[0].resource._id);
+	}, [schemas, resourceId]);
 
-	const createForm = useCallback(() => {}, []);
+	const currentTables = useMemo(
+		() => (tableName && currentResource && (currentResource?.schema as any)[tableName]) || {},
+		[currentResource, tableName],
+	);
+	useEffect(() => {
+		if (tableName) return;
+		const schema = currentResource && (currentResource?.schema as any);
+		if (schema && Object.keys(schema).length) {
+			setTableName(Object.keys(schema)[0]);
+		}
+	}, [currentResource, tableName]);
+
+	const [inputValues, immer] = useImmer<{ [name: string]: string }>({});
+
+	useEffect(() => {
+		const newValue = Object.fromEntries(Object.entries(currentTables).map(([name]) => [name, normalizeCase(name)]));
+		immer(newValue);
+	}, [currentTables, immer]);
+
+	const { addBlocks, addChild } = useEditor();
+
+	const createForm = useCallback(() => {
+		const createdBlocks = addBlocks(
+			Object.entries(inputValues).map(([name, label]) => ({
+				type: 'textInput',
+				label,
+				placeholder: label,
+				parentId: id,
+				pageId,
+			})),
+		);
+		createdBlocks.map(({ id: childId }) => addChild(id, childId));
+		close();
+	}, [addBlocks, addChild, close, id, inputValues, pageId]);
 
 	return (
 		<Dialog
@@ -55,7 +91,10 @@ export function GenerateFormModal({ isOpen, close }: { isOpen: boolean; close: (
 					<HTMLSelect
 						value={resourceId}
 						options={schemas.map((schema) => ({ value: schema.resource._id, label: schema.resource.name }))}
-						onChange={(e) => setResourceId(e.target.value)}
+						onChange={(e) => {
+							setResourceId(e.target.value);
+							setTableName('');
+						}}
 					/>
 				</FormGroup>
 				<FormGroup style={{ marginLeft: 8, marginBottom: 0 }} label="Table" inline>
@@ -81,11 +120,18 @@ export function GenerateFormModal({ isOpen, close }: { isOpen: boolean; close: (
 					</thead>
 					<tbody>
 						{Object.entries(currentTables).map(([name, v]) => (
-							<tr>
+							<tr key={name}>
 								<td>{name}</td>
 								<td>{(v as any).data_type}</td>
 								<td>
-									<InputGroup value={styleLabel(name)} />
+									<InputGroup
+										value={inputValues[name]}
+										onChange={(e) =>
+											immer((draft) => {
+												draft[name] = e.target.value;
+											})
+										}
+									/>
 								</td>
 								<td>Text input</td>
 							</tr>
@@ -103,7 +149,7 @@ export function GenerateFormModal({ isOpen, close }: { isOpen: boolean; close: (
 					paddingRight: 8,
 				}}
 			>
-				<Button onClick={() => {}} intent="primary">
+				<Button onClick={createForm} intent="primary">
 					Create form
 				</Button>
 			</div>

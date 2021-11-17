@@ -45,14 +45,20 @@ export function InputLabel() {
 	return (
 		<div
 			style={{
-				display: 'flex',
+				maxWidth: `${labelWidth}${labelWidthUnit}`,
+				width: `${labelWidth}${labelWidthUnit}`,
 				minWidth: `${labelWidth}${labelWidthUnit}`,
 				justifyContent: labelAlign === 'right' ? 'flex-end' : 'flex-start',
 				alignItems: 'flex-start',
-				lineHeight: '30px',
 			}}
 		>
-			<EditableText tagName="b" valuePropertyName="label" allowEntities={false} />
+			<EditableText
+				style={{ lineHeight: '30px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+				tagName="label"
+				className="bp4-label"
+				valuePropertyName="label"
+				allowEntities={false}
+			/>
 		</div>
 	);
 }

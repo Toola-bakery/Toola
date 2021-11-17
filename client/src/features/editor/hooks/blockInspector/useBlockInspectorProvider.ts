@@ -1,10 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
+import { installedBlocks } from '../../components/Block/BlockSelector';
 import { BasicBlock } from '../../types/basicBlock';
 import { useEditor } from '../useEditor';
 
-const TurnIntoBlocks = (<[string, string | ({ [key: string]: any } & { type: string })][]>[
+const TurnIntoBlocks: [
+	string,
+	keyof typeof installedBlocks | ({ [key: string]: any } & { type: keyof typeof installedBlocks }),
+][] = [
 	['Text', 'text'],
 	['Heading 1', { type: 'text', style: 'heading1' }],
 	['Heading 2', { type: 'text', style: 'heading2' }],
@@ -21,16 +25,12 @@ const TurnIntoBlocks = (<[string, string | ({ [key: string]: any } & { type: str
 	['KeyValue viewer', 'keyValue'],
 	['Table', 'table'],
 	['Image', 'image'],
-	['Input', 'input'],
+	['Input', 'textInput'],
 	['Numeric input', 'numericInput'],
 	['TextArea', 'textArea'],
 	['Date input', 'dateInput'],
 	['Button', 'button'],
-]).sort((a, b) => {
-	if (a > b) return 1;
-	if (b > a) return -1;
-	return 0;
-}) as [string, string | ({ [key: string]: any } & { type: string })][];
+];
 
 export function useBlockInspectorProvider(block: BasicBlock) {
 	const { id, display } = block;

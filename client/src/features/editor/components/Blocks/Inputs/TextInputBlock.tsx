@@ -1,24 +1,19 @@
 import { InputGroup } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
-import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlock } from '../../../hooks/useBlock';
-import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
-import { useReferenceEvaluator } from '../../../../executor/hooks/useReferences';
-import { BasicBlock } from '../../../types/basicBlock';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
-import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
 import { useValuePlaceholderInitialController } from './hooks';
 
 export type InputBlockType = InputBlockProps & InputBlockState & InputBlockMethods;
 export type InputBlockProps = {
-	type: 'input';
-	initialValue: string;
-	label: string;
+	type: 'textInput';
+	initialValue?: string;
+	placeholder?: string;
+	label?: string;
 };
 
 export type InputBlockState = {
@@ -33,9 +28,9 @@ const StyledInput = styled.div`
 	}
 `;
 
-export function InputBlock({ hide }: { hide: boolean }) {
+export function TextInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
-	const { value, setValue } = useValuePlaceholderInitialController();
+	const { value, setValue, placeholder } = useValuePlaceholderInitialController();
 	useDeclareBlockMethods<InputBlockMethods>({ setValue: (newValue: string) => setValue(newValue) }, [setValue]);
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState();
@@ -52,6 +47,7 @@ export function InputBlock({ hide }: { hide: boolean }) {
 					fill
 					value={value}
 					autoComplete="off"
+					placeholder={placeholder}
 					onChange={(e) => {
 						setValue(e.target.value);
 					}}

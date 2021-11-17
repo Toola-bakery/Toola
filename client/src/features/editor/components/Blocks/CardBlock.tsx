@@ -23,7 +23,7 @@ export function CardBlock({ hide }: { hide: boolean }) {
 				<Card>
 					<div style={{ display: 'flex', alignItems: 'center' }}>
 						<EmojiPicker useDefaultDocument={false} />
-						<EditableText tagName="h4" className="bp4-heading" />
+						<EditableText placeholder="Untitled" tagName="h4" className="bp4-heading" />
 					</div>
 					<ColumnBlock fake block={block as BasicBlock & ColumnBlockType} />
 				</Card>

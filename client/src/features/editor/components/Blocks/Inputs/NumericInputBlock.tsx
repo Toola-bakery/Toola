@@ -28,6 +28,7 @@ export function NumericInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { evaluate } = useReferenceEvaluator();
 	const [initialValue, setInitialValue] = useBlockProperty<string>('initialValue', '');
+	const [placeholder, setPlaceholder] = useBlockProperty<string>('placeholder', '');
 	const [value, setValue] = useBlockState<number | ''>('value', '');
 
 	useOnMountedEffect(() => {
@@ -42,8 +43,14 @@ export function NumericInputBlock({ hide }: { hide: boolean }) {
 				onChange: setInitialValue,
 				value: initialValue,
 			},
+			{
+				label: 'Placeholder',
+				type: 'input',
+				onChange: setPlaceholder,
+				value: placeholder,
+			},
 		],
-		[initialValue, setInitialValue],
+		[initialValue, placeholder, setInitialValue, setPlaceholder],
 	);
 	useAppendBlockMenu(menu, 1);
 
@@ -61,6 +68,7 @@ export function NumericInputBlock({ hide }: { hide: boolean }) {
 				<InputLabel />
 				<NumericInput
 					fill
+					placeholder={placeholder}
 					value={value}
 					autoComplete="off"
 					onValueChange={(valueAsNumber, valueAsString) => {

@@ -113,15 +113,15 @@ export function useTextBlockOnKeyDownHandler({
 				deleteBlockRef.current(id);
 				if (previousRef.current?.type === 'text') {
 					const newBlock = concatEntities(
-						previousRef.current.value,
-						previousRef.current.entities,
+						previousRef.current.value || '',
+						previousRef.current.entities || [],
 						valueRef.current,
 						entitiesRef.current,
 					);
 
 					updateBlockProps(
 						{ id: previousRef.current.id, value: newBlock[0], entities: newBlock[1] },
-						previousRef.current.value.length,
+						(previousRef.current.value || '').length,
 					);
 				}
 			}

@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Column } from 'react-table';
 import { v4 } from 'uuid';
 import { usePrevious } from '../../../../../../hooks/usePrevious';
-import { useRefLatest } from '../../../../../../hooks/useRefLatest';
-import { useBlockProperty } from '../../../../hooks/useBlockProperty';
-import { TableColumnProp } from '../TableBlock';
+import { normalizeCase } from '../../../../../../libs/normalizeCase';
 import { usePageContext, useReferenceEvaluator } from '../../../../../executor/hooks/useReferences';
+import { useBlockProperty } from '../../../../hooks/useBlockProperty';
+import { ColumnTypes } from '../RenderCellType';
+import { TableColumnProp } from '../TableBlock';
 
 export function useTableBlockColumnsAndData() {
 	const { editing } = usePageContext();
@@ -27,9 +28,10 @@ export function useTableBlockColumnsAndData() {
 			if (typeof row === 'object' && row !== null) Object.keys(row).forEach((key) => keys.add(key));
 		});
 		return Array.from(keys).map<TableColumnProp>((accessor) => ({
-			header: accessor,
+			header: normalizeCase(accessor),
 			value: `\${current["${accessor}"]}`,
 			width: 150,
+			type: /date/i.test(normalizeCase(accessor)) ? ColumnTypes.date : ColumnTypes.text,
 			id: v4(),
 			custom: false,
 		}));

@@ -14,7 +14,6 @@ import { BasicBlock } from '../../types/basicBlock';
 import { Blocks } from '../../types/blocks';
 import { EmojiPicker } from '../componentsWithLogic/EmojiPicker';
 import { ColumnBlock, ColumnBlockType } from './Layout/ColumnBlock';
-import { ColumnTypes, TableBlockProps } from './TableBlock/TableBlock';
 
 const TabsBlockStyles = styled.div`
 	height: 100%;

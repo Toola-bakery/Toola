@@ -25,7 +25,7 @@ import {
 	InputBlockProps,
 	InputBlockState,
 	InputBlockType,
-} from '../components/Blocks/Inputs/InputBlock';
+} from '../components/Blocks/Inputs/TextInputBlock';
 
 export type Blocks =
 	| InputBlockType

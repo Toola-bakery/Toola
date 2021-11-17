@@ -12,7 +12,7 @@ export function CreateBlockAtTheEnd({ parentId }: CreateBlockAtTheEndProps) {
 	const { editing } = usePageContext();
 
 	const handler = useCallback(() => {
-		if (editing) addBlockIn(parentId, BlockCreators.text());
+		if (editing) addBlockIn(parentId, { type: 'text' });
 	}, [editing, addBlockIn, parentId]);
 
 	return (

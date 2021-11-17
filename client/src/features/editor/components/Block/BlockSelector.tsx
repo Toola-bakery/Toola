@@ -7,7 +7,7 @@ import { CodeBlock } from '../Blocks/CodeBlock/CodeBlock';
 import { FormBlock } from '../Blocks/FormBlock/FormBlock';
 import { ImageBlock } from '../Blocks/ImageBlock';
 import { DateInputBlock } from '../Blocks/Inputs/DateInputBlock';
-import { InputBlock } from '../Blocks/Inputs/InputBlock';
+import { TextInputBlock } from '../Blocks/Inputs/TextInputBlock';
 import { NumericInputBlock } from '../Blocks/Inputs/NumericInputBlock';
 import { TextAreaBlock } from '../Blocks/Inputs/TextAreaBlock';
 import { JSONViewBlock } from '../Blocks/JSONViewBlock';
@@ -30,7 +30,7 @@ export const installedBlocks = {
 	keyValue: KeyValueBlock,
 	table: TableBlock,
 	image: ImageBlock,
-	input: InputBlock,
+	textInput: TextInputBlock,
 	numericInput: NumericInputBlock,
 	dateInput: DateInputBlock,
 	textArea: TextAreaBlock,

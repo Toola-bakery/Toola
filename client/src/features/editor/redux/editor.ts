@@ -3,6 +3,7 @@ import { applyPatches, Patch } from 'immer';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
+import { ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
 import { PageBlockProps } from '../components/Page/Page';
 import { BasicBlock } from '../types/basicBlock';
 import { BlockProps, Blocks, LayoutBlocks } from '../types/blocks';
@@ -44,10 +45,14 @@ function getPageHelper(state: EditorState, pageId: string): PageState {
 }
 
 function deleteBlockHelper(state: EditorState, pageId: string, blockId: string) {
+	const block = getBlockHelper(state, pageId, blockId);
+	if ((block as ColumnBlockType).blocks) {
+		const { blocks } = block as ColumnBlockType;
+		blocks.forEach((childId) => deleteBlockHelper(state, pageId, childId));
+	}
 	// allow recursive function
 	// eslint-disable-next-line @typescript-eslint/no-use-before-define
 	deleteChildFromParentHelper(state, pageId, blockId);
-
 	delete state.pages[pageId].blocksProperties[blockId];
 	// delete state.pages[pageId].blocksState[blockId];
 }
@@ -123,6 +128,8 @@ export const editorSlice = createSlice({
 			if (!parent) return;
 
 			(Array.isArray(blocksId) ? blocksId : [blocksId]).forEach((blockId, i) => {
+				// const { parentId: currentParentId } = getBlockHelper(state, pageId, blockId);
+				// if (currentParentId === parentId) return;
 				deleteChildFromParentHelper(state, pageId, blockId);
 				updateParentIdHelper(state, pageId, blockId, parentId);
 

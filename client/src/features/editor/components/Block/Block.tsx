@@ -74,7 +74,7 @@ export function Block({
 
 	const { addBlockAfter } = useEditor();
 	const addBlock = useCallback(() => {
-		if (editing) addBlockAfter(block.id, BlockCreators.text(), true);
+		if (editing) addBlockAfter(block.id, { type: 'text' }, true);
 	}, [editing, addBlockAfter, block.id]);
 
 	return (

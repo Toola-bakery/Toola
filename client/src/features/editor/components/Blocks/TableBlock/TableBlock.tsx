@@ -13,6 +13,7 @@ import { useTableColumnResizing } from './hooks/useTableColumnResizing';
 import { useTableInspector } from './hooks/useTableInspector';
 import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { ColumnDnD } from './ColumnDnD';
+import { ColumnTypes, RenderCellType } from './RenderCellType';
 import { TablePagination } from './TablePagination';
 import { TableStyles } from './TableStyles';
 
@@ -24,12 +25,6 @@ export type TableBlockProps = {
 	manualPagination: boolean;
 	connectedPage?: string;
 };
-
-export enum ColumnTypes {
-	json = 'json',
-	image = 'image',
-	text = 'text',
-}
 
 export type TableColumnProp = {
 	id: string;
@@ -170,18 +165,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 
 												return (
 													<td className="td" {...cell.getCellProps()} title={cellValue}>
-														{(() => {
-															// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-															// @ts-ignore
-															const type = cell.column.type as string;
-															if (type === ColumnTypes.image) {
-																if (Array.isArray(cell.value))
-																	return cell.value.map((url) => <img src={url} style={{ width: '100%' }} />);
-																return cellValue ? <img src={cellValue} style={{ width: '100%' }} /> : null;
-															}
-															if (type === ColumnTypes.json) return <JSONTree data={cell.value} />;
-															return cellValue;
-														})()}
+														<RenderCellType cell={cell} />
 													</td>
 												);
 											})}

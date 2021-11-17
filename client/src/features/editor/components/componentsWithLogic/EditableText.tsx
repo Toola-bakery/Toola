@@ -106,7 +106,13 @@ export function EditableText({
 				innerRef={contentEditableRef}
 				html={isFocused ? htmlValue : htmlString}
 				tagName={tagName}
-				style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: 0, ...style }}
+				style={{
+					whiteSpace: 'pre-wrap',
+					wordBreak: 'break-word',
+					marginBottom: 0,
+					cursor: editing ? 'text' : undefined,
+					...style,
+				}}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
 				placeholder={editing ? placeholder : ''}

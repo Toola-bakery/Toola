@@ -26,7 +26,7 @@ export function DropTarget({
 	return (
 		<div
 			style={{
-				backgroundColor: isOver ? 'red' : 'transparent',
+				backgroundColor: isOver ? '#adceeb' : 'transparent',
 				...(vertical ? { width: 5 } : { height: 5 }),
 			}}
 			ref={drop}

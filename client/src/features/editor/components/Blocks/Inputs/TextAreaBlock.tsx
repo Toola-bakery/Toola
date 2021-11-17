@@ -29,7 +29,7 @@ const StyledInput = styled.div`
 
 export function TextAreaBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
-	const { value, setValue } = useValuePlaceholderInitialController();
+	const { value, setValue, placeholder } = useValuePlaceholderInitialController();
 	useDeclareBlockMethods<InputBlockMethods>({ setValue: (newValue: string) => setValue(newValue) }, [setValue]);
 
 	const { onContextMenu, inspectorProps } = useBlockInspectorState();
@@ -46,6 +46,7 @@ export function TextAreaBlock({ hide }: { hide: boolean }) {
 					fill
 					value={value}
 					autoComplete="off"
+					placeholder={placeholder}
 					onChange={(e) => {
 						setValue(e.target.value);
 					}}

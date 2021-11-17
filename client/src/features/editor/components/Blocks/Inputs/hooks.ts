@@ -8,24 +8,27 @@ import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty
 export function useValuePlaceholderInitialController() {
 	const { evaluate } = useReferenceEvaluator();
 	const [initialValue, setInitialValue] = useBlockProperty<string>('initialValue', '');
-	const [value, setValue] = useBlockState('value', '');
-
-	useOnMountedEffect(() => {
-		if (initialValue) setValue(evaluate(initialValue));
-	});
+	const [placeholder, setPlaceholder] = useBlockProperty<string>('placeholder', '');
+	const [value, setValue] = useBlockState('value', () => evaluate(initialValue));
 
 	const menu = useMemo<MenuItemProps[]>(
 		() => [
 			{
-				label: 'Initial Value',
+				label: 'Initial value',
 				type: 'input',
 				onChange: setInitialValue,
 				value: initialValue,
 			},
+			{
+				label: 'Placeholder',
+				type: 'input',
+				onChange: setPlaceholder,
+				value: placeholder,
+			},
 		],
-		[initialValue, setInitialValue],
+		[initialValue, placeholder, setInitialValue, setPlaceholder],
 	);
 	useAppendBlockMenu(menu, 1);
 
-	return { value, setValue };
+	return { value, setValue, placeholder };
 }
