@@ -88,92 +88,90 @@ export function CodeHints({ hints, onSelect }: { onSelect: (value: Suggestion | 
 
 const formGroupStyle = { marginBottom: 0 };
 
-export const CodeInput = React.memo(
-	({
-		onChange,
-		value = '',
-		type = 'string',
-		label,
-		inline,
-		multiline,
-	}: {
-		label: string;
-		value: string;
-		type?: 'object' | 'string';
-		onChange: (v: string) => void;
-		inline?: boolean;
-		multiline?: boolean;
-	}) => {
-		const { start, ref: inputRef, updateCaret } = useCaretPosition();
+export function CodeInput({
+	onChange,
+	value = '',
+	type = 'string',
+	label,
+	inline,
+	multiline,
+}: {
+	label: string;
+	value: string;
+	type?: 'object' | 'string';
+	onChange: (v: string) => void;
+	inline?: boolean;
+	multiline?: boolean;
+}) {
+	const { start, ref: inputRef, updateCaret } = useCaretPosition();
 
-		const [nextCursorPosition, setNextCursorPosition] = useState<null | number>(null);
-		useEffect(() => {
-			if (nextCursorPosition === null) return;
-			setInputCaretPosition(inputRef.current, nextCursorPosition);
+	const [nextCursorPosition, setNextCursorPosition] = useState<null | number>(null);
+	useEffect(() => {
+		if (nextCursorPosition === null) return;
+		setInputCaretPosition(inputRef.current, nextCursorPosition);
+		updateCaret();
+	}, [inputRef, nextCursorPosition, updateCaret]);
+
+	const { isReference, currentWord, suggestionWordStartIndex } = useMemo(() => {
+		const closestSpaceIndex = value.lastIndexOf(' ', start - 1) + 1;
+		let word = value.slice(closestSpaceIndex, start);
+		let index = closestSpaceIndex;
+		const isRef = word.length > 0 && (word.startsWith('${') || type === 'object');
+
+		if (word.startsWith('${')) {
+			word = word.slice(2);
+			index += 2;
+		}
+
+		return { isReference: isRef, currentWord: word, suggestionWordStartIndex: index };
+	}, [start, type, value]);
+
+	const { blocks } = useCurrent();
+	const { globals } = usePageContext();
+
+	const level = currentWord.length - currentWord.replace(/\./g, '').length;
+
+	const suggestions = useMemo(() => {
+		return getSuggestionKeys({ ...blocks, globals }, level);
+	}, [blocks, globals, level]);
+
+	const filteredSuggestions = useMemo(() => {
+		if (!isReference) return [];
+		return suggestions.filter((v) => v.value.startsWith(currentWord) && v.value !== currentWord);
+	}, [isReference, suggestions, currentWord]);
+
+	const onChangeCallback = useCallback(
+		(e) => {
+			onChange(e.target.value);
 			updateCaret();
-		}, [inputRef, nextCursorPosition, updateCaret]);
-
-		const { isReference, currentWord, suggestionWordStartIndex } = useMemo(() => {
-			const closestSpaceIndex = value.lastIndexOf(' ', start - 1) + 1;
-			let word = value.slice(closestSpaceIndex, start);
-			let index = closestSpaceIndex;
-			const isRef = word.length > 0 && (word.startsWith('${') || type === 'object');
-
-			if (word.startsWith('${')) {
-				word = word.slice(2);
-				index += 2;
-			}
-
-			return { isReference: isRef, currentWord: word, suggestionWordStartIndex: index };
-		}, [start, type, value]);
-
-		const { blocks } = useCurrent();
-		const { globals } = usePageContext();
-
-		const level = currentWord.length - currentWord.replace(/\./g, '').length;
-
-		const suggestions = useMemo(() => {
-			return getSuggestionKeys({ ...blocks, globals }, level);
-		}, [blocks, globals, level]);
-
-		const filteredSuggestions = useMemo(() => {
-			if (!isReference) return [];
-			return suggestions.filter((v) => v.value.startsWith(currentWord) && v.value !== currentWord);
-		}, [isReference, suggestions, currentWord]);
-
-		const onChangeCallback = useCallback(
-			(e) => {
-				onChange(e.target.value);
-				updateCaret();
-			},
-			[onChange, updateCaret],
-		);
-		return (
+		},
+		[onChange, updateCaret],
+	);
+	return (
+		<div style={{ position: 'relative' }}>
+			<TextInput
+				formGroupStyle={formGroupStyle}
+				inline={inline}
+				label={label}
+				inputRef={inputRef}
+				value={value}
+				multiline={multiline}
+				fill
+				autoComplete="off"
+				onChange={onChangeCallback}
+			/>
 			<div style={{ position: 'relative' }}>
-				<TextInput
-					formGroupStyle={formGroupStyle}
-					inline={inline}
-					label={label}
-					inputRef={inputRef}
-					value={value}
-					multiline={multiline}
-					fill
-					autoComplete="off"
-					onChange={onChangeCallback}
+				<CodeHints
+					onSelect={(v) => {
+						if (!v) return;
+						const append = v.value + (v.canGoDeeper ? '.' : '');
+						const newValue = value.slice(0, suggestionWordStartIndex) + append + value.slice(start);
+						onChange(newValue);
+						setNextCursorPosition(suggestionWordStartIndex + append.length);
+					}}
+					hints={filteredSuggestions}
 				/>
-				<div style={{ position: 'relative' }}>
-					<CodeHints
-						onSelect={(v) => {
-							if (!v) return;
-							const append = v.value + (v.canGoDeeper ? '.' : '');
-							const newValue = value.slice(0, suggestionWordStartIndex) + append + value.slice(start);
-							onChange(newValue);
-							setNextCursorPosition(suggestionWordStartIndex + append.length);
-						}}
-						hints={filteredSuggestions}
-					/>
-				</div>
 			</div>
-		);
-	},
-);
+		</div>
+	);
+}
