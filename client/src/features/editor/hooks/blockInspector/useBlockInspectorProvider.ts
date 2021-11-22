@@ -20,6 +20,7 @@ const TurnIntoBlocks: [
 	['List', 'list'],
 	['Code', 'code'],
 	['Query', 'query'],
+	['Chart', 'chart'],
 	['Page', 'subpage'],
 	['Progress bar', 'progressBar'],
 	['JSON viewer', 'JSONView'],

@@ -17,8 +17,8 @@ export function CardBlock({ hide }: { hide: boolean }) {
 
 	return (
 		<div onContextMenu={showInspector}>
-			<Card>
-				<div style={{ display: 'flex', alignItems: 'center' }}>
+			<Card style={{ paddingTop: 25, paddingRight: 25, paddingBottom: 25, paddingLeft: 0 }}>
+				<div style={{ display: 'flex', alignItems: 'center', paddingLeft: 25 }}>
 					<EmojiPicker useDefaultDocument={false} />
 					<EditableText placeholder="Untitled" tagName="h4" className="bp4-heading" />
 				</div>

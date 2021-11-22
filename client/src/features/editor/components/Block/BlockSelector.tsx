@@ -3,6 +3,7 @@ import { BasicBlock } from '../../types/basicBlock';
 import { Blocks } from '../../types/blocks';
 import { ButtonBlock } from '../Blocks/ButtonBlock';
 import { CardBlock } from '../Blocks/CardBlock';
+import { ChartBlock } from '../Blocks/ChartBlock/ChartBlock';
 import { CodeBlock } from '../Blocks/CodeBlock/CodeBlock';
 import { FormBlock } from '../Blocks/FormBlock/FormBlock';
 import { ImageBlock } from '../Blocks/ImageBlock';
@@ -39,6 +40,7 @@ export const installedBlocks = {
 	card: CardBlock,
 	subpage: SubPageBlock,
 	progressBar: ProgressBarBlock,
+	chart: ChartBlock,
 };
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
 	const type = block.type as keyof typeof installedBlocks;
