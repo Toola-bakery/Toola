@@ -48,7 +48,7 @@ export function BlockContextProvider({
 		menu: [],
 	});
 
-	const [showInspector, setShowInspectorPrivate] = useState<DragClickEventHandler>(() => showInspectorPrivate);
+	const [showInspector, setShowInspectorPrivate] = useState<DragClickEventHandler>();
 
 	const setShowInspector = useCallback(
 		(nextShowInspector: DragClickEventHandler) => setShowInspectorPrivate(() => nextShowInspector),
@@ -65,8 +65,15 @@ export function BlockContextProvider({
 	);
 
 	const value = useMemo(
-		() => ({ block, showInspector, menu, appendMenuParticle, inspectorProps, setShowInspector }),
-		[block, showInspector, menu, appendMenuParticle, inspectorProps, setShowInspector],
+		() => ({
+			block,
+			showInspector: showInspector || showInspectorPrivate,
+			menu,
+			appendMenuParticle,
+			inspectorProps,
+			setShowInspector,
+		}),
+		[block, showInspector, showInspectorPrivate, menu, appendMenuParticle, inspectorProps, setShowInspector],
 	);
 	return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
 }

@@ -49,7 +49,7 @@ export function useTableBlockColumnsAndData() {
 		const cols: Column[] = (columns || []).map((col) => ({
 			Header: col.header,
 			accessor: (originalRow) => evaluate(col.value, originalRow),
-			minWidth: 100,
+			minWidth: 50,
 			maxWidth: 300,
 			width: col.width || 150,
 			type: col.type,

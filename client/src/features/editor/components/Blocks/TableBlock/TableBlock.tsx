@@ -49,7 +49,6 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	const [manualPagination] = useBlockProperty('manualPagination', false);
 	const [connectedPage] = useBlockProperty<string | undefined>('connectedPage');
 	const [, setColumns] = useBlockProperty<TableColumnProp[] | undefined>('columns');
-
 	const [, setSelectedRow] = useBlockState<any>('selectedRow');
 
 	const {
@@ -90,6 +89,7 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	const { showInspector } = useBlockContext();
 
 	useTableColumnResizing(columnResizing);
+	useTableInspector();
 
 	const addColumn = useCallback(() => {
 		setColumns((draft) => {
