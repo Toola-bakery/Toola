@@ -43,8 +43,8 @@ export function Logo() {
 				lineHeight: 30,
 				display: 'flex',
 				alignItems: 'center',
-				height: 30,
-				margin: 15,
+				height: 60,
+				paddingLeft: 15,
 			}}
 		>
 			<div style={{ fontSize: 30, marginRight: 5 }}>🍪</div>
