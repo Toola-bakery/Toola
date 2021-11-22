@@ -35,9 +35,11 @@ export function AppRouters() {
 				<PrivateRoute path={['/:pageId']}>
 					<EditorRoute />
 				</PrivateRoute>
-
-				<Route path="/">
+				<Route path="/landing">
 					<Landing />
+				</Route>
+				<Route path="/">
+					<Landing allowRedirect />
 				</Route>
 			</Switch>
 		</Router>

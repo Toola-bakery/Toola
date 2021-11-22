@@ -53,9 +53,9 @@ export function Logo() {
 	);
 }
 
-export function Landing() {
+export function Landing({ allowRedirect = false }: { allowRedirect?: boolean }) {
 	const { userId } = useUser(true);
-	useRelocateToAnyPageByCondition(!!userId);
+	useRelocateToAnyPageByCondition(!!userId && allowRedirect);
 
 	if (userId) return null;
 	return (
