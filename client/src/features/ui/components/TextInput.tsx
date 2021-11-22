@@ -12,32 +12,34 @@ export type TextInputProps<T extends boolean> = {
 	inputRef?: Exclude<React.Ref<T extends true ? HTMLTextAreaElement : HTMLInputElement>, null>;
 };
 
-export function TextInput<T extends boolean>({
-	fill,
-	label,
-	inline,
-	value,
-	inputRef,
-	multiline,
-	inputStyle,
-	formGroupStyle,
-	...rest
-}: TextInputProps<T> &
-	Omit<
-		TextareaHTMLAttributes<HTMLTextAreaElement> & InputHTMLAttributes<HTMLInputElement>,
-		keyof TextInputProps<T> | 'defaultValue'
-	>) {
-	return (
-		<FormGroup style={formGroupStyle} label={label} inline={inline}>
-			{multiline === true ? (
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				<TextArea style={inputStyle} {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
-			) : (
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				<InputGroup style={inputStyle} {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
-			)}
-		</FormGroup>
-	);
-}
+export const TextInput = React.memo(
+	<T extends boolean>({
+		fill,
+		label,
+		inline,
+		value,
+		inputRef,
+		multiline,
+		inputStyle,
+		formGroupStyle,
+		...rest
+	}: TextInputProps<T> &
+		Omit<
+			TextareaHTMLAttributes<HTMLTextAreaElement> & InputHTMLAttributes<HTMLInputElement>,
+			keyof TextInputProps<T> | 'defaultValue'
+		>) => {
+		return (
+			<FormGroup style={formGroupStyle} label={label} inline={inline}>
+				{multiline === true ? (
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					<TextArea style={inputStyle} {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
+				) : (
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					<InputGroup style={inputStyle} {...rest} inputRef={inputRef} fill={fill} placeholder={label} value={value} />
+				)}
+			</FormGroup>
+		);
+	},
+);

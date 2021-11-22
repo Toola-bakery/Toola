@@ -42,7 +42,7 @@ export type InspectorItemProps<Item = MenuItemProps> = {
 	inline?: boolean;
 };
 
-export function InspectorItem(props: InspectorItemProps) {
+export const InspectorItem = React.memo((props: InspectorItemProps) => {
 	const { item } = props;
 	if (item.type === 'blockName')
 		return <BlockNameMenuItem {...(props as InspectorItemProps<BlockNameMenuItemProps>)} />;
@@ -60,4 +60,4 @@ export function InspectorItem(props: InspectorItemProps) {
 	if (item.type === 'queryAction')
 		return <QueryActionMenuItem {...(props as InspectorItemProps<QueryActionMenuItemProps>)} />;
 	return null;
-}
+});

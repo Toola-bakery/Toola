@@ -1,4 +1,5 @@
 import { Button } from '@blueprintjs/core';
+import { useWhatChanged } from '@simbathesailor/use-what-changed';
 import React, { PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { usePageContext } from '../../../executor/hooks/useReferences';
@@ -43,9 +44,13 @@ export function BlockContextProvider({
 	const { blocks } = useCurrent();
 	const { editing } = usePageContext();
 
+	const block = blockId ? blocks[blockId] : customBlock;
+	if ((!blockId && !customBlock) || !block) throw new Error('BlockContextProvider: set customBlock or blockId');
+	const { appendMenuParticle, menu } = useBlockInspectorProvider(block);
+
 	const { onContextMenu: showInspectorPrivate, inspectorProps: inspectorPropsPrivate } = useInspectorState({
 		disabled: !editing,
-		menu: [],
+		menu,
 	});
 
 	const [showInspector, setShowInspectorPrivate] = useState<DragClickEventHandler>();
@@ -54,10 +59,6 @@ export function BlockContextProvider({
 		(nextShowInspector: DragClickEventHandler) => setShowInspectorPrivate(() => nextShowInspector),
 		[],
 	);
-
-	const block = blockId ? blocks[blockId] : customBlock;
-	if ((!blockId && !customBlock) || !block) throw new Error('BlockContextProvider: set customBlock or blockId');
-	const { appendMenuParticle, menu } = useBlockInspectorProvider(block);
 
 	const inspectorProps = useMemo<InspectorPropsType>(
 		() => ({ ...inspectorPropsPrivate, menu }),
@@ -90,7 +91,7 @@ export function Block({
 	const { editing } = usePageContext();
 
 	const [{ opacity }, dragRef, dragPreview] = useBlockDrag(block);
-	const { ref, isHover } = useHover<HTMLElement>();
+	// const { ref, isHover } = useHover<HTMLElement>();
 
 	const { addBlockAfter } = useEditor();
 	const addBlock = useCallback(() => {
@@ -99,12 +100,14 @@ export function Block({
 
 	return (
 		<BlockContextProvider block={block}>
-			<BlockInspector />
 			{!block.show || hide || minimal ? (
 				<BlockSelector block={block} hide={hide} />
 			) : (
 				<div
-					ref={mergeRefs([dragPreview, ref])}
+					ref={mergeRefs([
+						dragPreview,
+						//	ref
+					])}
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
@@ -114,8 +117,8 @@ export function Block({
 						transform: 'translate3d(0, 0, 0)',
 					}}
 				>
-					<BlockBadge dragRef={dragRef} show={isHover && editing} />
-					<div style={{ width: 25, flexShrink: 1, opacity: isHover && editing ? 1 : 0 }}>
+					<BlockBadge dragRef={dragRef} show={false} />
+					<div style={{ width: 25, flexShrink: 1, opacity: false ? 1 : 0 }}>
 						<Button
 							onClick={addBlock}
 							style={{
@@ -135,6 +138,7 @@ export function Block({
 					</div>
 				</div>
 			)}
+			<BlockInspector />
 		</BlockContextProvider>
 	);
 }

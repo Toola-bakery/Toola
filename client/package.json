@@ -10,6 +10,7 @@
 		"@blueprintjs/select": "next",
 		"@monaco-editor/react": "^4.2.2",
 		"@reduxjs/toolkit": "^1.6.0",
+		"@simbathesailor/use-what-changed": "^2.0.0",
 		"@testing-library/jest-dom": "latest",
 		"@testing-library/react": "latest",
 		"@testing-library/user-event": "latest",
