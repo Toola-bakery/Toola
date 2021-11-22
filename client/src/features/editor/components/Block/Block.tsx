@@ -91,7 +91,7 @@ export function Block({
 	const { editing } = usePageContext();
 
 	const [{ opacity }, dragRef, dragPreview] = useBlockDrag(block);
-	// const { ref, isHover } = useHover<HTMLElement>();
+	const { ref, isHover } = useHover<HTMLElement>();
 
 	const { addBlockAfter } = useEditor();
 	const addBlock = useCallback(() => {
@@ -104,10 +104,7 @@ export function Block({
 				<BlockSelector block={block} hide={hide} />
 			) : (
 				<div
-					ref={mergeRefs([
-						dragPreview,
-						//	ref
-					])}
+					ref={mergeRefs([dragPreview, ref])}
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
@@ -117,8 +114,8 @@ export function Block({
 						transform: 'translate3d(0, 0, 0)',
 					}}
 				>
-					<BlockBadge dragRef={dragRef} show={false} />
-					<div style={{ width: 25, flexShrink: 1, opacity: false ? 1 : 0 }}>
+					<BlockBadge dragRef={dragRef} show={isHover && editing} />
+					<div style={{ width: 25, flexShrink: 1, opacity: isHover && editing ? 1 : 0 }}>
 						<Button
 							onClick={addBlock}
 							style={{
