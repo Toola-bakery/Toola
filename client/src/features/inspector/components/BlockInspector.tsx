@@ -66,7 +66,7 @@ export function BlockInspector() {
 						))}
 				</StyledMenu>
 			) : (
-				state({}) || <></>
+				state?.({}) || <></>
 			),
 		[close, setPath, state],
 	);

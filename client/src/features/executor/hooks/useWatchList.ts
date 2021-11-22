@@ -24,6 +24,7 @@ export type WatchListProps = {
 
 export function evalGet(anyTopLevel: { globals: any; blocks: any }, keys: string[]) {
 	return populateKeys(keys).reduce<any>((acc, key) => {
+		if (!acc) return acc;
 		if (typeof acc === 'object' && key in acc) return acc[key];
 		return undefined;
 	}, anyTopLevel);
