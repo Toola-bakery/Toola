@@ -3,17 +3,10 @@ import { Popover2, Popover2TargetProps } from '@blueprintjs/popover2';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
-import { InspectorItem, MenuItemProps } from './InspectorItem';
+import { useBlockContext } from '../../editor/hooks/useBlockContext';
+import { InspectorItem } from './InspectorItem';
 import { NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
 import { ViewMenuItemProps } from './InspectorItems/ViewItem';
-
-export type BlockInspectorProps = {
-	menu: MenuItemProps[];
-	isOpen: [number, number] | false;
-	close: () => void;
-	path: string[];
-	setPath: (state: ((oldPath: string[]) => string[]) | string[]) => void;
-};
 
 const StyledMenu = styled(Menu)`
 	max-height: 350px;
@@ -23,7 +16,9 @@ const StyledMenu = styled(Menu)`
 	}
 `;
 
-export function BlockInspector({ isOpen, menu, close, path, setPath }: BlockInspectorProps) {
+export function BlockInspector() {
+	const { inspectorProps } = useBlockContext();
+	const { isOpen, menu, close, path, setPath } = inspectorProps;
 	const state = path.reduce<(NestedMenuItemProps | ViewMenuItemProps)['next']>((acc, key) => {
 		if (!Array.isArray(acc)) return acc;
 		const nextItem = acc.find((item) => item.label === key) as NestedMenuItemProps | ViewMenuItemProps;

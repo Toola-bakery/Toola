@@ -2,9 +2,8 @@ import { InputGroup } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { useBlock } from '../../../hooks/useBlock';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
 import { useValuePlaceholderInitialController } from './hooks';
 
@@ -31,28 +30,25 @@ const StyledInput = styled.div`
 export function TextInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { value, setValue, placeholder } = useValuePlaceholderInitialController();
+	const { showInspector } = useBlockContext();
+
 	useDeclareBlockMethods<InputBlockMethods>({ setValue: (newValue: string) => setValue(newValue) }, [setValue]);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
-
-	if (hide || !show) return <></>;
+	if (hide || !show) return null;
 
 	// TODO "helperText" Helper text with details...
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={onContextMenu}>
-				<InputLabel />
-				<InputGroup
-					fill
-					value={value}
-					autoComplete="off"
-					placeholder={placeholder}
-					onChange={(e) => {
-						setValue(e.target.value);
-					}}
-				/>
-			</StyledInput>
-		</>
+		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
+			<InputLabel />
+			<InputGroup
+				fill
+				value={value}
+				autoComplete="off"
+				placeholder={placeholder}
+				onChange={(e) => {
+					setValue(e.target.value);
+				}}
+			/>
+		</StyledInput>
 	);
 }

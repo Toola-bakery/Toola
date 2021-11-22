@@ -5,7 +5,6 @@ import { useBlockProperty } from '../../../../hooks/useBlockProperty';
 import { ColumnTypes } from '../RenderCellType';
 import { TableBlockProps, TableColumnProp } from '../TableBlock';
 import { MenuItemProps } from '../../../../../inspector/components/InspectorItem';
-import { useBlockInspectorState } from '../../../../hooks/blockInspector/useBlockInspectorState';
 import { useEditor } from '../../../../hooks/useEditor';
 
 export function useTableInspector() {
@@ -109,7 +108,4 @@ export function useTableInspector() {
 		];
 	}, [columns, connectedPage, id, immerBlockProps, manualPagination, setColumns, value]);
 	useAppendBlockMenu(menu, 1);
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
-
-	return { onContextMenu, inspectorProps };
 }

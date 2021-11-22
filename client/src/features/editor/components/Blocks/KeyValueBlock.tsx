@@ -1,11 +1,11 @@
+import { show } from '@blueprintjs/core/lib/esnext/components/context-menu/contextMenu';
 import React, { useMemo } from 'react';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
+import { useBlockContext } from '../../hooks/useBlockContext';
 import { useEditor } from '../../hooks/useEditor';
 import { BasicBlock } from '../../types/basicBlock';
-import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useReferences } from '../../../executor/hooks/useReferences';
-import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 
 export type KeyValueBlockType = KeyValueBlockProps;
 export type KeyValueBlockProps = {
@@ -34,20 +34,17 @@ export function KeyValueBlock({ block, hide }: { block: BasicBlock & KeyValueBlo
 		[id, immerBlockProps, value],
 	);
 	useAppendBlockMenu(menu, 1);
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
+	const { showInspector } = useBlockContext();
 
 	if (hide || !block.show) return null;
 
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<div onContextMenu={onContextMenu}>
-				{Object.entries(state || {}).map(([key, valueOfKey]) => (
-					<div key={key} style={{ wordBreak: 'break-word' }}>
-						<b>{key}</b>: {`${valueOfKey}`}
-					</div>
-				))}
-			</div>
-		</>
+		<div onContextMenu={showInspector}>
+			{Object.entries(state || {}).map(([key, valueOfKey]) => (
+				<div key={key} style={{ wordBreak: 'break-word' }}>
+					<b>{key}</b>: {`${valueOfKey}`}
+				</div>
+			))}
+		</div>
 	);
 }

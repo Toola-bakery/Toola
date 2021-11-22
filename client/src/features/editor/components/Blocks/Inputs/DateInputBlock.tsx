@@ -5,10 +5,9 @@ import { useReferenceEvaluator } from '../../../../executor/hooks/useReferences'
 import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
 import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlock } from '../../../hooks/useBlock';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
 
 const StyledInput = styled.div`
@@ -18,7 +17,6 @@ const StyledInput = styled.div`
 `;
 
 function parseDate(value: any) {
-	console.log('parseDate', value);
 	return value instanceof Date ? value.toISOString() : '';
 }
 
@@ -42,27 +40,22 @@ export function DateInputBlock({ hide }: { hide: boolean }) {
 	useAppendBlockMenu(menu, 1);
 
 	useDeclareBlockMethods({ setValue: (newValue: string | number) => setValue(parseDate(newValue)) }, [setValue]);
-
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
+	const { showInspector } = useBlockContext();
 
 	if (hide || !show) return <></>;
 
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={onContextMenu}>
-				<InputLabel />
-				<DateInput
-					formatDate={(date) => date.toLocaleString().split(',')[0]}
-					parseDate={(str) => new Date(str)}
-					fill
-					value={value ? new Date(value) : null}
-					onChange={(selectedDate) => {
-						console.log(selectedDate.toISOString(), 'selectedDate.toISOString()');
-						setValue(selectedDate.toISOString());
-					}}
-				/>
-			</StyledInput>
-		</>
+		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
+			<InputLabel />
+			<DateInput
+				formatDate={(date) => date.toLocaleString().split(',')[0]}
+				parseDate={(str) => new Date(str)}
+				fill
+				value={value ? new Date(value) : null}
+				onChange={(selectedDate) => {
+					setValue(selectedDate.toISOString());
+				}}
+			/>
+		</StyledInput>
 	);
 }

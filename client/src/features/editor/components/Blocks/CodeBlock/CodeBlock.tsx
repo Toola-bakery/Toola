@@ -14,8 +14,6 @@ import { useEditor } from '../../../hooks/useEditor';
 import { WatchList } from '../../../../executor/hooks/useWatchList';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { MonacoEditor } from './MonacoEditor';
 
 export type CodeBlockType = CodeBlockProps & CodeBlockState & CodeBlockMethods;
@@ -108,14 +106,11 @@ export function CodeBlock({ block, hide }: CodeBlockComponentProps) {
 
 	useAppendBlockMenu(menu, 1);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
-
 	const isHide = hide || !block.show;
 	if (isHide) return null;
 
 	const content = (
 		<CodeBlockStyles>
-			<BlockInspector {...inspectorProps} />
 			<SchemaDrawerWrapper>
 				<Tabs id={`CodeBlock:${id}`} animate={false}>
 					<Tab style={{ marginTop: 0 }} id="code" title="Code" panel={<MonacoEditor onEditorMount={onEditorMount} />} />

@@ -13,6 +13,7 @@ import { TextAreaBlock } from '../Blocks/Inputs/TextAreaBlock';
 import { JSONViewBlock } from '../Blocks/JSONViewBlock';
 import { KeyValueBlock } from '../Blocks/KeyValueBlock';
 import { ListBlock } from '../Blocks/ListBlock/ListBlock';
+import { ProgressBarBlock } from '../Blocks/ProgressBarBlock';
 import { QueryBlock } from '../Blocks/QueryBlock/QueryBlock';
 import { SubPageBlock } from '../Blocks/SubPageBlock';
 import { TableBlock } from '../Blocks/TableBlock/TableBlock';
@@ -37,6 +38,7 @@ export const installedBlocks = {
 	button: ButtonBlock,
 	card: CardBlock,
 	subpage: SubPageBlock,
+	progressBar: ProgressBarBlock,
 };
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
 	const type = block.type as keyof typeof installedBlocks;

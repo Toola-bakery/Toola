@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import styled from 'styled-components';
-import { getCaretIndex, getRange, getSelection, setCaretPosition } from '../../../helpers/caretOperators';
+import { getCaretIndex, getSelection, setCaretPosition } from '../../../helpers/caretOperators';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { useEditor } from '../../../hooks/useEditor';
 import { useEventListener } from '../../../hooks/useEvents';
 import { BasicBlock } from '../../../types/basicBlock';
 import { usePageContext, useReferences } from '../../../../executor/hooks/useReferences';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
-import { commonPlugins, entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
+import { entitiesToHTML, htmlToEntities } from './plugins/TextEntitiesMutation';
 import { TextEntity } from './plugins/TextPlugins';
 import { useTextBlockOnKeyDownHandler } from './hooks/useTextBlockOnKeyDownHandler';
 
@@ -82,7 +81,7 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 		}
 	});
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
+	const { showInspector, inspectorProps } = useBlockContext();
 
 	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
 		contentEditableRef,
@@ -115,29 +114,26 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 	if (hide || !block.show) return null;
 
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<StyledContentEditable>
-				<ContentEditable
-					disabled={!editing}
-					onContextMenu={(e) => {
-						if (contentEditableRef.current) {
-							const [n1, n2] = getSelection(contentEditableRef.current);
-							if (n1 !== n2) return;
-						}
-						onContextMenu(e);
-					}}
-					className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
-					onFocus={() => setIsFocused(true)}
-					onBlur={() => setIsFocused(false)}
-					innerRef={contentEditableRef}
-					html={isFocused ? htmlValue : htmlString}
-					tagName={textBlockStyleTag[style || 'text']}
-					style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-					onChange={onChangeHandler}
-					onKeyDown={onKeyDownHandler}
-				/>
-			</StyledContentEditable>
-		</>
+		<StyledContentEditable>
+			<ContentEditable
+				disabled={!editing}
+				onContextMenu={(e) => {
+					if (contentEditableRef.current) {
+						const [n1, n2] = getSelection(contentEditableRef.current);
+						if (n1 !== n2) return;
+					}
+					showInspector(e);
+				}}
+				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
+				onFocus={() => setIsFocused(true)}
+				onBlur={() => setIsFocused(false)}
+				innerRef={contentEditableRef}
+				html={isFocused ? htmlValue : htmlString}
+				tagName={textBlockStyleTag[style || 'text']}
+				style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+				onChange={onChangeHandler}
+				onKeyDown={onKeyDownHandler}
+			/>
+		</StyledContentEditable>
 	);
 }

@@ -6,6 +6,7 @@ import { v4 } from 'uuid';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { usePageModal } from '../../../../pageModal/hooks/usePageModal';
 import { useBlock } from '../../../hooks/useBlock';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
 import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useTableBlockColumnsAndData } from './hooks/useTableBlockColumnsAndData';
@@ -86,7 +87,8 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	useSyncBlockState<TableBlockState>('pageIndex', pageIndex);
 	useSyncBlockState<TableBlockState>('pageSize', pageSize);
 
-	const { onContextMenu, inspectorProps } = useTableInspector();
+	const { showInspector } = useBlockContext();
+
 	useTableColumnResizing(columnResizing);
 
 	const addColumn = useCallback(() => {
@@ -106,86 +108,83 @@ export function TableBlock({ hide }: { hide: boolean }) {
 	if (hide || !show) return null;
 
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<TableStyles onContextMenu={onContextMenu}>
-				<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
-					<div style={{ overflow: 'auto', height: style === 'a4' ? 'none' : 500 }}>
-						<HTMLTable bordered striped {...getTableProps()} className="table">
-							<thead style={{ position: 'sticky', top: 0, zIndex: 3 }}>
-								{headerGroups.map((headerGroup) => (
-									<tr {...headerGroup.getHeaderGroupProps()} className="tr">
-										{headerGroup.headers.map((column) => {
+		<TableStyles onContextMenu={showInspector}>
+			<Card style={{ overflow: 'hidden', padding: 0, zIndex: 1000 }}>
+				<div style={{ overflow: 'auto', height: style === 'a4' ? 'none' : 500 }}>
+					<HTMLTable bordered striped {...getTableProps()} className="table">
+						<thead style={{ position: 'sticky', top: 0, zIndex: 3 }}>
+							{headerGroups.map((headerGroup) => (
+								<tr {...headerGroup.getHeaderGroupProps()} className="tr">
+									{headerGroup.headers.map((column) => {
+										return (
+											<ColumnDnD
+												key={column.id}
+												column={column}
+												tableId={id}
+												allowResize={editing}
+												onClick={(e) => {
+													if (column.id === 'add') addColumn();
+													else showInspector(e, [`col${column.id}`]);
+												}}
+												onContextMenu={(e) => {
+													showInspector(e, [`col${column.id}`]);
+													e.stopPropagation();
+													e.preventDefault();
+												}}
+											/>
+										);
+									})}
+								</tr>
+							))}
+						</thead>
+						<tbody {...getTableBodyProps()} className="tbody">
+							{page.map((row) => {
+								prepareRow(row);
+								return (
+									<tr
+										{...row.getRowProps({
+											style: { backgroundColor: row.isSelected ? 'rgba(127, 180, 235, 0.3)' : undefined },
+										})}
+										onClick={() => {
+											const { isSelected } = row;
+											toggleAllRowsSelected(false);
+											if (!isSelected) row.toggleRowSelected();
+											setSelectedRow(isSelected ? null : row.original);
+										}}
+										onDoubleClick={() => {
+											if (connectedPage) {
+												modalHistory.push(connectedPage, row.original);
+											}
+										}}
+										className="tr"
+									>
+										{row.cells.map((cell) => {
+											const cellValue = ['string', 'number'].includes(typeof cell.value)
+												? cell.value
+												: JSON.stringify(cell.value);
+
 											return (
-												<ColumnDnD
-													key={column.id}
-													column={column}
-													tableId={id}
-													allowResize={editing}
-													onClick={(e) => {
-														if (column.id === 'add') addColumn();
-														else onContextMenu(e, [`col${column.id}`]);
-													}}
-													onContextMenu={(e) => {
-														onContextMenu(e, [`col${column.id}`]);
-														e.stopPropagation();
-														e.preventDefault();
-													}}
-												/>
+												<td className="td" {...cell.getCellProps()} title={cellValue}>
+													<RenderCellType cell={cell} />
+												</td>
 											);
 										})}
 									</tr>
-								))}
-							</thead>
-							<tbody {...getTableBodyProps()} className="tbody">
-								{page.map((row) => {
-									prepareRow(row);
-									return (
-										<tr
-											{...row.getRowProps({
-												style: { backgroundColor: row.isSelected ? 'rgba(127, 180, 235, 0.3)' : undefined },
-											})}
-											onClick={() => {
-												const { isSelected } = row;
-												toggleAllRowsSelected(false);
-												if (!isSelected) row.toggleRowSelected();
-												setSelectedRow(isSelected ? null : row.original);
-											}}
-											onDoubleClick={() => {
-												if (connectedPage) {
-													modalHistory.push(connectedPage, row.original);
-												}
-											}}
-											className="tr"
-										>
-											{row.cells.map((cell) => {
-												const cellValue = ['string', 'number'].includes(typeof cell.value)
-													? cell.value
-													: JSON.stringify(cell.value);
-
-												return (
-													<td className="td" {...cell.getCellProps()} title={cellValue}>
-														<RenderCellType cell={cell} />
-													</td>
-												);
-											})}
-										</tr>
-									);
-								})}
-							</tbody>
-						</HTMLTable>
-					</div>
-					<TablePagination
-						rowsPerPageOptions={[1, 5, 10, 25]}
-						count={manualPagination ? -1 : rows.length}
-						rowsPerPage={pageSize}
-						page={pageIndex}
-						onPageChange={gotoPage}
-						onRowsPerPageChange={setPageSize}
-						isLoading={isLoading}
-					/>
-				</Card>
-			</TableStyles>
-		</>
+								);
+							})}
+						</tbody>
+					</HTMLTable>
+				</div>
+				<TablePagination
+					rowsPerPageOptions={[1, 5, 10, 25]}
+					count={manualPagination ? -1 : rows.length}
+					rowsPerPage={pageSize}
+					page={pageIndex}
+					onPageChange={gotoPage}
+					onRowsPerPageChange={setPageSize}
+					isLoading={isLoading}
+				/>
+			</Card>
+		</TableStyles>
 	);
 }

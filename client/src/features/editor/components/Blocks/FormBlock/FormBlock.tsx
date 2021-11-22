@@ -3,9 +3,8 @@ import React, { useMemo, useState } from 'react';
 import { LinkButton } from '../../../../../components/LinkButton';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { useBlock } from '../../../hooks/useBlock';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty } from '../../../hooks/useBlockProperty';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useDeepChildren } from '../../../hooks/useDeepChildren';
 import { BasicBlock } from '../../../types/basicBlock';
@@ -16,12 +15,11 @@ import { GenerateFormModal } from './GenerateFormModal';
 
 export function FormBlock({ hide }: { hide: boolean }) {
 	const block = useBlock();
+	const { showInspector } = useBlockContext();
 	const [blocks] = useBlockProperty<string[]>('blocks', []);
 	const { editing } = usePageContext();
 	const { cleanForm, submitForm } = useDeclareBlockMethods({ cleanForm: () => {}, submitForm: () => {} }, []);
 	const children = useDeepChildren();
-
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
 	const [isModalOpen, setModalOpen] = useState(false);
 
@@ -29,8 +27,7 @@ export function FormBlock({ hide }: { hide: boolean }) {
 
 	return (
 		<>
-			<BlockInspector {...inspectorProps} />
-			<div onContextMenu={onContextMenu}>
+			<div onContextMenu={showInspector}>
 				<Card style={{ paddingLeft: 0, paddingRight: 20 }}>
 					<div style={{ display: 'flex', alignItems: 'center', paddingLeft: 30 }}>
 						<EmojiPicker useDefaultDocument={false} />

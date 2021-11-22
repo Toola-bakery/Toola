@@ -2,11 +2,10 @@ import { Button, Tab, Tabs } from '@blueprintjs/core';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { usePageContext, useReferenceEvaluator } from '../../../executor/hooks/useReferences';
-import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
-import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 import { useBlock } from '../../hooks/useBlock';
+import { useBlockContext } from '../../hooks/useBlockContext';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useCurrent } from '../../hooks/useCurrent';
 import { useEditor } from '../../hooks/useEditor';
@@ -118,48 +117,40 @@ export function TabsBlock({ hide }: { hide: boolean }) {
 		return [...tabMenus];
 	}, [setTabEmojis, setTabNames, setTabs, tabNames, tabs]);
 	useAppendBlockMenu(menu, 1);
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
+	const { showInspector } = useBlockContext();
 
 	if (hide || !block.show) return null;
 
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<TabsBlockStyles onContextMenu={(e) => onContextMenu(e, ['global'])}>
-				<Tabs>
-					{tabs.map((blockId, i) => (
-						<Tab
-							style={{ marginTop: 0 }}
-							id={blockId}
-							title={
-								<div
-									onContextMenu={(e) => onContextMenu(e, [`tab${blockId}`])}
-									style={{ display: 'flex', alignItems: 'center', lineHeight: '25px' }}
-								>
-									<EmojiPicker
-										setEmoji={(nextEmoji) =>
-											setTabEmojis((draft) => {
-												draft[i] = nextEmoji;
-											})
-										}
-										small
-										emoji={tabEmojis[i]}
-										useDefaultDocument={false}
-									/>
-									{calculatedTabNames[i] || 'Untitled'}
-								</div>
-							}
-							panel={<ColumnBlock block={blocks[blockId] as BasicBlock & ColumnBlockType} />}
-						/>
-					))}
-					<Button
-						minimal
-						small
-						icon="plus"
-						onClick={() => addColumnAfterAndPutItem(undefined, tabs[tabs.length - 1])}
+		<TabsBlockStyles onContextMenu={(e) => showInspector(e, ['global'])}>
+			<Tabs>
+				{tabs.map((blockId, i) => (
+					<Tab
+						style={{ marginTop: 0 }}
+						id={blockId}
+						title={
+							<div
+								onContextMenu={(e) => showInspector(e, [`tab${blockId}`])}
+								style={{ display: 'flex', alignItems: 'center', lineHeight: '25px' }}
+							>
+								<EmojiPicker
+									setEmoji={(nextEmoji) =>
+										setTabEmojis((draft) => {
+											draft[i] = nextEmoji;
+										})
+									}
+									small
+									emoji={tabEmojis[i]}
+									useDefaultDocument={false}
+								/>
+								{calculatedTabNames[i] || 'Untitled'}
+							</div>
+						}
+						panel={<ColumnBlock block={blocks[blockId] as BasicBlock & ColumnBlockType} />}
 					/>
-				</Tabs>
-			</TabsBlockStyles>
-		</>
+				))}
+				<Button minimal small icon="plus" onClick={() => addColumnAfterAndPutItem(undefined, tabs[tabs.length - 1])} />
+			</Tabs>
+		</TabsBlockStyles>
 	);
 }

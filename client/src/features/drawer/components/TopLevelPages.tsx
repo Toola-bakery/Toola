@@ -43,7 +43,6 @@ export function TopLevelPages() {
 
 	return (
 		<>
-			<BlockInspector {...inspectorProps} />
 			<Menu style={{ minWidth: 50, background: 'transparent' }}>
 				<StyledMenuDivider
 					title={

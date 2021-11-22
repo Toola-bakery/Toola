@@ -4,12 +4,12 @@ import styled from 'styled-components';
 import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { useReferenceEvaluator } from '../../../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
+import { parseIntSafe } from '../../../helpers/parsers';
 import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlock } from '../../../hooks/useBlock';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
 
 const StyledInput = styled.div`
@@ -18,22 +18,12 @@ const StyledInput = styled.div`
 	}
 `;
 
-function parseIntSafe(value: string | number) {
-	if (typeof value === 'number') return Number.isNaN(value) ? '' : value;
-	const parsed = parseInt(value, 10);
-	return Number.isNaN(parsed) ? '' : parsed;
-}
-
 export function NumericInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { evaluate } = useReferenceEvaluator();
 	const [initialValue, setInitialValue] = useBlockProperty<string>('initialValue', '');
 	const [placeholder, setPlaceholder] = useBlockProperty<string>('placeholder', '');
-	const [value, setValue] = useBlockState<number | ''>('value', '');
-
-	useOnMountedEffect(() => {
-		if (initialValue) setValue(parseIntSafe(evaluate(initialValue)));
-	});
+	const [value, setValue] = useBlockState<number | ''>('value', () => parseIntSafe(evaluate(initialValue)));
 
 	const menu = useMemo<MenuItemProps[]>(
 		() => [
@@ -56,26 +46,23 @@ export function NumericInputBlock({ hide }: { hide: boolean }) {
 
 	useDeclareBlockMethods({ setValue: (newValue: string | number) => setValue(parseIntSafe(newValue)) }, [setValue]);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
+	const { showInspector } = useBlockContext();
 
-	if (hide || !show) return <></>;
+	if (hide || !show) return null;
 
 	// TODO "helperText" Helper text with details...
 	return (
-		<>
-			<BlockInspector {...inspectorProps} />
-			<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={onContextMenu}>
-				<InputLabel />
-				<NumericInput
-					fill
-					placeholder={placeholder}
-					value={value}
-					autoComplete="off"
-					onValueChange={(valueAsNumber, valueAsString) => {
-						if (!Number.isNaN(valueAsNumber) && !valueAsString.includes('.')) setValue(valueAsNumber);
-					}}
-				/>
-			</StyledInput>
-		</>
+		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
+			<InputLabel />
+			<NumericInput
+				fill
+				placeholder={placeholder}
+				value={value}
+				autoComplete="off"
+				onValueChange={(valueAsNumber, valueAsString) => {
+					if (!Number.isNaN(valueAsNumber) && !valueAsString.includes('.')) setValue(valueAsNumber);
+				}}
+			/>
+		</StyledInput>
 	);
 }

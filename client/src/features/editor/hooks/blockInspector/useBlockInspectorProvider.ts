@@ -21,6 +21,7 @@ const TurnIntoBlocks: [
 	['Code', 'code'],
 	['Query', 'query'],
 	['Page', 'subpage'],
+	['Progress bar', 'progressBar'],
 	['JSON viewer', 'JSONView'],
 	['KeyValue viewer', 'keyValue'],
 	['Table', 'table'],

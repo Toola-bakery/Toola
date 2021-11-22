@@ -6,11 +6,11 @@ import { useBlockContext } from '../../hooks/useBlockContext';
 
 export function BlockBadge({ show, dragRef }: { show: boolean; dragRef: ConnectDragSource }) {
 	const { id } = useBlock();
-	const { onDragClick } = useBlockContext();
+	const { showInspector } = useBlockContext();
 	return (
 		<div
 			ref={dragRef}
-			onClick={onDragClick}
+			onClick={showInspector}
 			className="block-badge"
 			style={{
 				position: 'absolute',

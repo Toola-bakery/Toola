@@ -1,6 +1,6 @@
 import { IconName } from '@blueprintjs/core';
 import React from 'react';
-import { BlockInspectorProps } from './BlockInspector';
+import { InspectorPropsType } from '../hooks/useInspectorState';
 import { BlockNameMenuItem, BlockNameMenuItemProps } from './InspectorItems/BlockNameMenuItem';
 import { DatabaseMenuItem, DatabaseMenuItemProps } from './InspectorItems/DatabaseMenuItem';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
@@ -37,7 +37,7 @@ export type MenuItemProps =
 export type InspectorItemProps<Item = MenuItemProps> = {
 	item: Item;
 	close?: () => void;
-	setPath?: BlockInspectorProps['setPath'];
+	setPath?: InspectorPropsType['setPath'];
 	Wrapper?: typeof React.Component | React.FC<any>;
 	inline?: boolean;
 };

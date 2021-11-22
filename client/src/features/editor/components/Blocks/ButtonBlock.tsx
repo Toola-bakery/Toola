@@ -5,12 +5,10 @@ import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { usePageModal } from '../../../pageModal/hooks/usePageModal';
 import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlock } from '../../hooks/useBlock';
+import { useBlockContext } from '../../hooks/useBlockContext';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useCurrent } from '../../hooks/useCurrent';
-import { BasicBlock } from '../../types/basicBlock';
-import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { useReferenceEvaluator, useReferences } from '../../../executor/hooks/useReferences';
-import { useBlockInspectorState } from '../../hooks/blockInspector/useBlockInspectorState';
 import { CodeBlockType } from './CodeBlock/CodeBlock';
 import { QueryBlockType } from './QueryBlock/QueryBlock';
 
@@ -23,6 +21,8 @@ export type ButtonBlockProps = {
 
 export function ButtonBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
+	const { showInspector } = useBlockContext();
+
 	const { blocks } = useCurrent();
 	const [buttonName, setButtonName] = useBlockProperty('value', '');
 	const [actionType, setActionType] = useBlockProperty('actionType', 'Custom code');
@@ -97,14 +97,11 @@ export function ButtonBlock({ hide }: { hide: boolean }) {
 
 	useAppendBlockMenu(menu, 1);
 
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
-
 	if (hide || !show) return null;
 
 	return (
 		<>
-			<BlockInspector {...inspectorProps} />
-			<div onContextMenu={onContextMenu}>
+			<div onContextMenu={showInspector}>
 				<Button
 					fill
 					onClick={() => {

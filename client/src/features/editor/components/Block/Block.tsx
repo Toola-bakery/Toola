@@ -1,10 +1,10 @@
 import { Button } from '@blueprintjs/core';
 import React, { PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
-import { v4 } from 'uuid';
 import { usePageContext } from '../../../executor/hooks/useReferences';
+import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
-import { BlockCreators } from '../../helpers/BlockCreators';
+import { InspectorPropsType, useInspectorState } from '../../../inspector/hooks/useInspectorState';
 import { useBlockInspectorProvider } from '../../hooks/blockInspector/useBlockInspectorProvider';
 import { useBlockDrag } from '../../hooks/useBlockDrag';
 import { useCurrent } from '../../hooks/useCurrent';
@@ -15,12 +15,13 @@ import { useHover } from '../../../../hooks/useHover';
 import { BlockBadge } from './BlockBadge';
 import { BlockSelector } from './BlockSelector';
 
-type DragClickEventHandler = React.MouseEventHandler<HTMLElement>;
+type DragClickEventHandler = (e: React.MouseEvent, _path?: string[]) => void;
 
 export type BlockContextType = {
 	block: undefined | BasicBlock;
-	setOnDragClick: (listener: DragClickEventHandler) => void;
-	onDragClick?: DragClickEventHandler;
+	showInspector: DragClickEventHandler;
+	inspectorProps: InspectorPropsType;
+	setShowInspector: (listener: DragClickEventHandler) => void;
 	menu: MenuItemProps[];
 	appendMenuParticle: (menu: MenuItemProps[], index: number) => () => void;
 };
@@ -29,8 +30,9 @@ export const BlockContext = React.createContext<BlockContextType>({
 	appendMenuParticle: () => () => {},
 	menu: [],
 	block: undefined,
-	setOnDragClick: () => {},
-	onDragClick: () => {},
+	showInspector: () => {},
+	setShowInspector: () => {},
+	inspectorProps: { menu: [], setPath() {}, path: [''], close() {}, isOpen: false, open() {} },
 });
 
 export function BlockContextProvider({
@@ -39,21 +41,32 @@ export function BlockContextProvider({
 	children,
 }: PropsWithChildren<{ blockId?: string; block?: BasicBlock & Blocks }>) {
 	const { blocks } = useCurrent();
+	const { editing } = usePageContext();
 
-	const [onDragClick, setOnDragClickPrivate] = useState<DragClickEventHandler>();
-	const setOnDragClick = useCallback((handler: DragClickEventHandler) => {
-		setOnDragClickPrivate(() => handler);
-	}, []);
+	const { onContextMenu: showInspectorPrivate, inspectorProps: inspectorPropsPrivate } = useInspectorState({
+		disabled: !editing,
+		menu: [],
+	});
+
+	const [showInspector, setShowInspectorPrivate] = useState<DragClickEventHandler>(() => showInspectorPrivate);
+
+	const setShowInspector = useCallback(
+		(nextShowInspector: DragClickEventHandler) => setShowInspectorPrivate(() => nextShowInspector),
+		[],
+	);
 
 	const block = blockId ? blocks[blockId] : customBlock;
-
 	if ((!blockId && !customBlock) || !block) throw new Error('BlockContextProvider: set customBlock or blockId');
-
 	const { appendMenuParticle, menu } = useBlockInspectorProvider(block);
 
+	const inspectorProps = useMemo<InspectorPropsType>(
+		() => ({ ...inspectorPropsPrivate, menu }),
+		[inspectorPropsPrivate, menu],
+	);
+
 	const value = useMemo(
-		() => ({ block, setOnDragClick, onDragClick, menu, appendMenuParticle }),
-		[block, setOnDragClick, onDragClick, menu, appendMenuParticle],
+		() => ({ block, showInspector, menu, appendMenuParticle, inspectorProps, setShowInspector }),
+		[block, showInspector, menu, appendMenuParticle, inspectorProps, setShowInspector],
 	);
 	return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
 }
@@ -79,6 +92,7 @@ export function Block({
 
 	return (
 		<BlockContextProvider block={block}>
+			<BlockInspector />
 			{!block.show || hide || minimal ? (
 				<BlockSelector block={block} hide={hide} />
 			) : (

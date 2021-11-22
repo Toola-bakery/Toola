@@ -2,7 +2,7 @@ import { KeyboardEventHandler, MutableRefObject, RefObject } from 'react';
 import { useRefsLatest } from '../../../../../../hooks/useRefLatest';
 import { useAppSelector } from '../../../../../../redux/hooks';
 import { usePageContext } from '../../../../../executor/hooks/useReferences';
-import { InspectorPropsType } from '../../../../hooks/blockInspector/useBlockInspectorState';
+import { InspectorPropsType } from '../../../../../inspector/hooks/useInspectorState';
 import { getCaretGlobalPosition, getCaretIndex, getSelection } from '../../../../helpers/caretOperators';
 import { useBlock } from '../../../../hooks/useBlock';
 import { useBlockProperty } from '../../../../hooks/useBlockProperty';

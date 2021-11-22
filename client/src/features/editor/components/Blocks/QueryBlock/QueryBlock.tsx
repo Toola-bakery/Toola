@@ -9,16 +9,15 @@ import { SchemaDrawerWrapper } from '../../../../resources/components/SchemaDraw
 import { Database } from '../../../../resources/hooks/useResources';
 import { useQueryConstructor } from '../../../../inspector/hooks/useQueryConstructor';
 import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
+import { useBlock } from '../../../hooks/useBlock';
+import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useSyncBlockState } from '../../../hooks/useSyncBlockState';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { useEditor } from '../../../hooks/useEditor';
 import { usePageContext } from '../../../../executor/hooks/useReferences';
 import { BasicBlock } from '../../../types/basicBlock';
 import { useFunctionExecutor } from '../../../../executor/hooks/useExecutor';
-import { useBlockInspectorState } from '../../../hooks/blockInspector/useBlockInspectorState';
-import { BlockInspector } from '../../../../inspector/components/BlockInspector';
 import { CodeBlockState } from '../CodeBlock/CodeBlock';
-import { MonacoEditor } from '../CodeBlock/MonacoEditor';
 
 export type QueryBlockType = QueryBlockProps & QueryBlockState & QueryBlockMethods;
 export type QueryBlockProps = {
@@ -34,11 +33,6 @@ export type QueryBlockState = {
 };
 
 export type QueryBlockMethods = { trigger: () => void };
-
-export type QueryBlockComponentProps = {
-	block: BasicBlock & QueryBlockType;
-	hide: boolean;
-};
 
 const CodeBlockStyles = styled.div`
 	height: 100%;
@@ -61,9 +55,10 @@ const CodeBlockStyles = styled.div`
 	}
 `;
 
-export function QueryBlock({ block, hide }: QueryBlockComponentProps) {
-	const { id, manualControl, values } = block;
+export function QueryBlock({ hide }: { hide: boolean }) {
+	const { id, manualControl, values, show, parentId } = useBlock() as BasicBlock & QueryBlockType;
 	const { updateBlockProps } = useEditor();
+	const { showInspector } = useBlockContext();
 
 	const [databaseId, setDatabaseId] = useState<string>();
 
@@ -135,19 +130,17 @@ async function main () {
 				type: 'switch',
 				label: 'Manual control',
 				onChange: (nextValue: boolean) => updateBlockProps({ id, manualControl: nextValue }),
-				value: block.manualControl,
+				value: manualControl,
 			},
 		],
-		[block.manualControl, id, updateBlockProps],
+		[manualControl, id, updateBlockProps],
 	);
 	useAppendBlockMenu(menu, 1);
-	const { onContextMenu, inspectorProps } = useBlockInspectorState();
 
-	if (hide || !block.show) return null;
+	if (hide || !show) return null;
 
 	const content = (
-		<CodeBlockStyles onContextMenu={onContextMenu}>
-			<BlockInspector {...inspectorProps} />
+		<CodeBlockStyles onContextMenu={showInspector}>
 			<SchemaDrawerWrapper>
 				<Tabs id={`QueryBlock:${id}`} animate={false}>
 					<Tab
@@ -189,7 +182,7 @@ async function main () {
 		</CodeBlockStyles>
 	);
 
-	return block.parentId === 'queries' ? (
+	return parentId === 'queries' ? (
 		<div style={{ height: '100%' }}>{content}</div>
 	) : (
 		<Card style={{ height: '100%', padding: 0 }}>{content}</Card>
