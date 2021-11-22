@@ -13,7 +13,7 @@ export function PrivateRoute({
 	const history = useHistory();
 
 	useEffect(() => {
-		if (!userId) return history.replace('/login');
+		if (!userId) return history.replace('/');
 		if (allowWithoutProject) return;
 		if (!projects?.length && isSuccess) return history.replace('/createProject');
 		if (projects?.length && !currentProjectId) selectProject(projects[0]._id);
