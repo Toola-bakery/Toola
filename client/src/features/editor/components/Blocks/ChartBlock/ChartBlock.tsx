@@ -10,19 +10,27 @@ import { useBlockProperty } from '../../../hooks/useBlockProperty';
 
 export function ChartBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
-	const [value, setValue] = useBlockProperty('value', '');
-	const data = useReferences(value);
+	const [xValue, setXValue] = useBlockProperty('xValue', '');
+	const [yValue, setYValue] = useBlockProperty('yValue', '');
+	const xData = useReferences(xValue);
+	const yData = useReferences(yValue);
 
 	const menu = useMemo<MenuItemProps[]>(
 		() => [
 			{
-				label: 'Data Source',
+				label: 'X axis array',
 				type: 'input',
-				onChange: setValue,
-				value,
+				onChange: setXValue,
+				value: xValue,
+			},
+			{
+				label: 'Y axis array',
+				type: 'input',
+				onChange: setYValue,
+				value: yValue,
 			},
 		],
-		[setValue, value],
+		[setXValue, setYValue, xValue, yValue],
 	);
 	useAppendBlockMenu(menu, 1);
 	const { showInspector } = useBlockContext();
@@ -32,7 +40,19 @@ export function ChartBlock({ hide }: { hide: boolean }) {
 	return (
 		<div style={{ padding: 4 }} onContextMenu={showInspector}>
 			<PlotlyChart
-				data={Array.isArray(data) ? data : []}
+				data={
+					Array.isArray(xData) && Array.isArray(yData)
+						? [
+								{
+									x: xData,
+									y: yData,
+									type: 'line',
+									marker: { color: '#033663' },
+									mode: 'lines+markers',
+								},
+						  ]
+						: []
+				}
 				config={{ displayModeBar: false }}
 				layout={{
 					margin: {
