@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { usePagesMutations } from '../../editor/components/Page/hooks/usePagesMutations';
 import { EmojiIcon, EmojiPicker } from '../../editor/components/componentsWithLogic/EmojiPicker';
+import { PopoverInspector } from '../../inspector/components/PopoverInspector';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
 import { useDrawer } from '../hooks/useDrawer';
@@ -43,6 +44,7 @@ export function TopLevelPages() {
 
 	return (
 		<>
+			<PopoverInspector inspectorProps={inspectorProps} />
 			<Menu style={{ minWidth: 50, background: 'transparent' }}>
 				<StyledMenuDivider
 					title={
