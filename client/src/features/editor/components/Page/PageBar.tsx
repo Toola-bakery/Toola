@@ -11,6 +11,7 @@ import { SwitchMenuItem } from '../../../inspector/components/InspectorItems/Swi
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { useEditor } from '../../hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
+import { useCanEdit } from '../../hooks/useIsEditing';
 import { usePagesMutations } from './hooks/usePagesMutations';
 import { EmojiPicker } from '../componentsWithLogic/EmojiPicker';
 
@@ -35,6 +36,7 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 	const { renamePage, changePageEmoji } = useTopLevelPages();
 	const { deletePage } = usePagesMutations();
 	const { updateBlockProps } = useEditor();
+	const canEdit = useCanEdit();
 	const { navigate } = usePageNavigator();
 	const [isWide, setIsWide] = useBlockProperty('isWide', false);
 	const { setOpen } = useDrawer({ name: 'leftDrawer' });
@@ -99,7 +101,7 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 				)}
 			</div>
 			<div style={{ flexShrink: 1, flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-				{!isModal && !isMobile ? (
+				{!isModal && !isMobile && canEdit ? (
 					<Switch
 						style={{ margin: 0, marginRight: 8 }}
 						label="Editing"
@@ -113,7 +115,7 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 					minimal
 					content={
 						<Menu>
-							{isModal ? (
+							{isModal && !isMobile && canEdit ? (
 								<SwitchMenuItem
 									item={{
 										icon: 'edit',

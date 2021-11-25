@@ -1,18 +1,15 @@
-import { Button, H3, HTMLTable, Tag } from '@blueprintjs/core';
-import { useHistory } from 'react-router-dom';
+import { Button, H3, HTMLSelect, HTMLTable } from '@blueprintjs/core';
 import { Dayjs } from '../../features/ui/components/Dayjs';
-import { useMembers } from '../../features/usersAndProjects/hooks/useMembers';
-import { useProjects } from '../../features/usersAndProjects/hooks/useProjects';
+import { RoleIds, RoleNames, Roles, useMembers } from '../../features/usersAndProjects/hooks/useMembers';
 import { useOnMountedEffect } from '../../hooks/useOnMounted';
 
 export function MembersListRoute() {
-	const history = useHistory();
-	const { data, refetch, isFetched } = useMembers();
-	const { currentProject } = useProjects();
+	const { data, refetch, isFetched, updateRole } = useMembers();
 
 	useOnMountedEffect(() => {
 		if (isFetched) refetch();
 	});
+
 	return (
 		<div style={{ padding: 30, flex: 1 }}>
 			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -32,7 +29,7 @@ export function MembersListRoute() {
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((user) => {
+						{data.map(({ user, role }) => {
 							return (
 								<tr key={user._id}>
 									<td>{user.displayName}</td>
@@ -41,14 +38,13 @@ export function MembersListRoute() {
 										<Dayjs timeAgo time={user.createdAt} />
 									</td>
 									<td>
-										{currentProject?.owner === user._id ? (
-											<Tag intent="danger" style={{ marginRight: 4 }} round>
-												Owner
-											</Tag>
-										) : null}
-										<Tag intent="success" round>
-											User
-										</Tag>
+										<HTMLSelect
+											onChange={async (event) => {
+												updateRole.mutate({ userId: user._id, role: Number(event.target.value) as RoleIds });
+											}}
+											value={role || Roles.viewer}
+											options={Object.values(Roles).map((roleId) => ({ label: RoleNames[roleId], value: roleId }))}
+										/>
 									</td>
 								</tr>
 							);

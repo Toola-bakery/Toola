@@ -1,6 +1,7 @@
 import { ServiceSchema } from 'moleculer';
 import { ObjectId } from 'mongodb';
 import { v4 } from 'uuid';
+import { Roles } from '../../types/project.types';
 import { AuthMeta } from '../../types/users.types';
 import { mongoDB } from '../../utils/mongo';
 
@@ -9,9 +10,14 @@ type PageSchema = {
 	projectId: ObjectId;
 	value: any;
 	deleted?: boolean;
+	parentTree: string[];
+	createdAt: Date;
+	lastEditAt?: Date;
 };
 
 const pagesCollection = mongoDB.collection<PageSchema>('pages');
+pagesCollection.createIndex({ parentTree: 1 });
+pagesCollection.createIndex({ projectId: 1 });
 
 export const PagesService: ServiceSchema<
 	'pages',
@@ -46,10 +52,25 @@ export const PagesService: ServiceSchema<
 				}
 
 				try {
+					const parentTree = parentPageId
+						? await pagesCollection.findOne({ _id: parentPageId }, { projection: { parentTree: 1 } })
+						: null;
+
 					await pagesCollection.insertOne({
 						_id: id,
 						projectId,
-						value: { page: { id: 'page', title, pageId: id, blocks: [], parentId: parentPageId, type: 'page' } },
+						createdAt: new Date(),
+						parentTree: parentPageId && parentTree.parentTree ? [...parentTree.parentTree, parentPageId] : [],
+						value: {
+							page: {
+								id: 'page',
+								title,
+								pageId: id,
+								blocks: [],
+								parentId: parentPageId,
+								type: 'page',
+							},
+						},
 					});
 					return { ok: true };
 				} catch (e) {
@@ -64,21 +85,19 @@ export const PagesService: ServiceSchema<
 			},
 			async handler(ctx) {
 				const { id } = ctx.params;
-				const { userId, projectId: authProjectId } = ctx.meta;
+				const { userId } = ctx.meta;
 
 				const resp = await pagesCollection.findOne({ _id: id });
 
 				if (!resp) throw new Error('Page does not exists');
+				if (!userId) throw new Error('No access to project');
 
-				if (userId) {
-					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId: resp.projectId, userId });
-					if (!hasAccess) throw new Error('No access to project');
-				} else if (authProjectId.toString() !== resp.projectId.toString()) {
-					throw new Error('No access to project');
-				}
+				const { hasAccess, role } = await ctx.call('projects.hasAccess', { projectId: resp.projectId, userId });
+				if (!hasAccess) throw new Error('No access to project');
 
-				if (!resp || !resp.value || !resp.value.page) throw new Error('Cant find page');
-				return resp;
+				const { value, parentTree, deleted, projectId, createdAt, lastEditAt } = resp;
+				if (!resp.value || !resp.value.page) throw new Error('Cant find page');
+				return { value, parentTree, deleted, projectId, createdAt, lastEditAt, role };
 			},
 		},
 		list: {
@@ -115,18 +134,16 @@ export const PagesService: ServiceSchema<
 			},
 			async handler(ctx) {
 				const { id, value } = ctx.params;
-				const { userId, projectId: authProjectId } = ctx.meta;
+				const { userId } = ctx.meta;
 
 				const resp = await pagesCollection.findOne({ _id: id }, { projection: { projectId: 1 } });
 
-				if (userId) {
-					const { hasAccess } = await ctx.call('projects.hasAccess', { projectId: resp.projectId, userId });
-					if (!hasAccess) throw new Error('No access to project');
-				} else if (authProjectId.toString() !== resp.projectId.toString()) {
-					throw new Error('No access to project');
-				}
+				if (!userId) throw new Error('No access to project');
+				const { hasAccess, role } = await ctx.call('projects.hasAccess', { projectId: resp.projectId, userId });
+				if (!hasAccess) throw new Error('No access to project');
+				if (role < Roles.editor) throw new Error('No access to page');
 				// TODO block edit when deleted
-				return pagesCollection.updateOne({ _id: id }, { $set: { value } });
+				return pagesCollection.updateOne({ _id: id }, { $set: { value, lastEditAt: new Date() } });
 			},
 		},
 		delete: {
@@ -144,7 +161,7 @@ export const PagesService: ServiceSchema<
 					throw new Error('No access to project');
 				}
 
-				return pagesCollection.updateOne({ _id: id }, { $set: { deleted: true } });
+				return pagesCollection.updateMany({ $or: [{ parentTree: id }, { _id: id }] }, { $set: { deleted: true } });
 			},
 		},
 		topLevelPages: {

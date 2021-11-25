@@ -149,10 +149,10 @@ export function Page({
 	useEffect(() => {
 		if (isSuccess && data) dispatch(setPage({ blocks: data.value, pageId }));
 	}, [data, dispatch, isSuccess, pageId]);
-
-	usePageBlockPropsMutation(pageId, blocksProps);
-
 	const { editing, setEditing } = useIsEditing();
+
+	usePageBlockPropsMutation(pageId, blocksProps, editing);
+
 	const { isDevtoolsOpen } = useIsDevtoolsOpen();
 
 	const page = blocksProps?.page as BasicBlock & PageBlockType;
