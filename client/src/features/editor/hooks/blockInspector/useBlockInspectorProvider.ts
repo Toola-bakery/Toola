@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
+import { usePageContext } from '../../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { installedBlocks } from '../../components/Block/BlockSelector';
 import { BasicBlock } from '../../types/basicBlock';
@@ -36,10 +37,12 @@ const TurnIntoBlocks: [
 
 export function useBlockInspectorProvider(block: BasicBlock) {
 	const { id, display } = block;
-	const { deleteBlock, immerBlockProps, updateBlockType, updateBlockId } = useEditor();
+	const { blocksProps } = usePageContext();
+	const { deleteBlock, addBlockAfter, immerBlockProps, updateBlockType, updateBlockId } = useEditor();
 
 	const [menuParticles, setMenuParticles] = useState<{ [id: string]: { menu: MenuItemProps[]; index: number } }>({});
 	const isHide = display?.hide;
+	const thisBlockProps = blocksProps[id];
 
 	const defaultWrap = useCallback(
 		(items: MenuItemProps[]): MenuItemProps[] => {
@@ -81,6 +84,18 @@ export function useBlockInspectorProvider(block: BasicBlock) {
 				},
 				{
 					type: 'item',
+					icon: 'duplicate',
+					label: `Duplicate "${id}"`,
+					closeAfterCall: true,
+					call: () => {
+						const copyProps: any = { ...thisBlockProps };
+						delete copyProps.id;
+						delete copyProps.blocks;
+						addBlockAfter(id, copyProps);
+					},
+				},
+				{
+					type: 'item',
 					icon: 'trash',
 					label: `Delete block "${id}"`,
 					closeAfterCall: true,
@@ -88,7 +103,7 @@ export function useBlockInspectorProvider(block: BasicBlock) {
 				},
 			];
 		},
-		[deleteBlock, isHide, id, immerBlockProps, updateBlockId, updateBlockType],
+		[id, isHide, updateBlockId, immerBlockProps, updateBlockType, thisBlockProps, addBlockAfter, deleteBlock],
 	);
 
 	const appendMenuParticle = useCallback((menu: MenuItemProps[], index: number) => {
