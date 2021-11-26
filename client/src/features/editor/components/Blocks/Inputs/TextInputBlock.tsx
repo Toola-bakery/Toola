@@ -32,7 +32,6 @@ export function TextInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { value, setValue, placeholder } = useValuePlaceholderInitialController();
 	const { showInspector } = useBlockContext();
-	const [labelInline] = useBlockProperty<boolean>('labelInline', true);
 
 	useDeclareBlockMethods<InputBlockMethods>({ setValue: (newValue: string) => setValue(newValue) }, [setValue]);
 
@@ -40,20 +39,18 @@ export function TextInputBlock({ hide }: { hide: boolean }) {
 
 	// TODO "helperText" Helper text with details...
 	return (
-		<StyledInput
-			style={{ display: 'flex', flexDirection: labelInline ? 'row' : 'column' }}
-			onContextMenu={showInspector}
-		>
-			<InputLabel />
-			<InputGroup
-				fill
-				value={value}
-				autoComplete="off"
-				placeholder={placeholder}
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-			/>
-		</StyledInput>
+		<div onContextMenu={showInspector}>
+			<InputLabel>
+				<InputGroup
+					fill
+					value={value}
+					autoComplete="off"
+					placeholder={placeholder}
+					onChange={(e) => {
+						setValue(e.target.value);
+					}}
+				/>
+			</InputLabel>
+		</div>
 	);
 }

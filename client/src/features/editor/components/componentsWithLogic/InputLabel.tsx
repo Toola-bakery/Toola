@@ -61,10 +61,12 @@ export function InputLabel({ children }: PropsWithChildren<{ children?: ReactNod
 				display: 'flex',
 				alignItems: labelInline ? 'center' : undefined,
 				flexDirection: labelInline ? 'row' : 'column',
+				width: '100%',
 			}}
 		>
 			<div
 				style={{
+					display: 'flex',
 					maxWidth: `${labelWidth}${labelWidthUnit}`,
 					width: `${labelWidth}${labelWidthUnit}`,
 					minWidth: `${labelWidth}${labelWidthUnit}`,
