@@ -51,9 +51,10 @@ export function ProgressBarBlock({ hide }: { hide: boolean }) {
 	if (hide || !show) return null;
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} onContextMenu={showInspector}>
-			<InputLabel />
-			<ProgressBar value={typeof value === 'number' ? value : 0} />
+		<div onContextMenu={showInspector}>
+			<InputLabel>
+				<ProgressBar value={typeof value === 'number' ? value : 0} />
+			</InputLabel>
 		</div>
 	);
 }

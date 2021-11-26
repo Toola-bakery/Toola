@@ -1,7 +1,5 @@
 import { NumericInput } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
-import { useOnMountedEffect } from '../../../../../hooks/useOnMounted';
 import { useReferenceEvaluator } from '../../../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
 import { parseIntSafe } from '../../../helpers/parsers';
@@ -11,12 +9,6 @@ import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
-
-const StyledInput = styled.div`
-	.bp4-form-group {
-		margin-bottom: 0;
-	}
-`;
 
 export function NumericInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
@@ -52,17 +44,18 @@ export function NumericInputBlock({ hide }: { hide: boolean }) {
 
 	// TODO "helperText" Helper text with details...
 	return (
-		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
-			<InputLabel />
-			<NumericInput
-				fill
-				placeholder={placeholder}
-				value={value}
-				autoComplete="off"
-				onValueChange={(valueAsNumber, valueAsString) => {
-					if (!Number.isNaN(valueAsNumber) && !valueAsString.includes('.')) setValue(valueAsNumber);
-				}}
-			/>
-		</StyledInput>
+		<div onContextMenu={showInspector}>
+			<InputLabel>
+				<NumericInput
+					fill
+					placeholder={placeholder}
+					value={value}
+					autoComplete="off"
+					onValueChange={(valueAsNumber, valueAsString) => {
+						if (!Number.isNaN(valueAsNumber) && !valueAsString.includes('.')) setValue(valueAsNumber);
+					}}
+				/>
+			</InputLabel>
+		</div>
 	);
 }

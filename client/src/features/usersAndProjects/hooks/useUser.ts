@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { Config } from '../../../Config';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { setAuthValues } from '../redux/user';
+import { setAuthValues, UserSchema } from '../redux/user';
 
 export function useUser(skipFetch = false) {
 	const { userId, authToken, currentUser } = useAppSelector((state) => state.user);
@@ -12,10 +12,13 @@ export function useUser(skipFetch = false) {
 	const history = useHistory();
 
 	const {
-		data: user,
+		data: { user } = {},
 		isLoading,
 		refetch,
-	} = useQuery(['/users/get'], { enabled: !!authToken && !skipFetch, initialData: currentUser });
+	} = useQuery<{ user: UserSchema }>(['/users/get'], {
+		enabled: !!authToken && !skipFetch,
+		initialData: currentUser ? { user: currentUser } : undefined,
+	});
 
 	const authByToken = useCallback(
 		async (idToken: string) => {

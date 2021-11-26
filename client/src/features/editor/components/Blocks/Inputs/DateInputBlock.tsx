@@ -10,12 +10,6 @@ import { useBlockProperty, useBlockState } from '../../../hooks/useBlockProperty
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
 
-const StyledInput = styled.div`
-	.bp4-form-group {
-		margin-bottom: 0;
-	}
-`;
-
 function parseDate(value: any) {
 	return value instanceof Date ? value.toISOString() : '';
 }
@@ -42,20 +36,21 @@ export function DateInputBlock({ hide }: { hide: boolean }) {
 	useDeclareBlockMethods({ setValue: (newValue: string | number) => setValue(parseDate(newValue)) }, [setValue]);
 	const { showInspector } = useBlockContext();
 
-	if (hide || !show) return <></>;
+	if (hide || !show) return null;
 
 	return (
-		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
-			<InputLabel />
-			<DateInput
-				formatDate={(date) => date.toLocaleString().split(',')[0]}
-				parseDate={(str) => new Date(str)}
-				fill
-				value={value ? new Date(value) : null}
-				onChange={(selectedDate) => {
-					setValue(selectedDate.toISOString());
-				}}
-			/>
-		</StyledInput>
+		<div onContextMenu={showInspector}>
+			<InputLabel>
+				<DateInput
+					formatDate={(date) => date.toLocaleString().split(',')[0]}
+					parseDate={(str) => new Date(str)}
+					fill
+					value={value ? new Date(value) : null}
+					onChange={(selectedDate) => {
+						setValue(selectedDate.toISOString());
+					}}
+				/>
+			</InputLabel>
+		</div>
 	);
 }

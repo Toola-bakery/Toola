@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { DevtoolsWrapper } from '../../../devtools/components/DevtoolsWrapper';
 import { LeftDrawerWrapper } from '../../../drawer/components/LeftDrawerWrapper';
 import { usePageContext } from '../../../executor/hooks/useReferences';
+import { useUser } from '../../../usersAndProjects/hooks/useUser';
+import { UserSchema } from '../../../usersAndProjects/redux/user';
 import { useCurrent } from '../../hooks/useCurrent';
 import { useIsDevtoolsOpen } from '../../hooks/useIsDevtoolsOpen';
 import { BlockProps } from '../../types/blocks';
@@ -36,7 +38,7 @@ export type PageBlockProps = {
 };
 
 export type PageContextType = {
-	globals: { pageId: string; pageParams?: unknown };
+	globals: { pageId: string; pageParams?: unknown; currentUser: UserSchema | null };
 	page: BasicBlock & PageBlockType;
 	pageId: string;
 	editing: boolean;
@@ -47,7 +49,7 @@ export type PageContextType = {
 };
 
 export const PageContext = React.createContext<PageContextType>({
-	globals: { pageId: '' },
+	globals: { pageId: '', currentUser: null },
 	pageId: '',
 	page: {
 		id: '',
@@ -142,6 +144,7 @@ export function Page({
 }): JSX.Element {
 	const dispatch = useAppDispatch();
 
+	const { user } = useUser(true);
 	const blocksProps = useAppSelector((state) => selectBlocksProps(state, pageId));
 
 	const { isError, isSuccess, data } = usePage(pageId);
@@ -160,7 +163,7 @@ export function Page({
 	const value = useMemo<PageContextType>(
 		() => ({
 			pageId,
-			globals: { pageId, pageParams, isModal },
+			globals: { pageId, pageParams, isModal, currentUser: user || null },
 			page,
 			editing,
 			setEditing,
@@ -168,7 +171,7 @@ export function Page({
 			isDevtoolsOpen,
 			isModal,
 		}),
-		[isDevtoolsOpen, editing, setEditing, pageId, pageParams, page, blocksProps, isModal],
+		[isDevtoolsOpen, user, editing, setEditing, pageId, pageParams, page, blocksProps, isModal],
 	);
 
 	return (

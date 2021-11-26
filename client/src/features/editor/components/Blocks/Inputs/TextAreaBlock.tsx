@@ -20,12 +20,6 @@ export type InputBlockState = {
 
 export type InputBlockMethods = { setValue: (value: string) => void };
 
-const StyledInput = styled.div`
-	.bp4-form-group {
-		margin-bottom: 0;
-	}
-`;
-
 export function TextAreaBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { value, setValue, placeholder } = useValuePlaceholderInitialController();
@@ -37,17 +31,18 @@ export function TextAreaBlock({ hide }: { hide: boolean }) {
 
 	// TODO "helperText" Helper text with details...
 	return (
-		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
-			<InputLabel />
-			<TextArea
-				fill
-				value={value}
-				autoComplete="off"
-				placeholder={placeholder}
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-			/>
-		</StyledInput>
+		<div onContextMenu={showInspector}>
+			<InputLabel>
+				<TextArea
+					fill
+					value={value}
+					autoComplete="off"
+					placeholder={placeholder}
+					onChange={(e) => {
+						setValue(e.target.value);
+					}}
+				/>
+			</InputLabel>
+		</div>
 	);
 }

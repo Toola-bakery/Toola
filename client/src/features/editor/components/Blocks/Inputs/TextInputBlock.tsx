@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { useBlock } from '../../../hooks/useBlock';
 import { useBlockContext } from '../../../hooks/useBlockContext';
+import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { useDeclareBlockMethods } from '../../../hooks/useDeclareBlockMethods';
 import { InputLabel } from '../../componentsWithLogic/InputLabel';
 import { useValuePlaceholderInitialController } from './hooks';
@@ -31,6 +32,7 @@ export function TextInputBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { value, setValue, placeholder } = useValuePlaceholderInitialController();
 	const { showInspector } = useBlockContext();
+	const [labelInline] = useBlockProperty<boolean>('labelInline', true);
 
 	useDeclareBlockMethods<InputBlockMethods>({ setValue: (newValue: string) => setValue(newValue) }, [setValue]);
 
@@ -38,7 +40,10 @@ export function TextInputBlock({ hide }: { hide: boolean }) {
 
 	// TODO "helperText" Helper text with details...
 	return (
-		<StyledInput style={{ display: 'flex', flexDirection: 'row' }} onContextMenu={showInspector}>
+		<StyledInput
+			style={{ display: 'flex', flexDirection: labelInline ? 'row' : 'column' }}
+			onContextMenu={showInspector}
+		>
 			<InputLabel />
 			<InputGroup
 				fill

@@ -1,14 +1,22 @@
-import { useMemo } from 'react';
+import { PropsWithChildren, ReactNode, useMemo } from 'react';
+import styled from 'styled-components';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlockProperty } from '../../hooks/useBlockProperty';
 import { EditableText } from './EditableText';
 
-type AlignOptions = 'left' | 'right';
-export function InputLabel() {
+const StyledInput = styled.div`
+	.bp4-form-group {
+		margin-bottom: 0;
+	}
+`;
+
+type AlignOptions = 'left' | 'right' | 'center';
+export function InputLabel({ children }: PropsWithChildren<{ children?: ReactNode }>) {
 	const [label, setLabel] = useBlockProperty<string>('label', 'First name');
 	const [labelAlign, setLabelAlign] = useBlockProperty<AlignOptions>('labelAlign', 'left');
 	const [labelWidth, setLabelWidth] = useBlockProperty<number>('labelWidth', 33);
+	const [labelInline, setInline] = useBlockProperty<boolean>('labelInline', true);
 	const [labelWidthUnit, setLabelWidthUnit] = useBlockProperty<'%' | 'px' | 'col'>('labelWidthUnit', '%');
 
 	const menu = useMemo<MenuItemProps[]>(
@@ -20,11 +28,16 @@ export function InputLabel() {
 				next: [
 					{ label: 'Label', type: 'input', value: label, onChange: setLabel },
 					{
-						label: 'Label align',
-						type: 'select',
+						label: 'Inline',
+						type: 'switch',
+						value: labelInline,
+						onChange: setInline,
+					},
+					{
+						label: 'Align',
+						type: 'textAlign',
 						value: labelAlign,
 						onChange: (v) => setLabelAlign(v as AlignOptions),
-						options: ['left', 'right'],
 					},
 					{
 						label: 'Label width',
@@ -35,7 +48,7 @@ export function InputLabel() {
 				],
 			},
 		],
-		[label, labelAlign, labelWidth, setLabel, setLabelAlign, setLabelWidth],
+		[label, labelAlign, labelInline, labelWidth, setInline, setLabel, setLabelAlign, setLabelWidth],
 	);
 
 	useAppendBlockMenu(menu, 2);
@@ -43,22 +56,36 @@ export function InputLabel() {
 	if (!label) return null;
 
 	return (
-		<div
+		<StyledInput
 			style={{
-				maxWidth: `${labelWidth}${labelWidthUnit}`,
-				width: `${labelWidth}${labelWidthUnit}`,
-				minWidth: `${labelWidth}${labelWidthUnit}`,
-				justifyContent: labelAlign === 'right' ? 'flex-end' : 'flex-start',
-				alignItems: 'flex-start',
+				display: 'flex',
+				alignItems: labelInline ? 'center' : undefined,
+				flexDirection: labelInline ? 'row' : 'column',
 			}}
 		>
-			<EditableText
-				style={{ lineHeight: '30px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-				tagName="label"
-				className="bp4-label"
-				valuePropertyName="label"
-				allowEntities={false}
-			/>
-		</div>
+			<div
+				style={{
+					maxWidth: `${labelWidth}${labelWidthUnit}`,
+					width: `${labelWidth}${labelWidthUnit}`,
+					minWidth: `${labelWidth}${labelWidthUnit}`,
+					alignItems: 'flex-start',
+				}}
+			>
+				<EditableText
+					style={{
+						lineHeight: '30px',
+						textAlign: labelAlign,
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+						whiteSpace: 'nowrap',
+					}}
+					tagName="label"
+					className="bp4-label"
+					valuePropertyName="label"
+					allowEntities={false}
+				/>
+			</div>
+			{children}
+		</StyledInput>
 	);
 }
