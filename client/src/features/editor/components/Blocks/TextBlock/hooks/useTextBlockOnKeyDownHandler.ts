@@ -1,4 +1,4 @@
-import { KeyboardEventHandler, MutableRefObject, RefObject } from 'react';
+import { ClipboardEventHandler, KeyboardEventHandler, MutableRefObject, RefObject } from 'react';
 import { useRefsLatest } from '../../../../../../hooks/useRefLatest';
 import { useAppSelector } from '../../../../../../redux/hooks';
 import { usePageContext } from '../../../../../executor/hooks/useReferences';
@@ -8,7 +8,14 @@ import { useBlock } from '../../../../hooks/useBlock';
 import { useBlockProperty } from '../../../../hooks/useBlockProperty';
 import { useEditor } from '../../../../hooks/useEditor';
 import { selectBlockNeighborsProps } from '../../../../redux/editor';
-import { addPlugin, commonPlugins, concatEntities, removePlugin, sliceEntities } from '../plugins/TextEntitiesMutation';
+import {
+	addPlugin,
+	commonPlugins,
+	concatEntities,
+	htmlToEntities,
+	removePlugin,
+	sliceEntities,
+} from '../plugins/TextEntitiesMutation';
 import { TextEntity, TextEntityPlugins } from '../plugins/TextPlugins';
 
 const CMD_KEY = '/';
@@ -54,6 +61,18 @@ export function useTextBlockOnKeyDownHandler({
 		setEntities(newBlock[1]);
 	}
 
+	const onPaste: ClipboardEventHandler = (event) => {
+		event.preventDefault();
+		if (!contentEditableRef.current) return;
+		const pasteValue = event.clipboardData.getData('text/plain');
+		const pasteEntities: [string, TextEntity[]] = [pasteValue, []];
+		const index = getCaretIndex(contentEditableRef.current);
+		const firstPart = sliceEntities(valueRef.current, entitiesRef.current, 0, index - 1);
+		const secondPart = sliceEntities(valueRef.current, entitiesRef.current, index);
+		const newValue = concatEntities(...firstPart, ...concatEntities(...pasteEntities, ...secondPart));
+		setValue(newValue[0]);
+		setEntities(newValue[1]);
+	};
 	const onKeyDownHandler: KeyboardEventHandler = (e) => {
 		if (!contentEditableRef.current) return;
 		if (e.ctrlKey || e.metaKey) {
@@ -77,7 +96,7 @@ export function useTextBlockOnKeyDownHandler({
 			}
 
 			if (e.key === 'v') {
-				e.preventDefault();
+				// e.preventDefault();
 			}
 
 			return false;
@@ -128,5 +147,5 @@ export function useTextBlockOnKeyDownHandler({
 		}
 	};
 
-	return { onKeyDownHandler };
+	return { onKeyDownHandler, onPaste };
 }

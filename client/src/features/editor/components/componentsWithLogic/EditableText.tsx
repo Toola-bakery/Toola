@@ -84,7 +84,7 @@ export function EditableText({
 		[allowEntities, setEntities, setValue],
 	);
 
-	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
+	const { onKeyDownHandler, onPaste } = useTextBlockOnKeyDownHandler({
 		contentEditableRef,
 		setToPosRef,
 	});
@@ -114,6 +114,7 @@ export function EditableText({
 					...style,
 				}}
 				onChange={onChangeHandler}
+				onPaste={onPaste}
 				onKeyDown={onKeyDownHandler}
 				placeholder={editing ? placeholder : ''}
 			/>

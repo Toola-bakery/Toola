@@ -83,7 +83,7 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 
 	const { showInspector, inspectorProps } = useBlockContext();
 
-	const { onKeyDownHandler } = useTextBlockOnKeyDownHandler({
+	const { onKeyDownHandler, onPaste } = useTextBlockOnKeyDownHandler({
 		contentEditableRef,
 		inspectorProps,
 		setToPosRef,
@@ -132,6 +132,7 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 				tagName={textBlockStyleTag[style || 'text']}
 				style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
 				onChange={onChangeHandler}
+				onPaste={onPaste}
 				onKeyDown={onKeyDownHandler}
 			/>
 		</StyledContentEditable>
