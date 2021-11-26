@@ -102,7 +102,7 @@ export function ButtonBlock({ hide }: { hide: boolean }) {
 			},
 			{
 				type: 'nested',
-				label: 'Appearance',
+				label: 'Style',
 				icon: 'style',
 				next: [
 					{ type: 'input', value: minimal, onChange: setMinimal, label: 'Minimal' },

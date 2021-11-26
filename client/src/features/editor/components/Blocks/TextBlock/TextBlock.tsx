@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import styled from 'styled-components';
+import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
 import { getCaretIndex, getSelection, setCaretPosition } from '../../../helpers/caretOperators';
+import { useAppendBlockMenu } from '../../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlockContext } from '../../../hooks/useBlockContext';
 import { useBlockProperty } from '../../../hooks/useBlockProperty';
 import { useEditor } from '../../../hooks/useEditor';
@@ -109,8 +111,14 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 		}
 	}, [isFocused, value]);
 
-	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
+	const [textAlign, setTextAlign] = useBlockProperty<'left' | 'right' | 'center'>('textAlign', 'left');
 
+	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
+	const menu = useMemo<MenuItemProps[]>(
+		() => [{ type: 'textAlign', value: textAlign, onChange: setTextAlign, label: 'Align' }],
+		[setTextAlign, textAlign],
+	);
+	useAppendBlockMenu(menu, 0);
 	if (hide || !block.show) return null;
 
 	return (
@@ -130,7 +138,14 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 				innerRef={contentEditableRef}
 				html={isFocused ? htmlValue : htmlString}
 				tagName={textBlockStyleTag[style || 'text']}
-				style={{ margin: 0, paddingTop: 1, marginBottom: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+				style={{
+					margin: 0,
+					paddingTop: 1,
+					marginBottom: 0,
+					whiteSpace: 'pre-wrap',
+					wordBreak: 'break-word',
+					textAlign,
+				}}
 				onChange={onChangeHandler}
 				onPaste={onPaste}
 				onKeyDown={onKeyDownHandler}

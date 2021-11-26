@@ -3,7 +3,7 @@ import React from 'react';
 import { BasicItemProps, InspectorItemProps } from '../InspectorItem';
 
 export type SimpleMenuItemProps = BasicItemProps & {
-	type: undefined | 'item';
+	type: 'item';
 	call: () => void;
 	closeAfterCall?: boolean;
 };

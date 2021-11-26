@@ -1,5 +1,6 @@
 import { Button, Card } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
+import { useReferences } from '../../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
 import { useAppendBlockMenu } from '../../hooks/blockInspector/useAppendBlockMenu';
 import { useBlock } from '../../hooks/useBlock';
@@ -15,16 +16,44 @@ export function CardBlock({ hide }: { hide: boolean }) {
 	const { showInspector } = useBlockContext();
 	const [blocks] = useBlockProperty<string[]>('blocks', []);
 	const [backgroundColor, setBackgroundColor] = useBlockProperty<string>('backgroundColor');
+
+	// eslint-disable-next-line no-template-curly-in-string
+	const [borderRadius, setBorderRadius] = useBlockProperty<string>('borderRadius', '3px');
+	const borderRadiusCalculated = useReferences(borderRadius);
+
+	// eslint-disable-next-line no-template-curly-in-string
+	const [borderColor, setBorderColor] = useBlockProperty<string>('borderColor', '#dcdcdd');
+	// const borderRadiusCalculated = useReferences(borderRadius);
+
 	const menu = useMemo<MenuItemProps[]>(
 		() => [
 			{
-				type: 'input',
-				value: backgroundColor || '',
-				onChange: setBackgroundColor,
-				label: 'Background color',
+				type: 'nested',
+				label: 'Style',
+				icon: 'style',
+				next: [
+					{
+						type: 'input',
+						value: backgroundColor || '',
+						onChange: setBackgroundColor,
+						label: 'Background color',
+					},
+					{
+						type: 'input',
+						value: borderRadius || '',
+						onChange: setBorderRadius,
+						label: 'Border radius',
+					},
+					{
+						type: 'input',
+						value: borderColor || '',
+						onChange: setBorderColor,
+						label: 'Border color',
+					},
+				],
 			},
 		],
-		[backgroundColor, setBackgroundColor],
+		[backgroundColor, borderColor, borderRadius, setBackgroundColor, setBorderColor, setBorderRadius],
 	);
 	useAppendBlockMenu(menu, 0);
 	if (hide || !block.show) return null;
@@ -33,14 +62,20 @@ export function CardBlock({ hide }: { hide: boolean }) {
 		<div onContextMenu={showInspector}>
 			<Card
 				style={{
+					borderColor: borderColor || '#dcdcdd',
+					borderStyle: 'solid',
+					borderWidth: 1,
 					paddingTop: 20,
 					paddingRight: 20,
 					paddingBottom: 20,
 					paddingLeft: 0,
 					backgroundColor: backgroundColor || 'white',
+					borderRadius: borderRadiusCalculated,
+					boxShadow: 'none',
 				}}
+				elevation={0}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', paddingLeft: 25 }}>
+				<div style={{ display: 'flex', alignItems: 'center', paddingLeft: 30 }}>
 					<EmojiPicker hideIfEmpty useDefaultDocument={false} />
 					<EditableText placeholder="Untitled" tagName="h4" className="bp4-heading" />
 				</div>

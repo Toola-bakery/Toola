@@ -12,6 +12,7 @@ import { QuerySelectorMenuItem, QuerySelectorMenuItemProps } from './InspectorIt
 import { SelectMenuItem, SelectMenuItemProps } from './InspectorItems/SelectMenuItem';
 import { SimpleMenuItem, SimpleMenuItemProps } from './InspectorItems/SimpleMenuItem';
 import { SwitchMenuItem, SwitchMenuItemProps } from './InspectorItems/SwitchMenuItem';
+import { TextAlignItemProps, TextAlignMenuItem } from './InspectorItems/TextAlignMenuItem';
 import { ViewMenuItem, ViewMenuItemProps } from './InspectorItems/ViewItem';
 
 export type BasicItemProps = {
@@ -32,6 +33,7 @@ export type MenuItemProps =
 	| PageMenuItemProps
 	| BlockNameMenuItemProps
 	| PgSQLMenuItemProps
+	| TextAlignItemProps
 	| SwitchMenuItemProps;
 
 export type InspectorItemProps<Item = MenuItemProps> = {
@@ -42,22 +44,28 @@ export type InspectorItemProps<Item = MenuItemProps> = {
 	inline?: boolean;
 };
 
+const inspectorList: { [key in MenuItemProps['type']]: React.ReactNode } = {
+	blockName: BlockNameMenuItem,
+	item: SimpleMenuItem,
+	querySelector: QuerySelectorMenuItem,
+	switch: SwitchMenuItem,
+	nested: NestedMenuItem,
+	view: ViewMenuItem,
+	pgSQL: PgSQLMenuItem,
+	input: InputMenuItem,
+	pages: PageMenuItem,
+	database: DatabaseMenuItem,
+	select: SelectMenuItem,
+	queryAction: QueryActionMenuItem,
+	textAlign: TextAlignMenuItem,
+};
+
 export const InspectorItem = React.memo((props: InspectorItemProps) => {
 	const { item } = props;
-	if (item.type === 'blockName')
-		return <BlockNameMenuItem {...(props as InspectorItemProps<BlockNameMenuItemProps>)} />;
-	if (item.type === 'item') return <SimpleMenuItem {...(props as InspectorItemProps<SimpleMenuItemProps>)} />;
-	if (item.type === 'querySelector')
-		return <QuerySelectorMenuItem {...(props as InspectorItemProps<QuerySelectorMenuItemProps>)} />;
-	if (item.type === 'switch') return <SwitchMenuItem {...(props as InspectorItemProps<SwitchMenuItemProps>)} />;
-	if (item.type === 'nested') return <NestedMenuItem {...(props as InspectorItemProps<NestedMenuItemProps>)} />;
-	if (item.type === 'view') return <ViewMenuItem {...(props as InspectorItemProps<ViewMenuItemProps>)} />;
-	if (item.type === 'pgSQL') return <PgSQLMenuItem {...(props as InspectorItemProps<PgSQLMenuItemProps>)} />;
-	if (item.type === 'input') return <InputMenuItem {...(props as InspectorItemProps<InputMenuItemProps>)} />;
-	if (item.type === 'pages') return <PageMenuItem {...(props as InspectorItemProps<PageMenuItemProps>)} />;
-	if (item.type === 'database') return <DatabaseMenuItem {...(props as InspectorItemProps<DatabaseMenuItemProps>)} />;
-	if (item.type === 'select') return <SelectMenuItem {...(props as InspectorItemProps<SelectMenuItemProps>)} />;
-	if (item.type === 'queryAction')
-		return <QueryActionMenuItem {...(props as InspectorItemProps<QueryActionMenuItemProps>)} />;
-	return null;
+	const Inspector = inspectorList[item.type as keyof typeof inspectorList];
+	if (!Inspector) return null;
+
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	return <Inspector {...props} />;
 });
