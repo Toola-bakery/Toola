@@ -50,12 +50,15 @@ export function EmojiIcon({ emoji, small = false, useDefaultDocument = true }: E
 export function EmojiPicker({
 	onChange,
 	propertyName = 'emoji',
+	hideIfEmpty = false,
 	setEmoji: setControlledEmoji,
 	emoji: controlledEmoji,
+
 	...rest
 }: {
 	onChange?: (emoji: EmojiData | undefined) => void;
 	propertyName?: string;
+	hideIfEmpty?: boolean;
 	emoji?: string;
 	setEmoji?: (newEmoji: string | undefined) => void;
 } & EmojiIconProps = {}) {
@@ -65,7 +68,7 @@ export function EmojiPicker({
 	const emoji = setControlledEmoji ? controlledEmoji : internalEmoji;
 	const setEmoji = setControlledEmoji || setInternalEmoji;
 	const icon = <EmojiIcon {...rest} emoji={emoji} />;
-
+	if (hideIfEmpty && !emoji) return null;
 	if (!editing) return <div style={boxStyles}>{icon}</div>;
 	return (
 		<EmojiPopoverPicker
