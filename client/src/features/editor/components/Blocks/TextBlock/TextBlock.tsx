@@ -18,6 +18,7 @@ export type TextBlockType = TextBlockProps;
 
 const textBlockStyleTag = {
 	text: 'p',
+	list: 'li',
 	heading1: 'h1',
 	heading2: 'h2',
 	heading3: 'h3',
@@ -121,35 +122,39 @@ export function TextBlock({ block, hide }: { block: BasicBlock & TextBlockType; 
 	useAppendBlockMenu(menu, 0);
 	if (hide || !block.show) return null;
 
+	const contentEditable = (
+		<ContentEditable
+			disabled={!editing}
+			onContextMenu={(e) => {
+				if (contentEditableRef.current) {
+					const [n1, n2] = getSelection(contentEditableRef.current);
+					if (n1 !== n2) return;
+				}
+				showInspector(e);
+			}}
+			className={`Block ${style.includes('heading') ? 'bp4-heading' : 'bp4-text-large'}`}
+			onFocus={() => setIsFocused(true)}
+			onBlur={() => setIsFocused(false)}
+			innerRef={contentEditableRef}
+			html={isFocused ? htmlValue : htmlString}
+			tagName={textBlockStyleTag[style || 'text']}
+			style={{
+				margin: 0,
+				paddingTop: 1,
+				marginBottom: 0,
+				whiteSpace: 'pre-wrap',
+				wordBreak: 'break-word',
+				textAlign,
+			}}
+			onChange={onChangeHandler}
+			onPaste={onPaste}
+			onKeyDown={onKeyDownHandler}
+		/>
+	);
+
 	return (
 		<StyledContentEditable>
-			<ContentEditable
-				disabled={!editing}
-				onContextMenu={(e) => {
-					if (contentEditableRef.current) {
-						const [n1, n2] = getSelection(contentEditableRef.current);
-						if (n1 !== n2) return;
-					}
-					showInspector(e);
-				}}
-				className={`Block ${textBlockStyleTag[style || 'text'] !== 'p' ? 'bp4-heading' : 'bp4-text-large'}`}
-				onFocus={() => setIsFocused(true)}
-				onBlur={() => setIsFocused(false)}
-				innerRef={contentEditableRef}
-				html={isFocused ? htmlValue : htmlString}
-				tagName={textBlockStyleTag[style || 'text']}
-				style={{
-					margin: 0,
-					paddingTop: 1,
-					marginBottom: 0,
-					whiteSpace: 'pre-wrap',
-					wordBreak: 'break-word',
-					textAlign,
-				}}
-				onChange={onChangeHandler}
-				onPaste={onPaste}
-				onKeyDown={onKeyDownHandler}
-			/>
+			{style === 'list' ? <ul style={{ margin: 0 }}>{contentEditable}</ul> : contentEditable}
 		</StyledContentEditable>
 	);
 }

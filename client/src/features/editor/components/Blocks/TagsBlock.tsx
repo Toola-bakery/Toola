@@ -51,8 +51,8 @@ export function TagsBlock({ hide }: { hide: boolean }) {
 				? tagsCalculated.map((v, i) => (
 						<Tag
 							style={{
-								backgroundColor: tagColorsCalculated?.[i],
-								color: 'rgba(0,0,0,0.7)',
+								backgroundColor: tagColorsCalculated?.[i % (tagColorsCalculated?.length || 1)],
+								color: 'rgba(0,0,0,0.6)',
 								marginRight: 5,
 							}}
 							key={String(i)}
