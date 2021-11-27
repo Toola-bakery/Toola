@@ -8,6 +8,7 @@ import { CodeBlock } from '../Blocks/CodeBlock/CodeBlock';
 import { FormBlock } from '../Blocks/FormBlock/FormBlock';
 import { ImageBlock } from '../Blocks/ImageBlock';
 import { DateInputBlock } from '../Blocks/Inputs/DateInputBlock';
+import { MultiSelectBlock } from '../Blocks/Inputs/MultiSelectBlock';
 import { TextInputBlock } from '../Blocks/Inputs/TextInputBlock';
 import { NumericInputBlock } from '../Blocks/Inputs/NumericInputBlock';
 import { TextAreaBlock } from '../Blocks/Inputs/TextAreaBlock';
@@ -41,6 +42,7 @@ export const installedBlocks = {
 	subpage: SubPageBlock,
 	progressBar: ProgressBarBlock,
 	chart: ChartBlock,
+	multiSelect: MultiSelectBlock,
 };
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
 	const type = block.type as keyof typeof installedBlocks;

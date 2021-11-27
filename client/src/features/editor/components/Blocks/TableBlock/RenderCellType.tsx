@@ -33,7 +33,6 @@ const renderList: { [key in ColumnTypes]: (cell: Cell) => JSX.Element | null } =
 	},
 	[ColumnTypes.text]: (cell) => stringifyCellValue(cell) || '',
 	[ColumnTypes.date]: (cell) => {
-		console.log({ str: stringifyCellValue(cell), val: cell.value });
 		return <>{dayjs(stringifyCellValue(cell)).format('DD.MM.YYYY HH:mm')}</>;
 	},
 };

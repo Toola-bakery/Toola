@@ -151,10 +151,15 @@ export function TableBlock({ hide }: { hide: boolean }) {
 											if (!isSelected) row.toggleRowSelected();
 											setSelectedRow(isSelected ? null : row.original);
 										}}
-										onDoubleClick={() => {
+										onDoubleClick={(e) => {
 											if (connectedPage) {
 												modalHistory.push(connectedPage, row.original);
 											}
+										}}
+										onMouseDown={(event) => {
+											if (event.detail <= 1) return;
+											event.preventDefault();
+											event.stopPropagation();
 										}}
 										className="tr"
 									>

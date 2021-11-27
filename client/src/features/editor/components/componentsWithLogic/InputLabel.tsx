@@ -53,8 +53,6 @@ export function InputLabel({ children }: PropsWithChildren<{ children?: ReactNod
 
 	useAppendBlockMenu(menu, 2);
 
-	if (!label) return null;
-
 	return (
 		<StyledInput
 			style={{
@@ -64,29 +62,31 @@ export function InputLabel({ children }: PropsWithChildren<{ children?: ReactNod
 				width: '100%',
 			}}
 		>
-			<div
-				style={{
-					display: 'flex',
-					maxWidth: `${labelWidth}${labelWidthUnit}`,
-					width: `${labelWidth}${labelWidthUnit}`,
-					minWidth: `${labelWidth}${labelWidthUnit}`,
-					alignItems: 'flex-start',
-				}}
-			>
-				<EditableText
+			{label ? (
+				<div
 					style={{
-						lineHeight: '30px',
-						textAlign: labelAlign,
-						overflow: 'hidden',
-						textOverflow: 'ellipsis',
-						whiteSpace: 'nowrap',
+						display: 'flex',
+						maxWidth: `${labelWidth}${labelWidthUnit}`,
+						width: `${labelWidth}${labelWidthUnit}`,
+						minWidth: `${labelWidth}${labelWidthUnit}`,
+						alignItems: 'flex-start',
 					}}
-					tagName="label"
-					className="bp4-label"
-					valuePropertyName="label"
-					allowEntities={false}
-				/>
-			</div>
+				>
+					<EditableText
+						style={{
+							lineHeight: '30px',
+							textAlign: labelAlign,
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							whiteSpace: 'nowrap',
+						}}
+						tagName="label"
+						className="bp4-label"
+						valuePropertyName="label"
+						allowEntities={false}
+					/>
+				</div>
+			) : null}
 			{children}
 		</StyledInput>
 	);

@@ -37,8 +37,9 @@ export function useBlockProperty<T>(name: string, defaultValue?: T): [T | undefi
 	return [typeof currentValue === 'undefined' ? memDefaultValue : currentValue, update];
 }
 
-export function useBlockState<T>(name: string, defaultValue?: T | (() => T)): [T | undefined, (nextValue: T) => void];
-export function useBlockState<T>(name: string, defaultValue: T | (() => T)): [T, (nextValue: T) => void] {
+export function useBlockState<T>(name: string, defaultValue?: undefined): [T | undefined, (nextValue: T) => void];
+export function useBlockState<T>(name: string, defaultValue: T | (() => T)): [T, (nextValue: T) => void];
+export function useBlockState<T>(name: string, defaultValue?: T | (() => T)): [T | undefined, (nextValue: T) => void] {
 	const block = useBlock();
 	const { updateBlockState } = useEditor();
 

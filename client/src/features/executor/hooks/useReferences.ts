@@ -1,6 +1,7 @@
 import { useCallback, useContext, useMemo, useRef } from 'react';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { PageContext } from '../../editor/components/Page/Page';
+import { useBlock } from '../../editor/hooks/useBlock';
 import { useCurrent } from '../../editor/hooks/useCurrent';
 import { usePageModal } from '../../pageModal/hooks/usePageModal';
 import { useWatchList, WatchListProps } from './useWatchList';
@@ -20,6 +21,7 @@ export function useReferenceEvaluator({
 } = {}) {
 	const { globals } = usePageContext();
 	const { blocks } = useCurrent();
+	const block = useBlock();
 	const { watchList, isLoading, addToWatchList, setOnUpdate } = useWatchList({
 		syncWithBlockProps,
 		...watchListProps,
@@ -60,6 +62,7 @@ export function useReferenceEvaluator({
 				current,
 				updateId,
 				navigate,
+				self: block,
 				navigateModal: push,
 			});
 			const evaluateKeys = evaluateContext.map((v) => v[0]);
@@ -86,7 +89,7 @@ export function useReferenceEvaluator({
 				return e.message;
 			}
 		},
-		[addToWatchList, blocks, currentContext, globals, navigate, push, updateId, watchReferences],
+		[addToWatchList, block, blocks, currentContext, globals, navigate, push, updateId, watchReferences],
 	);
 
 	return { evaluate, watchList, isLoading, setOnUpdate };
