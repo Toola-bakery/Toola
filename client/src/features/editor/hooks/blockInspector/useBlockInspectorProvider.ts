@@ -16,6 +16,7 @@ const TurnIntoBlocks: [
 	['Heading 3', { type: 'text', style: 'heading3' }],
 	['Heading 4', { type: 'text', style: 'heading4' }],
 	['Card', 'card'],
+	['Tags', 'tags'],
 	['Form', 'form'],
 	['Tabs', 'tabs'],
 	['List', 'list'],

@@ -20,6 +20,7 @@ import { QueryBlock } from '../Blocks/QueryBlock/QueryBlock';
 import { SubPageBlock } from '../Blocks/SubPageBlock';
 import { TableBlock } from '../Blocks/TableBlock/TableBlock';
 import { TabsBlock } from '../Blocks/TabsBlock';
+import { TagsBlock } from '../Blocks/TagsBlock';
 import { TextBlock } from '../Blocks/TextBlock/TextBlock';
 
 export const installedBlocks = {
@@ -43,6 +44,7 @@ export const installedBlocks = {
 	progressBar: ProgressBarBlock,
 	chart: ChartBlock,
 	multiSelect: MultiSelectBlock,
+	tags: TagsBlock,
 };
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {
 	const type = block.type as keyof typeof installedBlocks;
