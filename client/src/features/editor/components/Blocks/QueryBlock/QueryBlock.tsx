@@ -117,8 +117,8 @@ async function main () {
 	const { callNextTime } = useNextRenderHook(trigger);
 
 	useEffect(() => {
-		setOnUpdate(() => callNextTime);
-	}, [callNextTime, setOnUpdate]);
+		setOnUpdate(() => (manualControl ? undefined : callNextTime));
+	}, [callNextTime, manualControl, setOnUpdate]);
 
 	useOnMountedEffect(() => {
 		if (!manualControl) trigger();

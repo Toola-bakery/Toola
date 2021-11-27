@@ -39,7 +39,7 @@ export function QuerySelectorMenuItem({
 						itemRenderer={(block, { handleClick }) => (
 							<MenuItem shouldDismissPopover={false} key={block.id} onClick={handleClick} text={block.id} />
 						)}
-						popoverProps={{ minimal: true, fill: true }}
+						popoverProps={{ minimal: true, fill: true, usePortal: false }}
 						onItemSelect={(block) => item.onChange(block.id)}
 					>
 						<Button fill text={item.value || 'Select query'} rightIcon="double-caret-vertical" />

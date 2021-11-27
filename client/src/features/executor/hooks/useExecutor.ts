@@ -2,6 +2,7 @@ import { parse } from 'flatted';
 import { useCallback, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 import { useRefsLatest } from '../../../hooks/useRefLatest';
+import { useBlockProperty } from '../../editor/hooks/useBlockProperty';
 import { useCurrent } from '../../editor/hooks/useCurrent';
 import { useEventListener } from '../../editor/hooks/useEvents';
 import { usePageContext } from './useReferences';
@@ -32,6 +33,7 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value,
 	const [logs, setLogs] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [lastEvent, setLastEvent] = useState<FunctionExecutorAction['action']>();
+	const [manualControl, setManualControl] = useBlockProperty<boolean>('manualControl', false);
 
 	const { addToWatchList, watchList, setOnUpdate } = useWatchList({
 		initialList: watchListProp,
@@ -103,8 +105,10 @@ export function useFunctionExecutor({ watchListProp, listener, onTrigger, value,
 	);
 
 	useEffect(() => {
-		setOnUpdate(() => trigger);
-	}, [setOnUpdate, trigger]);
+		setOnUpdate(() => {
+			if (!manualControl) return trigger;
+		});
+	}, [manualControl, setOnUpdate, trigger]);
 
 	return { runCode, lastEvent, UUID, trigger, loading, result, logs };
 }
