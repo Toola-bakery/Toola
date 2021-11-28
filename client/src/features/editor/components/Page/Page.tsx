@@ -187,7 +187,7 @@ export function Page({
 	return (
 		<PageContext.Provider value={value}>
 			<CurrentContextProvider current={undefined}>
-				<PageBlock isError={isError} />
+				{show ? <PageBlock isError={isError} /> : null}
 			</CurrentContextProvider>
 		</PageContext.Provider>
 	);
