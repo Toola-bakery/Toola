@@ -1,27 +1,28 @@
 import React from 'react';
+import { MultiSelectBlock } from '../../../blocks/blocks/Inputs/MultiSelectBlock';
 import { BasicBlock } from '../../types/basicBlock';
 import { Blocks } from '../../types/blocks';
-import { ButtonBlock } from '../Blocks/ButtonBlock';
-import { CardBlock } from '../Blocks/CardBlock';
-import { ChartBlock } from '../Blocks/ChartBlock/ChartBlock';
-import { CodeBlock } from '../Blocks/CodeBlock/CodeBlock';
-import { FormBlock } from '../Blocks/FormBlock/FormBlock';
-import { ImageBlock } from '../Blocks/ImageBlock';
-import { DateInputBlock } from '../Blocks/Inputs/DateInputBlock';
-import { MultiSelectBlock } from '../Blocks/Inputs/MultiSelectBlock';
-import { TextInputBlock } from '../Blocks/Inputs/TextInputBlock';
-import { NumericInputBlock } from '../Blocks/Inputs/NumericInputBlock';
-import { TextAreaBlock } from '../Blocks/Inputs/TextAreaBlock';
-import { JSONViewBlock } from '../Blocks/JSONViewBlock';
-import { KeyValueBlock } from '../Blocks/KeyValueBlock';
-import { ListBlock } from '../Blocks/ListBlock/ListBlock';
-import { ProgressBarBlock } from '../Blocks/ProgressBarBlock';
-import { QueryBlock } from '../Blocks/QueryBlock/QueryBlock';
-import { SubPageBlock } from '../Blocks/SubPageBlock';
-import { TableBlock } from '../Blocks/TableBlock/TableBlock';
-import { TabsBlock } from '../Blocks/TabsBlock';
-import { TagsBlock } from '../Blocks/TagsBlock';
-import { TextBlock } from '../Blocks/TextBlock/TextBlock';
+import { ButtonBlock } from '../../../blocks/blocks/ButtonBlock';
+import { CardBlock } from '../../../blocks/blocks/CardBlock';
+import { ChartBlock } from '../../../blocks/blocks/ChartBlock/ChartBlock';
+import { CodeBlock } from '../../../blocks/blocks/CodeBlock/CodeBlock';
+import { FormBlock } from '../../../blocks/blocks/FormBlock/FormBlock';
+import { ImageBlock } from '../../../blocks/blocks/ImageBlock';
+import { DateInputBlock } from '../../../blocks/blocks/Inputs/DateInputBlock';
+import { SelectBlock } from '../../../blocks/blocks/Inputs/SelectBlock';
+import { TextInputBlock } from '../../../blocks/blocks/Inputs/TextInputBlock';
+import { NumericInputBlock } from '../../../blocks/blocks/Inputs/NumericInputBlock';
+import { TextAreaBlock } from '../../../blocks/blocks/Inputs/TextAreaBlock';
+import { JSONViewBlock } from '../../../blocks/blocks/JSONViewBlock';
+import { KeyValueBlock } from '../../../blocks/blocks/KeyValueBlock';
+import { ListBlock } from '../../../blocks/blocks/ListBlock/ListBlock';
+import { ProgressBarBlock } from '../../../blocks/blocks/ProgressBarBlock';
+import { QueryBlock } from '../../../blocks/blocks/QueryBlock/QueryBlock';
+import { SubPageBlock } from '../../../blocks/blocks/SubPageBlock';
+import { TableBlock } from '../../../blocks/blocks/TableBlock/TableBlock';
+import { TabsBlock } from '../../../blocks/blocks/TabsBlock';
+import { TagsBlock } from '../../../blocks/blocks/TagsBlock';
+import { TextBlock } from '../../../blocks/blocks/TextBlock/TextBlock';
 
 export const installedBlocks = {
 	text: TextBlock,
@@ -44,6 +45,7 @@ export const installedBlocks = {
 	progressBar: ProgressBarBlock,
 	chart: ChartBlock,
 	multiSelect: MultiSelectBlock,
+	select: SelectBlock,
 	tags: TagsBlock,
 };
 export function BlockSelector({ block, hide = false }: { block: BasicBlock & Blocks; hide?: boolean }) {

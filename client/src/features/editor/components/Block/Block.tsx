@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import { useWhatChanged } from '@simbathesailor/use-what-changed';
 import React, { PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { usePageContext } from '../../../executor/hooks/useReferences';
@@ -47,8 +46,7 @@ export function BlockContextProvider({
 	const block = blockId ? blocks[blockId] : customBlock;
 	if ((!blockId && !customBlock) || !block) throw new Error('BlockContextProvider: set customBlock or blockId');
 	const { appendMenuParticle, menu } = useBlockInspectorProvider(block);
-
-	const { onContextMenu: showInspectorPrivate, inspectorProps: inspectorPropsPrivate } = useInspectorState({
+	const { onContextMenu: showInspectorPrivate, inspectorProps } = useInspectorState({
 		disabled: !editing,
 		menu,
 	});
@@ -58,11 +56,6 @@ export function BlockContextProvider({
 	const setShowInspector = useCallback(
 		(nextShowInspector: DragClickEventHandler) => setShowInspectorPrivate(() => nextShowInspector),
 		[],
-	);
-
-	const inspectorProps = useMemo<InspectorPropsType>(
-		() => ({ ...inspectorPropsPrivate, menu }),
-		[inspectorPropsPrivate, menu],
 	);
 
 	const value = useMemo(
@@ -76,7 +69,12 @@ export function BlockContextProvider({
 		}),
 		[block, showInspector, showInspectorPrivate, menu, appendMenuParticle, inspectorProps, setShowInspector],
 	);
-	return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
+	return (
+		<BlockContext.Provider value={value}>
+			{children}
+			<BlockInspector />
+		</BlockContext.Provider>
+	);
 }
 
 export function Block({
@@ -135,7 +133,6 @@ export function Block({
 					</div>
 				</div>
 			)}
-			<BlockInspector />
 		</BlockContextProvider>
 	);
 }

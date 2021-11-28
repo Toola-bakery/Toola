@@ -1,14 +1,34 @@
 import { Button, Icon, InputGroup, Menu, MenuItem, NonIdealState, Position } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 import * as React from 'react';
-import { useCallback } from 'react';
-import { DropTarget } from '../../../editor/components/Blocks/Layout/DropTarget';
+import { PropsWithChildren, ReactNode, useCallback } from 'react';
+import { DropTarget } from '../../../blocks/blocks/Layout/DropTarget';
+import { BlockContextProvider } from '../../../editor/components/Block/Block';
 import { PageBlockProps } from '../../../editor/components/Page/Page';
-import { BlockCreators } from '../../../editor/helpers/BlockCreators';
+import { BlockCreators } from '../../../blocks/helpers/BlockCreators';
+import { useBlockContext } from '../../../editor/hooks/useBlockContext';
 import { useBlockDrag } from '../../../editor/hooks/useBlockDrag';
 import { useCurrent } from '../../../editor/hooks/useCurrent';
 import { useEditor } from '../../../editor/hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
+
+function BlockContextMenu({
+	children,
+	...restDivProps
+}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & { children?: ReactNode }) {
+	const { showInspector } = useBlockContext();
+
+	return (
+		<div
+			{...restDivProps}
+			onContextMenu={(e) => {
+				showInspector(e);
+			}}
+		>
+			{children}
+		</div>
+	);
+}
 
 function QueryMenuItem({
 	blockId,
@@ -24,22 +44,24 @@ function QueryMenuItem({
 	const { blocks } = useCurrent();
 	const [{ opacity }, dragRef] = useBlockDrag(blocks[blockId]);
 	return (
-		<>
-			<div ref={dragRef}>
-				<MenuItem
-					style={{ opacity }}
-					active={activeBlockId === blockId}
-					onClick={() => setActiveBlock(blockId)}
-					key={blockId}
-					text={blockId}
-				/>
-			</div>
+		<BlockContextProvider block={blocks[blockId]}>
+			<BlockContextMenu>
+				<div ref={dragRef}>
+					<MenuItem
+						style={{ opacity }}
+						active={activeBlockId === blockId}
+						onClick={() => setActiveBlock(blockId)}
+						key={blockId}
+						text={blockId}
+					/>
+				</div>
+			</BlockContextMenu>
 			<DropTarget
 				key={`DropTarget:${blockId}`}
 				dropIds={['Block:code', 'Block:query']}
 				onDrop={(d) => onDrop(blockId, d)}
 			/>
-		</>
+		</BlockContextProvider>
 	);
 }
 
@@ -103,7 +125,7 @@ export function QueryList({
 							}}
 						>
 							<MenuItem icon="form" text="Add Query block" onClick={() => createQuery('query')} />
-							<MenuItem icon="code" text="Add Code block" onClick={() => createQuery('code')} />
+							<MenuItem icon="code" text="Add Node.JS block" onClick={() => createQuery('code')} />
 						</Menu>
 					}
 					position={Position.BOTTOM}

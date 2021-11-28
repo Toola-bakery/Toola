@@ -1,6 +1,6 @@
 import { Menu, MenuItem } from '@blueprintjs/core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { setInputCaretPosition } from '../../editor/helpers/caretOperators';
+import { setInputCaretPosition } from '../../blocks/helpers/caretOperators';
 import { useCurrent } from '../../editor/hooks/useCurrent';
 import { usePageContext } from '../../executor/hooks/useReferences';
 import { useCaretPosition } from '../../editor/hooks/useCaretPosition';

@@ -1,31 +1,31 @@
-import { ButtonBlockProps, ButtonBlockType } from '../components/Blocks/ButtonBlock';
-import { KeyValueBlockProps, KeyValueBlockType } from '../components/Blocks/KeyValueBlock';
-import { ColumnBlockProps, ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
-import { ImageBlockProps, ImageBlockType } from '../components/Blocks/ImageBlock';
+import { ButtonBlockProps, ButtonBlockType } from '../../blocks/blocks/ButtonBlock';
+import { KeyValueBlockProps, KeyValueBlockType } from '../../blocks/blocks/KeyValueBlock';
+import { ColumnBlockProps, ColumnBlockType } from '../../blocks/blocks/Layout/ColumnBlock';
+import { ImageBlockProps, ImageBlockType } from '../../blocks/blocks/ImageBlock';
 import {
 	QueryBlockMethods,
 	QueryBlockProps,
 	QueryBlockState,
 	QueryBlockType,
-} from '../components/Blocks/QueryBlock/QueryBlock';
-import { SubPageBlockProps, SubPageBlockType } from '../components/Blocks/SubPageBlock';
-import { TextBlockProps, TextBlockType } from '../components/Blocks/TextBlock/TextBlock';
+} from '../../blocks/blocks/QueryBlock/QueryBlock';
+import { SubPageBlockProps, SubPageBlockType } from '../../blocks/blocks/SubPageBlock';
+import { TextBlockProps, TextBlockType } from '../../blocks/blocks/TextBlock/TextBlock';
 import {
 	CodeBlockMethods,
 	CodeBlockProps,
 	CodeBlockState,
 	CodeBlockType,
-} from '../components/Blocks/CodeBlock/CodeBlock';
-import { JSONViewBlockProps, JSONViewBlockType } from '../components/Blocks/JSONViewBlock';
+} from '../../blocks/blocks/CodeBlock/CodeBlock';
+import { JSONViewBlockProps, JSONViewBlockType } from '../../blocks/blocks/JSONViewBlock';
 import { PageBlockProps, PageBlockType } from '../components/Page/Page';
-import { RowBlockProps, RowBlockType } from '../components/Blocks/Layout/RowBlock';
-import { TableBlockProps, TableBlockState, TableBlockType } from '../components/Blocks/TableBlock/TableBlock';
+import { RowBlockProps, RowBlockType } from '../../blocks/blocks/Layout/RowBlock';
+import { TableBlockProps, TableBlockState, TableBlockType } from '../../blocks/blocks/TableBlock/TableBlock';
 import {
 	InputBlockMethods,
 	InputBlockProps,
 	InputBlockState,
 	InputBlockType,
-} from '../components/Blocks/Inputs/TextInputBlock';
+} from '../../blocks/blocks/Inputs/TextInputBlock';
 
 export type Blocks =
 	| InputBlockType

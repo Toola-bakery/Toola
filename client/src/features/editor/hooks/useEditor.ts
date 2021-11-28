@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { AppToaster } from '../../../components/Toaster';
 import { store } from '../../../redux';
 import { installedBlocks } from '../components/Block/BlockSelector';
-import { ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
+import { ColumnBlockType } from '../../blocks/blocks/Layout/ColumnBlock';
 import { useCurrent } from './useCurrent';
 import { DeleteBlockEvent } from './useDeleteBlockHook';
 import { useEvents, Event } from './useEvents';
@@ -23,7 +23,7 @@ import {
 } from '../redux/editor';
 import { BasicBlock } from '../types/basicBlock';
 import { usePageContext } from '../../executor/hooks/useReferences';
-import { BlockCreators } from '../helpers/BlockCreators';
+import { BlockCreators } from '../../blocks/helpers/BlockCreators';
 import { BlockProps, Blocks } from '../types/blocks';
 
 const GENERATED_ID_REGEXP = new RegExp(`^(${Object.keys(installedBlocks).join('|')})\\d+`);

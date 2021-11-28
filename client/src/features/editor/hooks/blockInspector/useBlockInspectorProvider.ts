@@ -34,6 +34,7 @@ const TurnIntoBlocks: [
 	['Numeric input', 'numericInput'],
 	['TextArea', 'textArea'],
 	['Date input', 'dateInput'],
+	['Select', 'select'],
 	['Multiselect', 'multiSelect'],
 	['Button', 'button'],
 ];

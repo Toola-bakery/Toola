@@ -3,7 +3,7 @@ import { applyPatches, Patch } from 'immer';
 import createCachedSelector from 're-reselect';
 import update from 'immutability-helper';
 import { RootState } from '../../../redux';
-import { ColumnBlockType } from '../components/Blocks/Layout/ColumnBlock';
+import { ColumnBlockType } from '../../blocks/blocks/Layout/ColumnBlock';
 import { PageBlockProps } from '../components/Page/Page';
 import { BasicBlock } from '../types/basicBlock';
 import { BlockProps, Blocks, LayoutBlocks } from '../types/blocks';

@@ -21,7 +21,7 @@ import { selectBlocksProps, setPage } from '../../redux/editor';
 import { Block, BlockContext, BlockContextProvider } from '../Block/Block';
 import { CreateBlockAtTheEnd } from '../CreateBlockAtTheEnd';
 import { BasicBlock } from '../../types/basicBlock';
-import { ColumnBlock, ColumnBlockType } from '../Blocks/Layout/ColumnBlock';
+import { ColumnBlock, ColumnBlockType } from '../../../blocks/blocks/Layout/ColumnBlock';
 import { PageBar } from './PageBar';
 import { usePageBlockPropsMutation } from './hooks/usePageBlockPropsMutation';
 import { PageWrapper } from './PageWrapper';

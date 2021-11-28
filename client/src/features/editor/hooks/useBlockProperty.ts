@@ -2,6 +2,7 @@ import { Draft } from 'immer/dist/types/types-external';
 import { useCallback, useState } from 'react';
 import { useOnMountedEffect } from '../../../hooks/useOnMounted';
 import { useBlock } from './useBlock';
+import { useCurrent } from './useCurrent';
 import { useEditor } from './useEditor';
 
 export type Dispatch<T> = (nextValue: ((draft: Draft<T>) => undefined | void | T) | T) => void;
@@ -40,17 +41,22 @@ export function useBlockProperty<T>(name: string, defaultValue?: T): [T | undefi
 export function useBlockState<T>(name: string, defaultValue?: undefined): [T | undefined, (nextValue: T) => void];
 export function useBlockState<T>(name: string, defaultValue: T | (() => T)): [T, (nextValue: T) => void];
 export function useBlockState<T>(name: string, defaultValue?: T | (() => T)): [T | undefined, (nextValue: T) => void] {
-	const block = useBlock();
+	const { blocksState } = useCurrent();
+	const { id } = useBlock();
+	const block = blocksState[id];
 	const { updateBlockState } = useEditor();
 
-	const [memDefaultValue] = useState(defaultValue);
+	const [memDefaultValue, removeDefaultValue] = useState(defaultValue);
 
 	const update = useCallback(
 		(nextValue: any) => {
-			updateBlockState({ id: block.id, [name]: nextValue });
+			updateBlockState({ id, [name]: nextValue });
+			removeDefaultValue(undefined);
 		},
-		[block.id, name, updateBlockState],
+		[id, name, updateBlockState],
 	);
 
-	return [(block[name as keyof typeof block] as T) || memDefaultValue, update];
+	const value = block?.[name as keyof typeof block] as T;
+	// Handle state was changed;
+	return [typeof value !== 'undefined' ? value : memDefaultValue, update];
 }

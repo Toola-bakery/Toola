@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { usePageNavigator } from '../../../hooks/usePageNavigator';
 import { usePagesMutations } from '../../editor/components/Page/hooks/usePagesMutations';
-import { EmojiIcon, EmojiPicker } from '../../editor/components/componentsWithLogic/EmojiPicker';
+import { EmojiIcon, EmojiPicker } from '../../blocks/components/EmojiPicker';
 import { PopoverInspector } from '../../inspector/components/PopoverInspector';
 import { useInspectorState } from '../../inspector/hooks/useInspectorState';
 import { BlockInspector } from '../../inspector/components/BlockInspector';
