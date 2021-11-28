@@ -66,7 +66,7 @@ export function ButtonBlock({ hide }: { hide: boolean }) {
 		[buttonName, minimal, rounded, setButtonName, setMinimal, setRounded],
 	);
 
-	useAppendBlockMenu(menu, 1);
+	useAppendBlockMenu(menu, 0);
 
 	if (hide || !show) return null;
 

@@ -7,20 +7,19 @@ import { useReferences } from '../../../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
 
 export type ItemWithLabel = {
-	value: string;
-	label?: string;
+	value: unknown;
+	label?: unknown;
 };
 
-export function useSelectInputItems() {
+export function useSelectInputItems(menuIndex = 0) {
 	// eslint-disable-next-line no-template-curly-in-string
 	const [values, setValues] = useBlockProperty<string>('values', "${['apple', 'banana', 'watermelon']}");
 	const valuesCalculated = useReferences(values);
-
 	// eslint-disable-next-line no-template-curly-in-string
 	const [labels, setLabels] = useBlockProperty<string>('labels', '${self.values.map(v=>v.toUpperCase())}');
 	const labelsCalculated = useReferences(labels);
 
-	const items = useMemo(() => {
+	const items = useMemo<ItemWithLabel[]>(() => {
 		if (!Array.isArray(valuesCalculated)) return [];
 		const stringedValues = valuesCalculated.map(String);
 
@@ -44,7 +43,7 @@ export function useSelectInputItems() {
 		[labels, setLabels, setValues, values],
 	);
 
-	useAppendBlockMenu(menu, 0);
+	useAppendBlockMenu(menu, menuIndex);
 
 	return { items };
 }

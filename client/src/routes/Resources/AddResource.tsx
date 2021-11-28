@@ -1,6 +1,5 @@
 import { Button, H3 } from '@blueprintjs/core';
 import { useHistory } from 'react-router-dom';
-import { ResourcesList } from '../../features/resources/components/ResourcesList';
 
 const RESOURCE_LIST = [
 	{ name: 'mongo', label: 'Mongodb' },

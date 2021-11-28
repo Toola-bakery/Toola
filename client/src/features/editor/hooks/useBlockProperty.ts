@@ -1,5 +1,5 @@
 import { Draft } from 'immer/dist/types/types-external';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useOnMountedEffect } from '../../../hooks/useOnMounted';
 import { useBlock } from './useBlock';
 import { useCurrent } from './useCurrent';
@@ -55,6 +55,11 @@ export function useBlockState<T>(name: string, defaultValue?: T | (() => T)): [T
 		},
 		[id, name, updateBlockState],
 	);
+
+	useEffect(() => {
+		if (typeof memDefaultValue === 'undefined') return;
+		update(memDefaultValue);
+	}, [memDefaultValue, update]);
 
 	const value = block?.[name as keyof typeof block] as T;
 	// Handle state was changed;

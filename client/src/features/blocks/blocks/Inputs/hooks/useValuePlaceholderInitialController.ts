@@ -3,21 +3,15 @@ import { useReferenceEvaluator } from '../../../../executor/hooks/useReferences'
 import { MenuItemProps } from '../../../../inspector/components/InspectorItem';
 import { useAppendBlockMenu } from '../../../../editor/hooks/blockInspector/useAppendBlockMenu';
 import { useBlockProperty, useBlockState } from '../../../../editor/hooks/useBlockProperty';
+import { useInitialValue } from '../../../hooks/useInitialValue';
 
 export function useValuePlaceholderInitialController() {
-	const { evaluate } = useReferenceEvaluator();
-	const [initialValue, setInitialValue] = useBlockProperty<string>('initialValue', '');
+	const { calculateInitialValue } = useInitialValue(1);
 	const [placeholder, setPlaceholder] = useBlockProperty<string>('placeholder', '');
-	const [value, setValue] = useBlockState('value', () => evaluate(initialValue));
+	const [value, setValue] = useBlockState('value', calculateInitialValue);
 
 	const menu = useMemo<MenuItemProps[]>(
 		() => [
-			{
-				label: 'Initial value',
-				type: 'input',
-				onChange: setInitialValue,
-				value: initialValue,
-			},
 			{
 				label: 'Placeholder',
 				type: 'input',
@@ -25,9 +19,9 @@ export function useValuePlaceholderInitialController() {
 				value: placeholder,
 			},
 		],
-		[initialValue, placeholder, setInitialValue, setPlaceholder],
+		[placeholder, setPlaceholder],
 	);
-	useAppendBlockMenu(menu, 1);
+	useAppendBlockMenu(menu, 1.1);
 
 	return { value, setValue, placeholder };
 }

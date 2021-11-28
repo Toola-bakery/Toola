@@ -1,3 +1,4 @@
+import { decode } from 'html-entities';
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import styled from 'styled-components';
@@ -55,7 +56,7 @@ export function EditableText({
 	const value = controlledSetValue ? controlledValue || '' : internalValue;
 	const setValue = controlledSetValue || setInternalValue;
 
-	const htmlValue = useMemo<string>(() => entitiesToHTML(value, entities || []), [value, entities]);
+	const htmlValue = useMemo<string>(() => decode(entitiesToHTML(value, entities || [])), [value, entities]);
 	const html = useReferences(isFocused ? '' : htmlValue);
 	const htmlString = typeof html === 'string' ? html : html && JSON.stringify(html, Object.getOwnPropertyNames(html));
 

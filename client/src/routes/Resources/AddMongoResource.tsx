@@ -1,6 +1,5 @@
 import {
 	Button,
-	Card,
 	Checkbox,
 	FormGroup,
 	H3,
@@ -10,7 +9,7 @@ import {
 	RadioGroup,
 	TextArea,
 } from '@blueprintjs/core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from '../../features/form/hooks/useForm';
 import { useMutateResource } from '../../features/resources/hooks/useMutateResource';
 

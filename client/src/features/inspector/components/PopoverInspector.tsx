@@ -3,7 +3,6 @@ import { Classes, Menu } from '@blueprintjs/core';
 import { Popover2, Popover2TargetProps } from '@blueprintjs/popover2';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
-import { useBlockContext } from '../../editor/hooks/useBlockContext';
 import { InspectorPropsType } from '../hooks/useInspectorState';
 import { InspectorItem } from './InspectorItem';
 import { NestedMenuItemProps } from './InspectorItems/NestedMenuItem';

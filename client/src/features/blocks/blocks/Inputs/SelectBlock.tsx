@@ -1,29 +1,30 @@
 import { Button, MenuItem } from '@blueprintjs/core';
 import { ItemRenderer, Select } from '@blueprintjs/select';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useBlock } from '../../../editor/hooks/useBlock';
 import { useBlockContext } from '../../../editor/hooks/useBlockContext';
 import { useBlockState } from '../../../editor/hooks/useBlockProperty';
 import { InputLabel } from '../../components/InputLabel';
-import { useSelectInputItems } from './hooks/useSelectInputItems';
-
-type ItemWithLabel = {
-	value: string;
-	label?: string;
-};
+import { useInitialValue } from '../../hooks/useInitialValue';
+import { ItemWithLabel, useSelectInputItems } from './hooks/useSelectInputItems';
 
 const ItemSelect = Select.ofType<ItemWithLabel>();
 
 export function SelectBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { showInspector } = useBlockContext();
-	const [selectedKey, setSelectedKey] = useBlockState<string | null>('value', null);
-	const [selectedItem, setSelectedItem] = useState<ItemWithLabel | null>(null);
+	const { calculateInitialValue } = useInitialValue(0);
 
-	const { items } = useSelectInputItems();
+	const [selectedKey, setSelectedKey] = useBlockState<unknown | null>('value', calculateInitialValue);
+
+	const { items } = useSelectInputItems(1);
+
+	const selectedItem = useMemo(
+		() => (Array.isArray(items) && items.find((i) => i.value === String(selectedKey))) || null,
+		[items, selectedKey],
+	);
 
 	const onRemove = useCallback(() => {
-		setSelectedItem(null);
 		setSelectedKey(null);
 	}, [setSelectedKey]);
 
@@ -36,10 +37,10 @@ export function SelectBlock({ hide }: { hide: boolean }) {
 				<MenuItem
 					active={modifiers.active}
 					disabled={modifiers.disabled}
-					key={item.value}
+					key={String(item.value)}
 					icon={selectedKey === item.value ? 'tick' : 'blank'}
 					onClick={handleClick}
-					text={typeof item.label === 'undefined' ? item.value : item.label}
+					text={String(typeof item.label === 'undefined' ? item.value : item.label)}
 				/>
 			);
 		},
@@ -58,20 +59,19 @@ export function SelectBlock({ hide }: { hide: boolean }) {
 					itemRenderer={renderItem}
 					noResults={<MenuItem disabled text="No results." />}
 					onItemSelect={(item) => {
-						if (selectedKey === item.value) return onRemove(item);
-						setSelectedItem(item);
+						if (selectedKey === item.value) return onRemove();
 						setSelectedKey(item.value);
 					}}
 					itemsEqual="value"
 					popoverProps={{ minimal: true }}
 					itemPredicate={(query, item) =>
-						item.label?.toLowerCase().includes(query.toLowerCase()) ||
-						item.value.toLowerCase().includes(query.toLowerCase())
+						String(item.label)?.toLowerCase().includes(query.toLowerCase()) ||
+						String(item.value).toLowerCase().includes(query.toLowerCase())
 					}
 				>
 					<Button
 						fill
-						text={selectedItem?.label || selectedItem?.value || 'Not selected'}
+						text={String(selectedItem?.label || selectedItem?.value || selectedKey || 'Not selected')}
 						rightIcon="double-caret-vertical"
 					/>
 				</ItemSelect>

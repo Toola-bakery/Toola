@@ -5,6 +5,7 @@ import { BlockNameMenuItem, BlockNameMenuItemProps } from './InspectorItems/Bloc
 import { DatabaseMenuItem, DatabaseMenuItemProps } from './InspectorItems/DatabaseMenuItem';
 import { InputMenuItem, InputMenuItemProps } from './InspectorItems/InputMenuItem';
 import { NestedMenuItem, NestedMenuItemProps } from './InspectorItems/NestedMenuItem';
+import { NumericInputMenuItem, NumericInputMenuItemProps } from './InspectorItems/NumericInputMenuItem';
 import { PageMenuItem, PageMenuItemProps } from './InspectorItems/PageMenuItem';
 import { PgSQLMenuItem, PgSQLMenuItemProps } from './InspectorItems/PgSQLMenuItem';
 import { QueryActionMenuItem, QueryActionMenuItemProps } from './InspectorItems/QueryActionMenuItem';
@@ -33,6 +34,7 @@ export type MenuItemProps =
 	| PageMenuItemProps
 	| BlockNameMenuItemProps
 	| PgSQLMenuItemProps
+	| NumericInputMenuItemProps
 	| TextAlignItemProps
 	| SwitchMenuItemProps;
 
@@ -58,6 +60,7 @@ const inspectorList: { [key in MenuItemProps['type']]: React.ReactNode } = {
 	select: SelectMenuItem,
 	queryAction: QueryActionMenuItem,
 	textAlign: TextAlignMenuItem,
+	numericInput: NumericInputMenuItem,
 };
 
 export const InspectorItem = React.memo((props: InspectorItemProps) => {

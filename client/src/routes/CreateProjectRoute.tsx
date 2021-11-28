@@ -2,7 +2,6 @@ import { Button, FormGroup, H1, InputGroup } from '@blueprintjs/core';
 import React, { useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import { Config } from '../Config';
 import { useProjects } from '../features/usersAndProjects/hooks/useProjects';
 import { useKy } from '../hooks/useKy';
 

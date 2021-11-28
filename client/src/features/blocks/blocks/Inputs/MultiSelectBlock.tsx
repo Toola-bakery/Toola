@@ -9,12 +9,12 @@ import { ItemWithLabel, useSelectInputItems } from './hooks/useSelectInputItems'
 
 const ItemSelect = MultiSelect.ofType<ItemWithLabel>();
 
-const renderTag = (item: ItemWithLabel) => (typeof item.label === 'undefined' ? item.value : item.label);
+const renderTag = (item: ItemWithLabel) => String(typeof item.label === 'undefined' ? item.value : item.label);
 
 export function MultiSelectBlock({ hide }: { hide: boolean }) {
 	const { show } = useBlock();
 	const { showInspector } = useBlockContext();
-	const [selectedKeys, setSelectedKeys] = useBlockState<string[]>('value', []);
+	const [selectedKeys, setSelectedKeys] = useBlockState<unknown[]>('value', []);
 	const [selectedItems, setSelectedItems] = useState<ItemWithLabel[]>([]);
 
 	const onRemove = useCallback(
@@ -36,10 +36,10 @@ export function MultiSelectBlock({ hide }: { hide: boolean }) {
 				<MenuItem
 					active={modifiers.active}
 					disabled={modifiers.disabled}
-					key={item.value}
-					icon={selectedKeys.includes(item.value) ? 'tick' : 'blank'}
+					key={String(item.value)}
+					icon={selectedKeys.includes(String(item.value)) ? 'tick' : 'blank'}
 					onClick={handleClick}
-					text={typeof item.label === 'undefined' ? item.value : item.label}
+					text={String(typeof item.label === 'undefined' ? item.value : item.label)}
 				/>
 			);
 		},
@@ -68,8 +68,8 @@ export function MultiSelectBlock({ hide }: { hide: boolean }) {
 					onRemove={onRemove}
 					popoverProps={{ minimal: true }}
 					itemPredicate={(query, item) =>
-						item.label?.toLowerCase().includes(query.toLowerCase()) ||
-						item.value.toLowerCase().includes(query.toLowerCase())
+						String(item.label)?.toLowerCase().includes(query.toLowerCase()) ||
+						String(item.value).toLowerCase().includes(query.toLowerCase())
 					}
 				/>
 			</InputLabel>
