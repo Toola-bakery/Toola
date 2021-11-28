@@ -37,7 +37,7 @@ export function QueriesTab() {
 			</div>
 			<div style={{ height: '100%', width: '100%' }}>
 				{queries.map((blockId, index) => (
-					<Block key={blockId} block={blocks[blockId]} hide={currentActive !== blockId} minimal />
+					<Block key={`${pageId}:${blockId}`} block={blocks[blockId]} hide={currentActive !== blockId} minimal />
 				))}
 			</div>
 		</div>

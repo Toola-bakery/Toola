@@ -68,7 +68,7 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 			if (i % 2 === 0)
 				return (
 					<div
-						key={`rowItem${blockKey}`}
+						key={`rowItem${pageId}${blockKey}`}
 						style={{
 							width: `calc(100% * ${(1 / block.blocks.length).toFixed(3)} - 5px - 5px / ${block.blocks.length})`,
 						}}
@@ -91,7 +91,7 @@ export function RowBlock({ block, fake = false }: { block: BasicBlock & RowBlock
 				/>
 			);
 		});
-	}, [addColumnAfterAndPutItem, block.blocks, blocks, createRowAndColumns, fake]);
+	}, [addColumnAfterAndPutItem, block.blocks, blocks, createRowAndColumns, fake, pageId]);
 
 	if (!block.show && !fake) return <></>;
 

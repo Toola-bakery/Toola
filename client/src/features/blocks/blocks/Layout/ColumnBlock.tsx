@@ -19,7 +19,7 @@ export function ColumnBlock({ block, fake }: { block: BasicBlock & ColumnBlockTy
 	const elements = useMemo(() => {
 		return block.blocks?.map((blockKey) => {
 			return (
-				<div key={`${blocks[blockKey].id}`}>
+				<div key={`${pageId}${blocks[blockKey].id}`}>
 					{(() => {
 						if (!blocks[blockKey]) return null;
 						if (blocks[blockKey].type === 'row')

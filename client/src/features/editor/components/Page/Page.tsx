@@ -1,9 +1,10 @@
 import { Button, NonIdealState } from '@blueprintjs/core';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { usePageNavigator } from '../../../../hooks/usePageNavigator';
+import { usePrevious } from '../../../../hooks/usePrevious';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { DevtoolsWrapper } from '../../../devtools/components/DevtoolsWrapper';
 import { LeftDrawerWrapper } from '../../../drawer/components/LeftDrawerWrapper';
@@ -159,6 +160,15 @@ export function Page({
 	const { isDevtoolsOpen } = useIsDevtoolsOpen();
 
 	const page = blocksProps?.page as BasicBlock & PageBlockType;
+
+	const [show, setShow] = useState(false);
+	const previousPageId = usePrevious(pageId);
+	useEffect(() => {
+		if (!show) setShow(true);
+		if (previousPageId !== pageId && show) {
+			setShow(false);
+		}
+	}, [pageId, previousPageId, show]);
 
 	const value = useMemo<PageContextType>(
 		() => ({
