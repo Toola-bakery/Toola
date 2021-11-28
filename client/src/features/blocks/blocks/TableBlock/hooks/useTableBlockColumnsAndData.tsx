@@ -5,22 +5,20 @@ import { usePrevious } from '../../../../../hooks/usePrevious';
 import { normalizeCase } from '../../../../../libs/normalizeCase';
 import { usePageContext, useReferenceEvaluator } from '../../../../executor/hooks/useReferences';
 import { useBlockProperty } from '../../../../editor/hooks/useBlockProperty';
+import { useDataSource } from '../../../hooks/useDataSource';
 import { ColumnTypes } from '../RenderCellType';
 import { TableColumnProp } from '../TableBlock';
 
 export function useTableBlockColumnsAndData() {
 	const { editing } = usePageContext();
 	const [columns, setColumns] = useBlockProperty<TableColumnProp[] | undefined>('columns');
-	const [value] = useBlockProperty('value', '');
-
-	const { evaluate, isLoading } = useReferenceEvaluator();
-
+	const { value, valueCalculated, isLoading } = useDataSource();
+	const { evaluate } = useReferenceEvaluator();
 	const data = useMemo<any[]>(() => {
-		const state = evaluate(value);
-		if (Array.isArray(state)) return state;
-		if (typeof state === 'object') return [state];
+		if (Array.isArray(valueCalculated)) return valueCalculated;
+		if (typeof valueCalculated === 'object') return [valueCalculated];
 		return [];
-	}, [evaluate, value]);
+	}, [valueCalculated]);
 
 	const calculateColumnsFromData = useCallback(() => {
 		const keys = new Set<string>();

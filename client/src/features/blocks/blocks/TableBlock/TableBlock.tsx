@@ -1,5 +1,4 @@
 import { Card, HTMLTable } from '@blueprintjs/core';
-import JSONTree from 'react-json-tree';
 import { useBlockLayout, usePagination, useResizeColumns, useRowSelect, useTable } from 'react-table';
 import React, { useCallback } from 'react';
 import { v4 } from 'uuid';
@@ -12,7 +11,6 @@ import { useSyncBlockState } from '../../../editor/hooks/useSyncBlockState';
 import { useTableBlockColumnsAndData } from './hooks/useTableBlockColumnsAndData';
 import { useTableColumnResizing } from './hooks/useTableColumnResizing';
 import { useTableInspector } from './hooks/useTableInspector';
-import { BlockInspector } from '../../../inspector/components/BlockInspector';
 import { ColumnDnD } from './ColumnDnD';
 import { ColumnTypes, RenderCellType } from './RenderCellType';
 import { TablePagination } from './TablePagination';

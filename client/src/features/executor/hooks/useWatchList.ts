@@ -71,6 +71,10 @@ export function useWatchList({
 		[onListChanged, watchListObj],
 	);
 
+	const clearWatchList = useCallback(() => {
+		setWatchListObj({});
+	}, []);
+
 	const topLevel = useMemo(() => ({ blocks, globals, pageId }), [blocks, globals, pageId]);
 	const previousTopLevel = usePrevious(topLevel);
 
@@ -102,5 +106,5 @@ export function useWatchList({
 		if (isUpdated) onUpdate?.();
 	}, [blocks, globals, onUpdate, pageId, previousTopLevel, topLevel, watchList]);
 
-	return { watchList, addToWatchList, isLoading, setOnUpdate };
+	return { watchList, addToWatchList, isLoading, setOnUpdate, clearWatchList };
 }

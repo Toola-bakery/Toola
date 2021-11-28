@@ -87,15 +87,6 @@ export function useTableInspector() {
 				value: connectedPage || '',
 			},
 			{
-				label: 'Data Source',
-				type: 'input',
-				onChange: (v) =>
-					immerBlockProps<TableBlockProps>(id, (draft) => {
-						draft.value = v;
-					}),
-				value,
-			},
-			{
 				label: 'Server Side Pagination',
 				type: 'switch',
 				value: Boolean(manualPagination),
@@ -106,6 +97,6 @@ export function useTableInspector() {
 			},
 			...columnMenus,
 		];
-	}, [columns, connectedPage, id, immerBlockProps, manualPagination, setColumns, value]);
+	}, [columns, connectedPage, id, immerBlockProps, manualPagination, setColumns]);
 	useAppendBlockMenu(menu, 1);
 }

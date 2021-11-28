@@ -1,4 +1,4 @@
-import { Card } from '@blueprintjs/core';
+import { Card, Spinner } from '@blueprintjs/core';
 import React, { useMemo } from 'react';
 import { useReferenceEvaluator } from '../../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../../inspector/components/InspectorItem';
@@ -10,29 +10,22 @@ import { BasicBlock } from '../../../editor/types/basicBlock';
 import { CurrentContextProvider } from '../../../editor/components/CurrentContext';
 import { parseIntSafe } from '../../helpers/parsers';
 import { useCardStyle } from '../../hooks/useCardStyle';
+import { useDataSource } from '../../hooks/useDataSource';
 import { ColumnBlock, ColumnBlockType } from '../Layout/ColumnBlock';
 
 export function ListBlock({ hide }: { hide: boolean }) {
 	const block = useBlock();
-	const [value, setValue] = useBlockProperty('value', '');
+	const { isLoading, valueCalculated } = useDataSource();
 	useBlockProperty<string[]>('blocks', []);
 	const [columnCount, setColumnCount] = useBlockProperty<number>('columnCount', 1);
 
-	const { evaluate } = useReferenceEvaluator();
-
 	const data = useMemo<any[]>(() => {
-		const state = evaluate(value);
-		return Array.isArray(state) ? state : [state];
-	}, [evaluate, value]);
+		if (!valueCalculated) return [];
+		return Array.isArray(valueCalculated) ? valueCalculated : [valueCalculated];
+	}, [valueCalculated]);
 
 	const menu = useMemo<MenuItemProps[]>(
 		() => [
-			{
-				label: 'Data Source',
-				type: 'input',
-				onChange: (v) => setValue(v),
-				value,
-			},
 			{
 				label: 'Column count',
 				type: 'numericInput',
@@ -40,7 +33,7 @@ export function ListBlock({ hide }: { hide: boolean }) {
 				value: columnCount,
 			},
 		],
-		[columnCount, setColumnCount, setValue, value],
+		[columnCount, setColumnCount],
 	);
 	useAppendBlockMenu(menu, 1);
 	const { showInspector } = useBlockContext();
@@ -51,6 +44,34 @@ export function ListBlock({ hide }: { hide: boolean }) {
 
 	return (
 		<div style={{ display: 'flex', flexWrap: 'wrap' }} onContextMenu={showInspector}>
+			{!data.length && isLoading
+				? new Array(3).fill(0).map((_, i) => (
+						<div
+							style={{
+								marginRight: (i + 1) % columnCount === 0 ? 0 : 30,
+								width: `calc(100% * ${(1 / columnCount).toFixed(3)} - 30px + 30px * (${1 / columnCount}) )`,
+								marginBottom: 13,
+							}}
+						>
+							<Card
+								style={{
+									width: '100%',
+									borderColor: borderColor || '#dcdcdd',
+									borderStyle: 'solid',
+									borderWidth: 1,
+									backgroundColor:
+										backgroundColorCalculatedArray?.[i % backgroundColorCalculatedArray.length] || 'white',
+									borderRadius: borderRadiusCalculated,
+									boxShadow: 'none',
+									height: '100%',
+								}}
+								elevation={0}
+							>
+								<Spinner />
+							</Card>
+						</div>
+				  ))
+				: null}
 			{data.map((item, i) => (
 				<div
 					style={{
@@ -62,6 +83,7 @@ export function ListBlock({ hide }: { hide: boolean }) {
 					<CurrentContextProvider current={item}>
 						<Card
 							style={{
+								width: '100%',
 								borderColor: borderColor || '#dcdcdd',
 								borderStyle: 'solid',
 								borderWidth: 1,
