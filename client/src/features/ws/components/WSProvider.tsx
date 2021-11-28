@@ -15,14 +15,22 @@ export const WSProviderContext = React.createContext<WSProviderContextType>({
 	sendWS: () => {},
 });
 
-let resolve = () => {};
-const getNewPromise = () =>
-	new Promise<void>((_resolve) => {
-		resolve = _resolve;
+const resolve = { current: () => {} };
+const isResolved = { current: false };
+
+const getNewPromise = () => {
+	const promise = new Promise<void>((_resolve) => {
+		resolve.current = _resolve;
+		isResolved.current = false;
+	});
+	promise.then(() => {
+		isResolved.current = true;
 	});
 
-let isWsReadyPromise = getNewPromise();
-isWsReadyPromise.then();
+	return promise;
+};
+
+const isWsReadyPromise = { current: getNewPromise() };
 
 export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>): JSX.Element {
 	const { send } = useEvents();
@@ -46,17 +54,19 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 	const windowFocus = useWindowFocus();
 	useEffect(() => {
 		const closeListener = () => {
-			isWsReadyPromise = getNewPromise();
+			if (isResolved.current) isWsReadyPromise.current = getNewPromise();
 		};
-
 		ws.addEventListener('close', closeListener);
-		if (windowFocus && ws.readyState !== ws.OPEN) ws.reconnect();
+		if (windowFocus && ws.readyState !== ws.OPEN) {
+			ws.close();
+			ws.reconnect();
+		}
 		return () => ws.removeEventListener('close', closeListener);
 	}, [ws, windowFocus]);
 
 	const sendWS = useCallback(
 		async (data: unknown, skipReady = false) => {
-			if (!skipReady) await isWsReadyPromise;
+			if (!skipReady) await isWsReadyPromise.current;
 			if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(data));
 		},
 		[ws],
@@ -82,7 +92,7 @@ export function WSProvider({ children }: React.PropsWithChildren<{ a?: false }>)
 		[sendWS],
 	);
 
-	useEventListener('ws/auth.success', resolve, [sendWS]);
+	useEventListener('ws/auth.success', () => resolve.current(), [sendWS]);
 
 	const value = useMemo<WSProviderContextType>(() => ({ ws: ws as WebSocket, sendWS }), [ws, sendWS]);
 
