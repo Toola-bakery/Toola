@@ -13,7 +13,7 @@ import { useEditor } from '../../hooks/useEditor';
 import { usePageContext } from '../../../executor/hooks/useReferences';
 import { useCanEdit } from '../../hooks/useIsEditing';
 import { usePagesMutations } from './hooks/usePagesMutations';
-import { EmojiPicker } from '../componentsWithLogic/EmojiPicker';
+import { EmojiPicker } from '../../../blocks/components/EmojiPicker';
 
 const StyledEditableText = styled.div`
 	input:focus,
@@ -127,15 +127,15 @@ export function PageBar({ isModal }: { isModal: boolean }) {
 								/>
 							) : null}
 
-							{/*<SwitchMenuItem*/}
-							{/*	item={{*/}
-							{/*		icon: 'print',*/}
-							{/*		label: 'Use A4 layout',*/}
-							{/*		value: style === 'a4',*/}
-							{/*		onChange: (v) => id && updateBlockProps({ id, style: v ? 'a4' : 'app' }),*/}
-							{/*		type: 'switch',*/}
-							{/*	}}*/}
-							{/*/>*/}
+							<SwitchMenuItem
+								item={{
+									icon: 'print',
+									label: 'Use A4 layout',
+									value: style === 'a4',
+									onChange: (v) => id && updateBlockProps({ id, style: v ? 'a4' : 'app' }),
+									type: 'switch',
+								}}
+							/>
 							{style !== 'a4' ? (
 								<SwitchMenuItem
 									item={{
