@@ -29,6 +29,7 @@
 		"moleculer": "^0.14.16",
 		"moleculer-web": "^0.10.0",
 		"mongodb": "^4.0.1",
+		"node-p5": "^1.0.4",
 		"patch-package": "^6.4.7",
 		"pg": "^8.7.1",
 		"postinstall-postinstall": "^2.1.0",
@@ -72,6 +73,6 @@
 		"arrowParens": "avoid"
 	},
 	"engines": {
-		"node" : ">=12.0.0"
+		"node": ">=12.0.0"
 	}
 }
