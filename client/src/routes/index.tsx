@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import CreateProjectRoute from './CreateProjectRoute';
 import EditorRoute from './EditorRoute';
-import { Landing } from './Landing';
+import { Landing } from './Landing/Landing';
 import LoginRoute from './LoginRoute';
 import { ResourcesRoute } from './Resources/ResourcesRoute';
 import { SettingsAndMembersRoute } from './SettingsAndMembers/SettingsAndMembersRoute';
@@ -32,12 +32,14 @@ export function AppRouters() {
 					</LeftDrawerWrapper>
 				</PrivateRoute>
 
-				<PrivateRoute path={['/:pageId']}>
-					<EditorRoute />
-				</PrivateRoute>
 				<Route path="/landing">
 					<Landing />
 				</Route>
+
+				<PrivateRoute path={['/:pageId']}>
+					<EditorRoute />
+				</PrivateRoute>
+
 				<Route path="/">
 					<Landing allowRedirect />
 				</Route>
