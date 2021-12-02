@@ -1,4 +1,4 @@
-import { MenuItem, NumericInput } from '@blueprintjs/core';
+import { FormGroup, MenuItem, NumericInput } from '@blueprintjs/core';
 import React from 'react';
 import styled from 'styled-components';
 import { parseIntSafe } from '../../../blocks/helpers/parsers';
@@ -23,12 +23,14 @@ export function NumericInputMenuItem({ item, Wrapper = MenuItem }: InspectorItem
 				shouldDismissPopover={false}
 				icon={item.icon}
 				text={
-					<NumericInput
-						value={parseIntSafe(item.value)}
-						onValueChange={(valueAsNumber) => {
-							item.onChange(valueAsNumber);
-						}}
-					/>
+					<FormGroup style={{ marginBottom: 0 }} label={item.label}>
+						<NumericInput
+							value={parseIntSafe(item.value)}
+							onValueChange={(valueAsNumber) => {
+								item.onChange(valueAsNumber);
+							}}
+						/>
+					</FormGroup>
 				}
 			/>
 		</CSSFix>

@@ -35,7 +35,7 @@ export function ListBlock({ hide }: { hide: boolean }) {
 		],
 		[columnCount, setColumnCount],
 	);
-	useAppendBlockMenu(menu, 1);
+	useAppendBlockMenu(menu, 0);
 	const { showInspector } = useBlockContext();
 
 	const { borderColor, borderRadiusCalculated, backgroundColor, backgroundColorCalculatedArray } = useCardStyle(2);
