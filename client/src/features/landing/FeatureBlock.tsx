@@ -1,12 +1,13 @@
 import { Button } from '@blueprintjs/core';
 import { ReactNode, useMemo, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
 type FeatureItem = { title: ReactNode | string; description: ReactNode | string; video?: string; image?: string };
 const BORDER_RADIUS = 12;
 
 const StyledHeading = styled.h2`
-	font-size: 20px;
+	font-size: 21px;
 	font-weight: 800;
 	line-height: 1.3;
 	margin-bottom: 0;
@@ -21,7 +22,7 @@ const StyledHeading = styled.h2`
 `;
 
 const StyledDescription = styled.p`
-	font-size: 20px;
+	font-size: 19px;
 	line-height: 1.3;
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -118,15 +119,15 @@ export function FeatureBlock({
 		<div
 			style={{
 				display: 'flex',
-				flexDirection: 'row',
+				flexDirection: isMobile ? 'column-reverse' : 'row',
 				width: '100%',
-				paddingLeft: 90,
-				paddingRight: 90,
+				paddingLeft: isMobile ? 20 : 90,
+				paddingRight: isMobile ? 20 : 90,
 				alignItems: 'center',
-				marginBottom: 60,
+				marginBottom: isMobile ? 40 : 60,
 			}}
 		>
-			<div style={{ width: '40%', paddingRight: 60 }}>
+			<div style={{ width: isMobile ? '100%' : '40%', paddingRight: 60 }}>
 				<StyledHeading>{title}</StyledHeading>
 				<StyledDescription>{description}</StyledDescription>
 				<div>
@@ -143,7 +144,7 @@ export function FeatureBlock({
 					))}
 				</div>
 			</div>
-			<div style={{ width: '60%' }}>
+			<div style={{ width: isMobile ? '100%' : '60%' }}>
 				<div
 					style={{
 						position: 'relative',
