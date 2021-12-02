@@ -5,6 +5,7 @@ import { useResizeDetector } from 'react-resize-detector';
 import { MonacoEditorStyled } from '../../../../components/MonacoEditorStyled';
 import { useBlock } from '../../../editor/hooks/useBlock';
 import { useBlockProperty } from '../../../editor/hooks/useBlockProperty';
+import { usePageContext } from '../../../executor/hooks/useReferences';
 import { setupMonaco } from './setupMonaco';
 
 export function MonacoEditor({
@@ -12,6 +13,7 @@ export function MonacoEditor({
 }: {
 	onEditorMount: (editor?: Monaco.editor.IStandaloneCodeEditor) => void;
 }) {
+	const { editing } = usePageContext();
 	const { height, ref: blockRef } = useResizeDetector();
 	const { parentId } = useBlock();
 	const [value, setValue] = useBlockProperty('value', '');
@@ -42,6 +44,8 @@ export function MonacoEditor({
 					minimap: { enabled: false },
 					scrollBeyondLastLine: false,
 					scrollbar: { vertical: 'hidden', useShadows: false },
+					readOnly: !editing,
+					domReadOnly: !editing,
 				}}
 				wrapperClassName=""
 				onMount={onEditorMount}

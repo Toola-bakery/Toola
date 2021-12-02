@@ -32,7 +32,7 @@ const DevtoolsStyles = styled.div`
 	.bp4-tab-panel {
 		margin-top: 0;
 		height: calc(100% - 31px);
-		overflow-y: auto;
+		overflow-y: visible;
 		min-height: unset !important;
 	}
 

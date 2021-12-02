@@ -109,7 +109,7 @@ export function Block({
 						opacity,
 						width: '100%',
 						position: 'relative',
-						transform: 'translate3d(0, 0, 0)',
+						// transform: 'translate3d(0, 0, 0)',
 					}}
 				>
 					<BlockBadge dragRef={dragRef} show={isHover && editing} />

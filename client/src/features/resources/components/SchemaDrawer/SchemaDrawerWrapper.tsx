@@ -15,7 +15,8 @@ export function SchemaDrawerWrapper({ children }: PropsWithChildren<{ resourcesF
 				style={{
 					height: '100%',
 					width: width - 181 - (isOpen && parentId === 'queries' ? size : 0),
-					overflowX: 'auto',
+					overflowX: 'visible',
+					overflowY: 'visible',
 				}}
 			>
 				{children}

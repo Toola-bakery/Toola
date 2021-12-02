@@ -70,6 +70,7 @@ export function setupMonaco(monaco: Monaco) {
 	getAndLoadPackage(monaco, '@types/node');
 	getAndLoadPackage(monaco, 'axios');
 	getAndLoadPackage(monaco, 'bson');
+	getAndLoadPackage(monaco, 'canvas');
 	getAndLoadPackage(monaco, '@types/uuid');
 	getAndLoadPackage(monaco, 'mongodb');
 
