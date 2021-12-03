@@ -2,7 +2,6 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
 const BeautyStyles = styled.span`
-	padding: 0 5px;
 	background: linear-gradient(135deg, #6699ff 0%, #ff3366 100%);
 	color: #b664b0;
 	background-clip: text !important;

@@ -3,7 +3,13 @@ import { ReactNode, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 
-type FeatureItem = { title: ReactNode | string; description: ReactNode | string; video?: string; image?: string };
+type FeatureItem = {
+	title: ReactNode | string;
+	icon: ReactNode | string;
+	description: ReactNode | string;
+	video?: string;
+	image?: string;
+};
 const BORDER_RADIUS = 12;
 
 const StyledHeading = styled.h2`
@@ -11,6 +17,7 @@ const StyledHeading = styled.h2`
 	font-weight: 800;
 	line-height: 1.3;
 	margin-bottom: 0;
+	margin-top: 10px;
 
 	@media screen and (min-width: 900px) {
 		& {
@@ -121,13 +128,12 @@ export function FeatureBlock({
 				display: 'flex',
 				flexDirection: isMobile ? 'column-reverse' : 'row',
 				width: '100%',
-				paddingLeft: isMobile ? 20 : 90,
-				paddingRight: isMobile ? 20 : 90,
 				alignItems: 'center',
 				marginBottom: isMobile ? 40 : 60,
 			}}
 		>
 			<div style={{ width: isMobile ? '100%' : '40%', paddingRight: 60 }}>
+				{!isMobile && defaultItem.icon ? <p style={{ fontSize: 70 }}>{defaultItem.icon}</p> : null}
 				<StyledHeading>{title}</StyledHeading>
 				<StyledDescription>{description}</StyledDescription>
 				<div>

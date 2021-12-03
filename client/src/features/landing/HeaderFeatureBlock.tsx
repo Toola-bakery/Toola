@@ -30,13 +30,18 @@ export function HeaderFeatureBlock() {
 				flexDirection: isMobile ? 'column' : 'row',
 				width: '100%',
 				marginBottom: 70,
-				paddingLeft: isMobile ? 20 : 90,
-				paddingRight: isMobile ? 20 : 90,
-				alignItems: 'center',
+				alignItems: isMobile ? 'center' : 'flex-start',
 			}}
 		>
-			<div style={{ width: isMobile ? '100%' : '50%', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-				<StyledHeading>
+			<div
+				style={{
+					width: isMobile ? '100%' : '50%',
+					alignItems: isMobile ? 'center' : 'flex-start',
+					display: 'flex',
+					flexDirection: 'column',
+				}}
+			>
+				<StyledHeading style={{ marginLeft: isMobile ? 0 : -2 }}>
 					The Open Source
 					<br />
 					<BeautyText>Retool Alternative</BeautyText>

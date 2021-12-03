@@ -4,11 +4,10 @@ export function Logo() {
 			style={{
 				fontSize: 20,
 				fontWeight: 700,
-				lineHeight: 30,
+				lineHeight: '30px',
 				display: 'flex',
 				alignItems: 'center',
-				height: 60,
-				paddingLeft: 15,
+				height: 30,
 			}}
 		>
 			<div style={{ fontSize: 30, marginRight: 5 }}>🍪</div>
