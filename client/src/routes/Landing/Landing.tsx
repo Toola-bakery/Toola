@@ -1,4 +1,5 @@
 import { isMobile } from 'react-device-detect';
+import GitHubButton from 'react-github-btn';
 import { SocialIcon } from 'react-social-icons';
 import { useRelocateToAnyPageByCondition } from '../../features/drawer/hooks/useRelocateToAnyPageByCondition';
 import { FeatureBlock } from '../../features/landing/FeatureBlock';
@@ -13,8 +14,26 @@ export function Landing({ allowRedirect = false }: { allowRedirect?: boolean }) 
 	if (userId && allowRedirect) return null;
 	return (
 		<div>
-			<div style={{ position: 'fixed', top: 0, zIndex: 200, padding: 15 }}>
+			<div
+				style={{
+					position: 'fixed',
+					top: 0,
+					zIndex: 200,
+					padding: 15,
+					display: 'flex',
+					width: '100%',
+					justifyContent: 'space-between',
+				}}
+			>
 				<Logo />
+				<GitHubButton
+					href="https://github.com/toola-bakery/toola"
+					data-size="large"
+					data-show-count="true"
+					aria-label="Star toola-bakery/toola on GitHub"
+				>
+					Star
+				</GitHubButton>
 			</div>
 			<div
 				style={{

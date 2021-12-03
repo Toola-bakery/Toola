@@ -1,5 +1,6 @@
 import { Button } from '@blueprintjs/core';
 import { isMobile } from 'react-device-detect';
+import GitHubButton from 'react-github-btn';
 import styled from 'styled-components';
 import { BeautyText } from './BeautyText';
 
@@ -49,15 +50,27 @@ export function HeaderFeatureBlock() {
 				<div style={{ marginBottom: 20, fontSize: 16, maxWidth: 500, textAlign: isMobile ? 'center' : 'left' }}>
 					Build internal tools in minutes. Stop the mess of scripts, APIs, and UI libraries
 				</div>
-				<Button
-					text="Request access"
-					outlined
-					large
-					intent="primary"
-					onClick={() => {
-						window.open('https://airtable.com/shrMtcUUyltKP9vUh', '_blank');
-					}}
-				/>
+				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+					<Button
+						text="Request access"
+						outlined
+						large
+						intent="primary"
+						onClick={() => {
+							window.open('https://airtable.com/shrMtcUUyltKP9vUh', '_blank');
+						}}
+					/>
+					<Button
+						text="View on GitHub"
+						outlined
+						large
+						style={{ marginLeft: 8 }}
+						intent="none"
+						onClick={() => {
+							window.open('https://github.com/toola-bakery/toola', '_blank');
+						}}
+					/>
+				</div>
 			</div>
 			<div style={{ width: isMobile ? '100%' : '50%', marginTop: isMobile ? 20 : 0 }}>
 				<div style={{ position: 'relative', paddingBottom: '62.5%', height: 0 }}>
