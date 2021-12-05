@@ -8,10 +8,13 @@ export function useTopLevelPages() {
 	const { currentProjectId } = useProjects();
 	const queryClient = useQueryClient();
 
-	const { data = [], refetch } = useQuery<TopLevelPageItem[]>(
-		['/pages/topLevelPages', { projectId: currentProjectId || '' }],
-		{ enabled: !!currentProjectId },
-	);
+	const {
+		data = [],
+		refetch,
+		...rest
+	} = useQuery<TopLevelPageItem[]>(['/pages/topLevelPages', { projectId: currentProjectId || '' }], {
+		enabled: !!currentProjectId,
+	});
 
 	const sortedList = useMemo(
 		() =>
@@ -66,5 +69,5 @@ export function useTopLevelPages() {
 		[currentProjectId, data, queryClient],
 	);
 
-	return { pages: sortedList, changePageEmoji, refetch, appendPage, renamePage, deletePage };
+	return { pages: sortedList, changePageEmoji, refetch, appendPage, renamePage, deletePage, ...rest };
 }
