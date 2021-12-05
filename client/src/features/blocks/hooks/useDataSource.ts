@@ -4,7 +4,7 @@ import { useBlockProperty } from '../../editor/hooks/useBlockProperty';
 import { useReferenceEvaluator } from '../../executor/hooks/useReferences';
 import { MenuItemProps } from '../../inspector/components/InspectorItem';
 
-export function useDataSource() {
+export function useDataSource(index = 0) {
 	const [value, setValue] = useBlockProperty('value', '');
 	const { evaluate, isLoading } = useReferenceEvaluator();
 
@@ -21,7 +21,7 @@ export function useDataSource() {
 		[setValue, value],
 	);
 
-	useAppendBlockMenu(menu, 1);
+	useAppendBlockMenu(menu, index);
 
 	return { isLoading, value, valueCalculated };
 }
