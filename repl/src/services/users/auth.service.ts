@@ -32,6 +32,7 @@ export type JWTSchema = {
 };
 
 const tokensCollection = mongoDB.collection<TokenSchema>('tokens');
+const usersCollection = mongoDB.collection<UserSchema>('users');
 
 tokensCollection.createIndex({ token: 1 });
 tokensCollection.createIndex({ userId: 1, isValid: 1 });
@@ -171,7 +172,7 @@ export const AuthService: ServiceSchema<
 
 				const { password } = await ctx.call('auth.hashPassword', { openPassword });
 
-				const { user } = await ctx.call<{ user: UserSchema }, { email: string }>('users.get', { email });
+				const user = await usersCollection.findOne({ email });
 				if (!user || user.password !== password) throw new Error('Cant find user or bad password');
 
 				const { token } = await ctx.call('auth.createToken', { userId: user._id });
