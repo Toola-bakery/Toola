@@ -124,7 +124,7 @@ export const UsersService: ServiceSchema<
 				if (email) {
 					const user = await usersCollection.findOne(
 						{ email },
-						publicData || project ? { projection: PUBLIC_PROJECTION || project } : undefined,
+						{ projection: PUBLIC_PROJECTION },
 					);
 					return { user };
 				}
@@ -133,7 +133,7 @@ export const UsersService: ServiceSchema<
 					const users = await usersCollection
 						.find(
 							{ _id: { $in: userIds } },
-							publicData || project ? { projection: PUBLIC_PROJECTION || project } : undefined,
+							{ projection: PUBLIC_PROJECTION },
 						)
 						.toArray();
 					return { users };
@@ -141,7 +141,7 @@ export const UsersService: ServiceSchema<
 				if (userId || currentUserId) {
 					const user = await usersCollection.findOne(
 						{ _id: userId || new ObjectId(currentUserId) },
-						publicData || project ? { projection: PUBLIC_PROJECTION || project } : undefined,
+						{ projection: PUBLIC_PROJECTION },
 					);
 					return { user };
 				}
